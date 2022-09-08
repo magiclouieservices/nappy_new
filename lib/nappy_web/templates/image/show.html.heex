@@ -1,0 +1,22 @@
+<div class="container mx-auto">
+  <%= if @status === "approved" do %>
+    <img class="w-48" src={Catalog.image_url(@image, w: 350, q: 0)} alt={@image.title} />
+
+    <h1>
+      Title: <%= @image.title %>
+    </h1>
+
+    <h2>
+      Photographer: <%= link(@image.user.username,
+        to: Routes.user_profile_path(@conn, :show, @image.user.username)
+      ) %>
+    </h2>
+
+    <h3>Tags</h3>
+    <ul>
+      <%= for tag <- @tags do %>
+        <li>- <%= tag %></li>
+      <% end %>
+    </ul>
+  <% end %>
+</div>

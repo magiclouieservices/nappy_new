@@ -1,0 +1,19 @@
+<.form let={f} for={@changeset} action={@action}>
+  <%= if @changeset.action do %>
+    <div class="alert alert-danger">
+      <p>Oops, something went wrong! Please check the errors below.</p>
+    </div>
+  <% end %>
+
+  <%= label(f, :privacy_link) %>
+  <%= text_input(f, :privacy_link) %>
+  <%= error_tag(f, :privacy_link) %>
+
+  <%= label(f, :terms_of_agreement_link) %>
+  <%= text_input(f, :terms_of_agreement_link) %>
+  <%= error_tag(f, :terms_of_agreement_link) %>
+
+  <div>
+    <%= submit("Save") %>
+  </div>
+</.form>

@@ -1,0 +1,121 @@
+<section class="py-20">
+  <.form
+    multipart
+    let={f}
+    for={@conn}
+    action={Routes.upload_path(@conn, :create)}
+    class="container mx-auto w-3/5"
+  >
+    <h1 class="text-4xl font-tiempos-bold mb-6">
+      Submit your photos
+    </h1>
+    <p class="my-4">
+      Help us tackle diversity and representation by submitting your photos of black and brown people to the nappy community.
+    </p>
+    <p class="my-4 text-gray-500">
+      <u>
+        <a href="#">
+          That's nice... but what's in it for me?
+        </a>
+      </u>
+    </p>
+    <div class="p-4 bg-black text-white my-8">
+      <p>To make sure your photos get featured:</p>
+      <ul>
+        <li class="my-2">
+          <i class="fa-regular fa-circle-xmark"></i>
+          Don’t submit photos you don’t have the rights to.
+        </li>
+        <li class="my-2">
+          <i class="fa-regular fa-circle-xmark"></i>
+          Don’t submit photos of people without their permission/release.
+        </li>
+        <li class="my-2">
+          <i class="fa-regular fa-circle-xmark"></i>
+          Don’t submit photos with text/graphics/logos on them.
+        </li>
+        <li class="my-2">
+          <i class="fa-regular fa-circle-xmark"></i>
+          Don’t submit photos that doesn’t include black or brown subjects.
+        </li>
+        <li class="text-gray-400">
+          <u>
+            <em>
+              <a href="#">
+                Read the full list
+              </a>
+            </em>
+          </u>
+        </li>
+      </ul>
+    </div>
+    <div class="sm:mt-0 sm:col-span-2">
+      <div class="flex justify-center px-6 py-28 border-2 border-black border-dashed">
+        <div class="space-y-1 text-center">
+          <svg
+            class="mx-auto h-20 w-20"
+            stroke="currentColor"
+            fill="none"
+            viewBox="0 0 48 48"
+            aria-hidden="true"
+          >
+            <path
+              d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+          </svg>
+          <div class="flex justify-center">
+            <%= label(f, :photo_file, "Drag and drop or click to upload a photo",
+              class:
+                "relative cursor-pointer bg-white text-lg font-tiempos-bold text-green-600 hover:text-green-500 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-green-500"
+            ) %>
+            <%= file_input(f, :photo_file, class: "sr-only") %>
+          </div>
+          <p class="text-lg font-tiempos-bold">
+            The photo must be greater than or equal to: 1024x768 - 50MB
+          </p>
+        </div>
+      </div>
+    </div>
+    <div class="container mx-auto w-11/12 mt-12">
+      <div class="my-6">
+        <%= label(f, :photo_title, "Title", class: "font-semibold") %>
+        <%= text_input(f, :photo_title,
+          class:
+            "mt-1 appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-gray-500 focus:border-gray-500 sm:text-sm",
+          placeholder: "i.e. Woman eating ice cream or Child with dog"
+        ) %>
+      </div>
+      <div class="my-6">
+        <%= label(f, :photo_category, "Category", class: "font-semibold") %>
+        <%= select(f, :photo_category, ["Active", "Others", "People", "Food"],
+          prompt: [key: "Choose category", disabled: true],
+          class:
+            "mt-1 focus:ring-gray-500 w-full focus:border-gray-500 border-gray-300 rounded-md"
+        ) %>
+      </div>
+      <div class="my-6">
+        <label for="tags" class="font-semibold">Tags</label>
+        <div id="tags" class="flex items-center">
+          <input
+            class="mt-1 appearance-none block px-3 py-2 border-none border-transparent focus:outline-none focus:ring-transparent focus:border-transparent sm:text-sm"
+            type="text"
+            id="add_tag"
+            placeholder="Add a tag"
+          />
+        </div>
+      </div>
+
+      <div class="flex justify-center">
+        <button
+          class="mt-2 inline-flex items-center px-8 py-3 rounded shadow-sm text-white bg-green-600 hover:bg-green-700 text-lg focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
+          type="submit"
+        >
+          <i class="fa-solid fa-cloud-arrow-up mr-2"></i> Upload
+        </button>
+      </div>
+    </div>
+  </.form>
+</section>

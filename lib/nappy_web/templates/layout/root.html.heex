@@ -4,36 +4,64 @@
     <meta charset="utf-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="robots" content="NOINDEX, NOFOLLOW" />
     <%= csrf_meta_tag() %>
     <title><%= Nappy.app_name() %></title>
+    <link
+      phx-track-static
+      rel="stylesheet"
+      href={Routes.static_path(@conn, "/assets/fonts/tiempos.css")}
+    />
+    <link
+      phx-track-static
+      rel="stylesheet"
+      href={Routes.static_path(@conn, "/assets/fonts/brands.min.css")}
+    />
+    <link
+      phx-track-static
+      rel="stylesheet"
+      href={Routes.static_path(@conn, "/assets/fonts/fontawesome.min.css")}
+    />
+    <link
+      phx-track-static
+      rel="stylesheet"
+      href={Routes.static_path(@conn, "/assets/fonts/solid.min.css")}
+    />
+    <link
+      phx-track-static
+      rel="stylesheet"
+      href={Routes.static_path(@conn, "/assets/fonts/regular.min.css")}
+    />
     <link phx-track-static rel="stylesheet" href={Routes.static_path(@conn, "/assets/app.css")} />
     <script
       defer
       phx-track-static
       type="text/javascript"
-      src={Routes.static_path(@conn, "/assets/app.js")}
+      src={Routes.static_path(@conn, "/assets/js/app.js")}
     >
     </script>
+    <%= if Phoenix.Controller.current_path(@conn) === Routes.upload_path(@conn, :new) do %>
+      <script
+        defer
+        phx-track-static
+        type="text/javascript"
+        src={Routes.static_path(@conn, "/assets/js/tags.js")}
+      >
+      </script>
+    <% end %>
   </head>
   <body>
-    <header>
-      <section class="container">
-        <nav>
-          <ul>
-            <li><a href="https://hexdocs.pm/phoenix/overview.html">Get Started</a></li>
-            <%= if function_exported?(Routes, :live_dashboard_path, 2) do %>
-              <li><%= link("LiveDashboard", to: Routes.live_dashboard_path(@conn, :home)) %></li>
-            <% end %>
-          </ul>
-        </nav>
-        <a href="https://phoenixframework.org/" class="phx-logo">
-          <img
-            src={Routes.static_path(@conn, "/images/phoenix.png")}
-            alt="Phoenix Framework Logo"
-          />
-        </a>
-      </section>
-    </header>
+    <div class="border-b border-slate-20">
+      <nav class="container mx-auto">
+        <%= render("_user_menu.html", assigns) %>
+      </nav>
+    </div>
     <%= @inner_content %>
+    <hr class="mt-8" />
+    <footer class="mt-4 mb-8 container mx-auto">
+      <%= render("footer.html", assigns) %>
+    </footer>
+    <hr class="mt-8" />
+    <%= render("copyright.html") %>
   </body>
 </html>

@@ -1,0 +1,76 @@
+<h1>Show Settings</h1>
+
+<ul>
+  <li>
+    <strong>Notifier email:</strong>
+    <%= @settings.notifier_email %>
+  </li>
+
+  <li>
+    <strong>Support email:</strong>
+    <%= @settings.support_email %>
+  </li>
+
+  <li>
+    <strong>Allow registration:</strong>
+    <%= @settings.allow_registration %>
+  </li>
+
+  <li>
+    <strong>Allow uploads:</strong>
+    <%= @settings.allow_uploads %>
+  </li>
+
+  <li>
+    <strong>Allow downloads:</strong>
+    <%= @settings.allow_downloads %>
+  </li>
+
+  <li>
+    <strong>Allow oauth login:</strong>
+    <%= @settings.allow_oauth_login %>
+  </li>
+
+  <li>
+    <strong>Enable captcha:</strong>
+    <%= @settings.enable_captcha %>
+  </li>
+
+  <li>
+    <strong>Maintenance enabled:</strong>
+    <%= @settings.maintenance_enabled %>
+  </li>
+
+  <li>
+    <strong>Image per page:</strong>
+    <%= @settings.image_per_page %>
+  </li>
+
+  <li>
+    <strong>Max tag count:</strong>
+    <%= @settings.max_tag_count %>
+  </li>
+
+  <li>
+    <strong>Max image upload size:</strong>
+    <%= @settings.max_image_upload_size %>
+  </li>
+
+  <li>
+    <strong>Max concurrent upload:</strong>
+    <%= @settings.max_concurrent_upload %>
+  </li>
+
+  <li>
+    <strong>Min width upload image:</strong>
+    <%= @settings.min_width_upload_image %>
+  </li>
+
+  <li>
+    <strong>Min height upload image:</strong>
+    <%= @settings.min_height_upload_image %>
+  </li>
+</ul>
+
+<span><%= link("Edit", to: Routes.admin_settings_path(@conn, :edit, @settings)) %></span> |
+<span><%= link("Back", to: Routes.admin_settings_path(@conn, :index)) %></span>

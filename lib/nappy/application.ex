@@ -7,6 +7,11 @@ defmodule Nappy.Application do
 
   @impl true
   def start(_type, _args) do
+    Logger.add_backend(Sentry.LoggerBackend)
+
+    # (Dev only): alternative logger for Ecto queries
+    Ecto.DevLogger.install(Nappy.Repo)
+
     children = [
       # Start the Ecto repository
       Nappy.Repo,
@@ -15,9 +20,11 @@ defmodule Nappy.Application do
       # Start the PubSub system
       {Phoenix.PubSub, name: Nappy.PubSub},
       # Start the Endpoint (http/https)
-      NappyWeb.Endpoint
+      NappyWeb.Endpoint,
       # Start a worker by calling: Nappy.Worker.start_link(arg)
       # {Nappy.Worker, arg}
+      # Finch for swoosh api client
+      {Finch, name: Swoosh.Finch}
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html

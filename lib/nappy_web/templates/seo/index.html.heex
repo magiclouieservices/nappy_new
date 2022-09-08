@@ -1,0 +1,40 @@
+<h1>Listing Seo</h1>
+
+<table>
+  <thead>
+    <tr>
+      <th>Default description</th>
+      <th>Default collections description</th>
+      <th>Default categories description</th>
+      <th>Global banner text</th>
+      <th>Default keywords</th>
+
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <%= for seo <- @seo do %>
+      <tr>
+        <td><%= seo.default_description %></td>
+        <td><%= seo.default_collections_description %></td>
+        <td><%= seo.default_categories_description %></td>
+        <td><%= seo.global_banner_text %></td>
+        <td><%= seo.default_keywords %></td>
+
+        <td>
+          <span><%= link("Show", to: Routes.seo_path(@conn, :show, seo)) %></span>
+          <span><%= link("Edit", to: Routes.seo_path(@conn, :edit, seo)) %></span>
+          <span>
+            <%= link("Delete",
+              to: Routes.seo_path(@conn, :delete, seo),
+              method: :delete,
+              data: [confirm: "Are you sure?"]
+            ) %>
+          </span>
+        </td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
+
+<span><%= link("New Seo", to: Routes.seo_path(@conn, :new)) %></span>

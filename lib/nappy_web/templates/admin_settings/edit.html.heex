@@ -1,0 +1,8 @@
+<h1>Edit Settings</h1>
+
+<%= render(
+  "form.html",
+  Map.put(assigns, :action, Routes.admin_settings_path(@conn, :update, @settings))
+) %>
+
+<span><%= link("Back", to: Routes.admin_settings_path(@conn, :index)) %></span>

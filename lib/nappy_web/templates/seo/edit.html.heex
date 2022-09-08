@@ -1,0 +1,5 @@
+<h1>Edit Seo</h1>
+
+<%= render("form.html", Map.put(assigns, :action, Routes.seo_path(@conn, :update, @seo))) %>
+
+<span><%= link("Back", to: Routes.seo_path(@conn, :index)) %></span>

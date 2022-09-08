@@ -1,0 +1,12 @@
+<img
+  class="w-32 rounded-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-900"
+  src={Accounts.avatar_url(@conn, @user.avatar_link)}
+  alt="{@user.username}'s profile"
+/>
+<h1>
+  <%= if not is_nil(@user.name) do %>
+    <%= @user.name %>
+  <% else %>
+    <%= @user.username %>
+  <% end %>
+</h1>

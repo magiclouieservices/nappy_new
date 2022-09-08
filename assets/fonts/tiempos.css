@@ -1,0 +1,19 @@
+@font-face {
+  font-family: 'Tiempos';
+  font-style: normal;
+  src: local(""),
+    url('TiemposText-Regular.eot') format('embedded-opentype'),
+    url('TiemposText-Regular.ttf') format('truetype'),
+    url('TiemposText-Regular.svg') format('svg'),
+    url('TiemposText-Regular.woff') format('woff'),
+}
+
+@font-face {
+  font-family: 'Tiempos Bold';
+  font-style: normal;
+  src: local(""),
+    url('TiemposText-Bold.eot') format('embedded-opentype'),
+    url('TiemposText-Bold.ttf') format('truetype'),
+    url('TiemposText-Bold.svg') format('svg'),
+    url('TiemposText-Bold.woff') format('woff');
+}

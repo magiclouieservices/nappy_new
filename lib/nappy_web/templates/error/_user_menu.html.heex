@@ -1,0 +1,28 @@
+<div class="flex justify-between items-center my-2">
+  <a
+    class="focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-900"
+    href={Routes.home_url(@conn, :index)}
+  >
+    <img class="w-24" src={Routes.static_path(@conn, "/images/nappy-logo.png")} />
+  </a>
+
+  <ul class="flex items-center gap-7">
+    <li>
+      <i class="text-gray-900 fa-solid fa-magnifying-glass"></i>
+    </li>
+    <li>
+      <span>Explore</span>
+    </li>
+    <li>
+      <span>
+        Studio <span class="rounded-full bg-rose-500 text-xs p-1 text-white">New</span>
+      </span>
+    </li>
+    <li>
+      <span>About</span>
+    </li>
+    <li>
+      <span>Submit</span>
+    </li>
+  </ul>
+</div>

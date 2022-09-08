@@ -10,10 +10,19 @@ import Config
 config :nappy,
   ecto_repos: [Nappy.Repo]
 
+config :nappy, Nappy.Repo,
+  migration_primary_key: [name: :id, type: :binary_id],
+  generators: [binary_id: true]
+
 # Configures the endpoint
 config :nappy, NappyWeb.Endpoint,
   url: [host: "localhost"],
-  render_errors: [view: NappyWeb.ErrorView, accepts: ~w(html json), layout: false],
+  render_errors: [
+    view: NappyWeb.ErrorView,
+    accepts: ~w(html json),
+    root_layout: {NappyWeb.ErrorView, "root.html"},
+    layout: false
+  ],
   pubsub_server: Nappy.PubSub,
   live_view: [signing_salt: "qK3SHwn/"]
 
@@ -33,13 +42,40 @@ config :swoosh, :api_client, false
 config :esbuild,
   version: "0.14.29",
   default: [
-    args:
-      ~w(js/app.js --bundle --target=es2017 --outdir=../priv/static/assets --external:/fonts/* --external:/images/*),
+    args: ~w(
+      js/app.js
+      js/tags.js
+      fonts/tiempos.css
+      fonts/solid.min.css
+      fonts/fontawesome.min.css
+      fonts/brands.min.css
+      fonts/regular.min.css
+      --bundle
+      --loader:.woff=file
+      --loader:.woff2=file
+      --loader:.ttf=file
+      --loader:.eot=file
+      --loader:.svg=file
+      --target=es2017
+      --outdir=../priv/static/assets
+      --external:/fonts/*
+      --external:/images/*
+    ),
     cd: Path.expand("../assets", __DIR__),
     env: %{"NODE_PATH" => Path.expand("../deps", __DIR__)}
   ]
 
-# Configures Elixir's Logger
+config :tailwind,
+  version: "3.1.6",
+  default: [
+    args: ~w(
+      --config=tailwind.config.js
+      --input=css/app.css
+      --output=../priv/static/assets/app.css
+    ),
+    cd: Path.expand("../assets", __DIR__)
+  ]
+
 config :logger, :console,
   format: "$time $metadata[$level] $message\n",
   metadata: [:request_id]

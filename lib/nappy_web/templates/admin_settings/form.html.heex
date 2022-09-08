@@ -1,0 +1,67 @@
+<.form let={f} for={@changeset} action={@action}>
+  <%= if @changeset.action do %>
+    <div class="alert alert-danger">
+      <p>Oops, something went wrong! Please check the errors below.</p>
+    </div>
+  <% end %>
+
+  <%= label(f, :notifier_email) %>
+  <%= text_input(f, :notifier_email) %>
+  <%= error_tag(f, :notifier_email) %>
+
+  <%= label(f, :support_email) %>
+  <%= text_input(f, :support_email) %>
+  <%= error_tag(f, :support_email) %>
+
+  <%= label(f, :allow_registration) %>
+  <%= checkbox(f, :allow_registration) %>
+  <%= error_tag(f, :allow_registration) %>
+
+  <%= label(f, :allow_uploads) %>
+  <%= checkbox(f, :allow_uploads) %>
+  <%= error_tag(f, :allow_uploads) %>
+
+  <%= label(f, :allow_downloads) %>
+  <%= checkbox(f, :allow_downloads) %>
+  <%= error_tag(f, :allow_downloads) %>
+
+  <%= label(f, :allow_oauth_login) %>
+  <%= checkbox(f, :allow_oauth_login) %>
+  <%= error_tag(f, :allow_oauth_login) %>
+
+  <%= label(f, :enable_captcha) %>
+  <%= checkbox(f, :enable_captcha) %>
+  <%= error_tag(f, :enable_captcha) %>
+
+  <%= label(f, :maintenance_enabled) %>
+  <%= checkbox(f, :maintenance_enabled) %>
+  <%= error_tag(f, :maintenance_enabled) %>
+
+  <%= label(f, :image_per_page) %>
+  <%= number_input(f, :image_per_page) %>
+  <%= error_tag(f, :image_per_page) %>
+
+  <%= label(f, :max_tag_count) %>
+  <%= number_input(f, :max_tag_count) %>
+  <%= error_tag(f, :max_tag_count) %>
+
+  <%= label(f, :max_image_upload_size) %>
+  <%= number_input(f, :max_image_upload_size) %>
+  <%= error_tag(f, :max_image_upload_size) %>
+
+  <%= label(f, :max_concurrent_upload) %>
+  <%= number_input(f, :max_concurrent_upload) %>
+  <%= error_tag(f, :max_concurrent_upload) %>
+
+  <%= label(f, :min_width_upload_image) %>
+  <%= number_input(f, :min_width_upload_image) %>
+  <%= error_tag(f, :min_width_upload_image) %>
+
+  <%= label(f, :min_height_upload_image) %>
+  <%= number_input(f, :min_height_upload_image) %>
+  <%= error_tag(f, :min_height_upload_image) %>
+
+  <div>
+    <%= submit("Save") %>
+  </div>
+</.form>

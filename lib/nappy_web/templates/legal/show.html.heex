@@ -1,0 +1,16 @@
+<h1>Show Legal</h1>
+
+<ul>
+  <li>
+    <strong>Privacy link:</strong>
+    <%= @legal.privacy_link %>
+  </li>
+
+  <li>
+    <strong>Terms of agreement link:</strong>
+    <%= @legal.terms_of_agreement_link %>
+  </li>
+</ul>
+
+<span><%= link("Edit", to: Routes.legal_path(@conn, :edit, @legal)) %></span> |
+<span><%= link("Back", to: Routes.legal_path(@conn, :index)) %></span>

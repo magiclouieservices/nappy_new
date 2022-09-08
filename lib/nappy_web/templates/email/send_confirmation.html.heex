@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <%= csrf_meta_tag() %>
+    <title>
+      <%= Nappy.app_name() %>: <%= @title %>
+    </title>
+    <style media="all" rel="stylesheet" type="text/css">
+      /* Media Queries */
+      @media  only screen and (max-width: 500px) {
+        .button {
+          width: 100% !important;
+        }
+      }
+
+      .blackbtn{
+        padding:10px 20px;
+        color: #fff;
+        background-color: #000;
+        border-radius:20px;
+        text-decoration:none;
+        font-weight:bold;
+      }
+    </style>
+  </head>
+
+  <body style="background:#fff; font-size:15px; line-height:25px; font-family:Helvetica Neue, helvetica, arial;">
+    <!--header start-->
+    <div style="background:#fff; padding: 20px 10px; border-bottom: 1px solid #000; text-align:center;">
+      <a href={Routes.home_index_path(NappyWeb.Endpoint, :index)} target="_blank">
+        <img
+          src={Routes.static_path(NappyWeb.Endpoint, "/images/nappy-logo.png")}
+          style="width: 90px;"
+        />
+      </a>
+    </div>
+    <!--header start--><!--body start-->
+    <div style="width:80%; max-width:600px; margin:auto; padding: 20px;">
+      <p>Thanks for signing up to join <%= Nappy.app_name() %>.</p>
+
+      <p>There's just one final step to verify your email.</p>
+
+      <p>
+        <a class="blackbtn" href={@url} target="_blank" rel="noopener noreferer nofollow">
+          Click here to verify
+        </a>
+      </p>
+      <p>
+        or copy and paste the following code in your browser: <br />
+        <%= @url %>
+      </p>
+
+      <p>- <%= Nappy.app_name() %> Crew</p>
+    </div>
+    <!--body end--><!--footer start-->
+    <div style="background:#fff; color: #333; padding: 20px 10px; text-align:center; font-family:Helvetica Neue, helvetica; font-size:13px; text-decoration:none;">
+      <hr style="width:300px; color:#333;" />
+      <p>
+        <a href={Routes.home_index_path(NappyWeb.Endpoint, :index)} target="_blank">
+          <img
+            src={Routes.static_path(NappyWeb.Endpoint, "/images/nappy-logo.png")}
+            style="width: 90px; height: 30px;"
+          />
+        </a>
+      </p>
+
+      <p>
+        <a href={Routes.home_index_path(NappyWeb.Endpoint, :index)} target="_blank">
+          <span style="color:#000000;">Website</span>
+        </a>
+        &nbsp; | &nbsp;
+        <a href={Routes.home_index_path(NappyWeb.Endpoint, :index)} target="_blank">
+          <span style="color:#000000;">Studio</span>
+        </a>
+        &nbsp; | &nbsp;
+        <a href="https://www.instagram.com/nappystock" target="_blank">
+          <span style="color:#000000;">Instagram</span>
+        </a>
+        &nbsp;| &nbsp;
+        <a href="https://www.facebook.com/nappystock">
+          <span style="color:#000000;">Facebook</span>
+        </a>
+        &nbsp;| &nbsp;
+        <a href="https://www.twitter.com/nappystock" target="_blank">
+          <span style="color:#000000;">Twitter</span>
+        </a>
+      </p>
+    </div>
+    <!--footer end-->
+  </body>
+</html>

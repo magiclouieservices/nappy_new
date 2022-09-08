@@ -11,7 +11,7 @@ defmodule NappyWeb.ErrorHelpers do
   def error_tag(form, field) do
     Enum.map(Keyword.get_values(form.errors, field), fn error ->
       content_tag(:span, translate_error(error),
-        class: "invalid-feedback",
+        class: "block text-sm text-red-700",
         phx_feedback_for: input_name(form, field)
       )
     end)
@@ -44,4 +44,14 @@ defmodule NappyWeb.ErrorHelpers do
       Gettext.dgettext(NappyWeb.Gettext, "errors", msg, opts)
     end
   end
+
+  @doc """
+  Returns an error message for an upload error.
+
+  See [`upload_errors/2`](https://hexdocs.pm/phoenix_live_view/Phoenix.LiveView.Helpers.html#upload_errors/2).
+  """
+  def upload_error_to_string(:too_large), do: "The file is too large"
+  def upload_error_to_string(:too_many_files), do: "You have selected too many files"
+  def upload_error_to_string(:not_accepted), do: "You have selected an unacceptable file type"
+  def upload_error_to_string(:external_client_failure), do: "Something went terribly wrong"
 end

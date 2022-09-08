@@ -20,13 +20,19 @@ config :nappy, NappyWeb.Endpoint,
   # Binding to loopback ipv4 address prevents access from other machines.
   # Change to `ip: {0, 0, 0, 0}` to allow access from other machines.
   http: [ip: {127, 0, 0, 1}, port: 4000],
+  # force_ssl: [
+  #   rewrite_on: [:x_forwarded_proto],
+  #   hsts: true,
+  #   expires: 0
+  # ],
   check_origin: false,
   code_reloader: true,
   debug_errors: true,
   secret_key_base: "Ki1HU3BeSv0IyQGeru8+GNSLLt4M4vdky4t+ZjCR5YNYGeJqJvkqfGp2zJB2HVRP",
   watchers: [
     # Start the esbuild watcher by calling Esbuild.install_and_run(:default, args)
-    esbuild: {Esbuild, :install_and_run, [:default, ~w(--sourcemap=inline --watch)]}
+    esbuild: {Esbuild, :install_and_run, [:default, ~w(--sourcemap=inline --watch)]},
+    tailwind: {Tailwind, :install_and_run, [:default, ~w(--watch)]}
   ]
 
 # ## SSL Support
@@ -65,7 +71,13 @@ config :nappy, NappyWeb.Endpoint,
   ]
 
 # Do not include metadata nor timestamps in development logs
-config :logger, :console, format: "[$level] $message\n"
+config :logger,
+       :console,
+       truncate: :infinity,
+       format: "[$level] $message\n"
+
+config :nappy, Nappy.Mailer, adapter: Swoosh.Adapters.Local
+config :swoosh, :api_client, false
 
 # Set a higher stacktrace during development. Avoid configuring such
 # in production as building large stacktraces may be expensive.

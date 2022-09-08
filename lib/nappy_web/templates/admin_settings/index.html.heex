@@ -1,0 +1,58 @@
+<h1>Listing Settings</h1>
+
+<table>
+  <thead>
+    <tr>
+      <th>Notifier email</th>
+      <th>Support email</th>
+      <th>Allow registration</th>
+      <th>Allow uploads</th>
+      <th>Allow downloads</th>
+      <th>Allow oauth login</th>
+      <th>Enable captcha</th>
+      <th>Maintenance enabled</th>
+      <th>Image per page</th>
+      <th>Max tag count</th>
+      <th>Max image upload size</th>
+      <th>Max concurrent upload</th>
+      <th>Min width upload image</th>
+      <th>Min height upload image</th>
+
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <%= for settings <- @settings do %>
+      <tr>
+        <td><%= settings.notifier_email %></td>
+        <td><%= settings.support_email %></td>
+        <td><%= settings.allow_registration %></td>
+        <td><%= settings.allow_uploads %></td>
+        <td><%= settings.allow_downloads %></td>
+        <td><%= settings.allow_oauth_login %></td>
+        <td><%= settings.enable_captcha %></td>
+        <td><%= settings.maintenance_enabled %></td>
+        <td><%= settings.image_per_page %></td>
+        <td><%= settings.max_tag_count %></td>
+        <td><%= settings.max_image_upload_size %></td>
+        <td><%= settings.max_concurrent_upload %></td>
+        <td><%= settings.min_width_upload_image %></td>
+        <td><%= settings.min_height_upload_image %></td>
+
+        <td>
+          <span><%= link("Show", to: Routes.admin_settings_path(@conn, :show, settings)) %></span>
+          <span><%= link("Edit", to: Routes.admin_settings_path(@conn, :edit, settings)) %></span>
+          <span>
+            <%= link("Delete",
+              to: Routes.admin_settings_path(@conn, :delete, settings),
+              method: :delete,
+              data: [confirm: "Are you sure?"]
+            ) %>
+          </span>
+        </td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
+
+<span><%= link("New Settings", to: Routes.admin_settings_path(@conn, :new)) %></span>

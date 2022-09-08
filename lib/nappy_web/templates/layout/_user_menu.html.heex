@@ -1,0 +1,75 @@
+<div class="flex justify-between items-center my-2 py-2">
+  <a
+    class="focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-900"
+    href={Routes.home_index_path(@conn, :index)}
+  >
+    <img class="w-24" src={Routes.static_path(@conn, "/images/nappy-logo.png")} />
+  </a>
+
+  <ul class="flex items-center gap-7">
+    <%= unless Phoenix.Controller.current_path(@conn) === Routes.home_index_path(@conn, :index) do %>
+      <li>
+        <i class="text-gray-900 fa-solid fa-magnifying-glass"></i>
+      </li>
+    <% end %>
+    <li>
+      <span>Explore</span>
+    </li>
+    <li>
+      <span>
+        Studio <span class="rounded-full bg-rose-500 text-xs p-1 text-white">New</span>
+      </span>
+    </li>
+    <li>
+      <span>About</span>
+    </li>
+    <li>
+      <%= link("Submit", to: Routes.upload_path(@conn, :new)) %>
+    </li>
+    <li>
+      <%= link("Bulk", to: Routes.upload_path(@conn, :bulk_new)) %>
+    </li>
+    <%= if function_exported?(Routes, :live_dashboard_path, 2) do %>
+      <li>
+        <a
+          class="p-1 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-900"
+          href={Routes.live_dashboard_path(@conn, :home)}
+        >
+          <i class="text-gray-900 fa-solid fa-gauge fa-lg"></i>
+        </a>
+      </li>
+    <% end %>
+    <li>
+      <%= if @current_user != nil do %>
+        <img
+          class="rounded-full w-7 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-900"
+          src={Nappy.Accounts.avatar_url(@conn, @current_user.avatar_link)}
+        />
+      <% else %>
+        <a
+          class="focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-900"
+          href={Routes.user_session_path(@conn, :create)}
+        >
+          <i class="text-gray-900 fa-solid fa-user fa-lg"></i>
+        </a>
+      <% end %>
+    </li>
+    <li>
+      <%= if @current_user != nil do %>
+        <%= button("Log out",
+          to: Routes.user_session_path(@conn, :delete),
+          method: :delete,
+          class:
+            "px-4 py-2 border border-gray-900 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-900"
+        ) %>
+      <% else %>
+        <a
+          class="inline-flex items-center px-6 py-2 border border-gray-900 rounded-md text-gray-900 bg-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-900"
+          href={Routes.user_registration_path(@conn, :new)}
+        >
+          Join
+        </a>
+      <% end %>
+    </li>
+  </ul>
+</div>

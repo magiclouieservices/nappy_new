@@ -1,5 +1,58 @@
+@import "tailwindcss/base";
+@import "tailwindcss/components";
+@import "tailwindcss/utilities";
+
 /* This file is for your main application CSS */
-@import "./phoenix.css";
+
+@font-face {
+  font-family: 'Tiempos';
+  src: url("fonts/tiempos.css");
+}
+
+#tags {
+  /*margin: 100px auto 0 auto;*/
+  /*max-width: 600px;*/
+  border: 1px solid rgb(209, 213, 219);
+  border-radius: 5px;
+  /*padding: 5px;*/
+}
+
+#tags .tag {
+  position: relative;
+  display: block;
+  float: left;
+  color: #FFFFFF;
+  background: #1f2937;
+  padding: 5px 20px 5px 5px;
+  margin: 4px;
+  border-radius: 2px;
+  font-size: 12px;
+  line-height: 12px;
+  transition: all 0.3s ease-in-out;
+}
+#tags .tag .close {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 14px;
+  height: 100%;
+  background: #9ca3af;
+  cursor: pointer;
+  border-radius: 0 2px 2px 0;
+  transition: background 0.3s;
+}
+#tags .tag .close:after {
+  font-family: 'Font Awesome 6 Free';
+  position: absolute;
+  content: "\f00d";
+  background: transparent;
+  color: #1f2937;
+  top: 6px;
+  left: 3px;
+}
+#tags .tag .close:hover {
+  background: rgba(215, 65, 70, 0.87);
+}
 
 /* Alerts and form errors used by phx.new */
 .alert {

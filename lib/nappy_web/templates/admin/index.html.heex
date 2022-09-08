@@ -1,0 +1,11 @@
+<.form
+  let={f}
+  for={@conn}
+  action={Routes.user_session_path(@conn, :create)}
+  as={:user}
+  class="space-y-6"
+>
+  <%= label(f, :name) %>
+  <%= select(f, :name, Ecto.Enum.values(Nappy.Accounts.AccountRole, :name)) %>
+  <%= error_tag(f, :name) %>
+</.form>

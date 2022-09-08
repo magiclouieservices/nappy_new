@@ -20,9 +20,31 @@ if System.get_env("PHX_SERVER") do
   config :nappy, NappyWeb.Endpoint, server: true
 end
 
-config :nappy, :config, app_name: "Nappy"
+config :nappy, :runtime,
+  app_name: "Nappy",
+  embed_url: "https://devnappy.imgix.net",
+  subscription_url: "https://email.boogie.co/subscribe",
+  support_email: "support@nappy.co",
+  notifications_email: "notifications@nappy.co",
+  bucket_name: System.get_env("BUCKET_NAME")
 
 if config_env() == :prod do
+  config :honeybadger,
+    exclude_envs: [:test],
+    environment_name: :prod,
+    use_logger: true,
+    api_key: System.get_env("HONEYBADGER_API_KEY")
+
+  config :ex_aws,
+    access_key_id: System.get_env("WASABI_ACCESS_KEY_ID"),
+    secret_access_key: System.get_env("WASABI_SECRET_ACCESS_KEY"),
+    region: System.get_env("WASABI_REGION")
+
+  config :ex_aws, :s3,
+    scheme: "https://",
+    # port: 9000,
+    host: System.get_env("WASABI_HOST")
+
   database_url =
     System.get_env("DATABASE_URL") ||
       raise """
@@ -71,15 +93,17 @@ if config_env() == :prod do
   # Also, you may need to configure the Swoosh API client of your choice if you
   # are not using SMTP. Here is an example of the configuration:
   #
-  #     config :nappy, Nappy.Mailer,
-  #       adapter: Swoosh.Adapters.Mailgun,
-  #       api_key: System.get_env("MAILGUN_API_KEY"),
-  #       domain: System.get_env("MAILGUN_DOMAIN")
+  config :nappy, Nappy.Mailer,
+    adapter: Swoosh.Adapters.Mailgun,
+    api_key: System.get_env("MAILGUN_API_KEY"),
+    domain: System.get_env("MAILGUN_DOMAIN"),
+    base_url: System.get_env("MAILER_BASE_URL")
+
   #
   # For this example you need include a HTTP client required by Swoosh API client.
   # Swoosh supports Hackney and Finch out of the box:
   #
-  #     config :swoosh, :api_client, Swoosh.ApiClient.Hackney
+  config :swoosh, :api_client, Swoosh.ApiClient.Finch
   #
   # See https://hexdocs.pm/swoosh/Swoosh.html#module-installation for details.
 end

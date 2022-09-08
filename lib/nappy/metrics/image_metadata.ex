@@ -1,0 +1,59 @@
+defmodule Nappy.Metrics.ImageMetadata do
+  use Nappy.Schema
+  import Ecto.Changeset
+  alias Nappy.Catalog.Images
+
+  @moduledoc false
+
+  schema "image_metadata" do
+    belongs_to :image, Images
+    field :aperture, :float
+    field :aspect_ratio, :float
+    field :camera_software, :string
+    field :device_model, :string
+    field :extension_type, :string
+    field :file_size, :float
+    field :focal, :float
+    field :height, :integer
+    field :iso, :integer
+    field :shutter_speed, :float
+    field :width, :integer
+    field :color_palette, :string
+
+    timestamps()
+  end
+
+  @doc false
+  def changeset(image_metadata, attrs) do
+    image_metadata
+    |> cast(attrs, [
+      :image_id,
+      :extension_type,
+      :height,
+      :width,
+      :file_size,
+      :focal,
+      :iso,
+      :shutter_speed,
+      :aperture,
+      :aspect_ratio,
+      :device_model,
+      :camera_software,
+      :color_palette
+    ])
+    |> validate_required([
+      :image_id,
+      :extension_type,
+      :height,
+      :width,
+      :file_size
+      # :focal,
+      # :iso,
+      # :shutter_speed,
+      # :aperture,
+      # :aspect_ratio,
+      # :device_model,
+      # :camera_software
+    ])
+  end
+end
