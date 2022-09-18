@@ -15,6 +15,10 @@ defmodule Nappy do
     Application.get_env(:nappy, :runtime)[:support_email]
   end
 
+  def path(path) do
+    "#{NappyWeb.Endpoint.url()}/#{path}"
+  end
+
   def notifications_email do
     Application.get_env(:nappy, :runtime)[:notifications_email]
   end

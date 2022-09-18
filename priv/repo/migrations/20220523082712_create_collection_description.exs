@@ -5,12 +5,12 @@ defmodule Nappy.Repo.Migrations.CreateCollectionDescription do
     create table(:collection_description) do
       add :user_id, references(:users, on_delete: :delete_all), null: false
       add :title, :string, null: false
+      add :slug, :string, null: false
       add :description, :text
       add :is_enabled, :boolean, default: false, null: false
 
       # add :thumbnail, :binary_id,
-      #   comment:
-      #     "Image displayed in a specific collection page. Can choose only from available approved images."
+      #   comment: "Image displayed in a specific collection page. Can choose only from available approved images."
       add :thumbnail, references(:images, on_delete: :delete_all),
         null: false,
         comment:
@@ -21,12 +21,6 @@ defmodule Nappy.Repo.Migrations.CreateCollectionDescription do
 
     create index(:collection_description, [:user_id])
     create index(:collection_description, [:thumbnail])
-
-    alter table(:collections) do
-      add :collection_description_id, references(:collection_description, on_delete: :delete_all),
-        null: false
-    end
-
-    create index(:collections, [:collection_description_id])
+    create unique_index(:collection_description, [:slug])
   end
 end

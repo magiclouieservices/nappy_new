@@ -31,9 +31,11 @@
           x-transition:leave="transition ease-in duration-75"
           x-transition:leave-start="transform opacity-100 scale-100"
           x-transition:leave-end="transform opacity-0 scale-95"
-          class="absolute flex w-48 left-[-50%] flex-col py-4 gap-2 items-center justify-center mt-1 bg-black text-white"
+          class="absolute flex w-48 left-[-50%] flex-col py-4 gap-2 items-center justify-center mt-1 bg-black text-white z-50"
         >
-          <a class="hover:text-slate-300" href="#">Collections</a>
+          <a class="hover:text-slate-300" href={Routes.collections_path(@conn, :index)}>
+            Collections
+          </a>
           <a class="hover:text-slate-300" href="#">Categories</a>
           <a class="hover:text-slate-300" href="#">For Brands</a>
           <a class="hover:text-slate-300" href="https://nappy.kampsite.co">Photo Request</a>
@@ -51,9 +53,6 @@
     </li>
     <li>
       <%= link("Submit", to: Routes.upload_path(@conn, :new)) %>
-    </li>
-    <li>
-      <%= link("Bulk", to: Routes.upload_path(@conn, :bulk_new)) %>
     </li>
     <%= if function_exported?(Routes, :live_dashboard_path, 2) do %>
       <li>

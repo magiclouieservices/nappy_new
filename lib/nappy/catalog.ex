@@ -47,6 +47,12 @@ defmodule Nappy.Catalog do
     |> Repo.paginate(params)
   end
 
+  def image_url_by_id(uuid, opts \\ []) do
+    image = get_image!(uuid)
+
+    image_url(image, opts)
+  end
+
   def image_url(%Images{} = image, opts \\ []) do
     ext = Metrics.get_image_extension(image.id)
     base_url = Nappy.embed_url()
@@ -409,7 +415,19 @@ defmodule Nappy.Catalog do
 
   """
   def list_collection_description do
-    Repo.all(CollectionDescription)
+    image_query =
+      Images
+      |> where(image_status_id: ^Metrics.get_image_status_id(:active))
+      |> or_where(image_status_id: ^Metrics.get_image_status_id(:featured))
+
+    collection_query =
+      Collection
+      |> preload(image: ^image_query)
+      |> order_by(fragment("RANDOM()"))
+
+    CollectionDescription
+    |> preload(collections: ^collection_query)
+    |> Repo.all()
   end
 
   @doc """
@@ -427,6 +445,66 @@ defmodule Nappy.Catalog do
 
   """
   def get_collection_description!(id), do: Repo.get!(CollectionDescription, id)
+
+  def get_collection_description_by_slug(slug) do
+    CollectionDescription
+    |> where(slug: ^slug)
+    |> limit(1)
+    |> preload(:user)
+    |> Repo.one()
+  end
+
+  def paginate_collection(slug, params \\ [page: 1]) do
+    coll_desc_id =
+      from(cd in CollectionDescription,
+        where: cd.slug == ^slug,
+        select: cd.id
+      )
+      |> Repo.one()
+
+    Collection
+    |> join(:inner, [c], i in assoc(c, :image))
+    |> join(:inner, [_, i], u in assoc(i, :user))
+    |> join(:inner, [_, i, _], im in assoc(i, :image_metadata))
+    |> where([_, i], i.image_status_id == ^Metrics.get_image_status_id(:active))
+    |> or_where([_, i], i.image_status_id == ^Metrics.get_image_status_id(:featured))
+    |> where(collection_description_id: ^coll_desc_id)
+    |> order_by(fragment("RANDOM()"))
+    |> select([_, i, u, im], %Images{
+      id: i.id,
+      description: i.description,
+      generated_description: i.generated_description,
+      generated_tags: i.generated_tags,
+      slug: i.slug,
+      tags: i.tags,
+      title: i.title,
+      category_id: i.category_id,
+      image_metadata: im,
+      image_status_id: i.image_status_id,
+      user_id: u.id,
+      user: u,
+      inserted_at: i.inserted_at,
+      updated_at: i.updated_at
+    })
+    |> Repo.paginate(params)
+
+    # coll_desc_id =
+    #   CollectionDescription
+    #   |> where(slug: ^slug)
+    #   |> select([cd], cd.id)
+    #   |> Repo.one()
+
+    # image_query =
+    #   Images
+    #   |> where(image_status_id: ^Metrics.get_image_status_id(:active))
+    #   |> or_where(image_status_id: ^Metrics.get_image_status_id(:featured))
+    #   |> preload([:user, :image_metadata])
+
+    # Collection
+    # |> preload(image: ^image_query)
+    # |> where(collection_description_id: ^coll_desc_id)
+    # |> Repo.paginate(params)
+  end
 
   @doc """
   Creates a collection_description.
