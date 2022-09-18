@@ -22,9 +22,16 @@ defmodule NappyWeb.Router do
     pipe_through :browser
 
     live "/", HomeLive.Index, :index
+
+    # specific image
     live "/photo/:slug", ImageLive.Show, :show
-    # get "/photo/:slug", ImageController, :show
+
+    # user profile
     get "/user/:username", UserProfileController, :show
+
+    # collections
+    get "/collections", CollectionsController, :index
+    live "/collection/:slug", CollectionsLive.Show, :show
 
     # resources "/legal", LegalController
     # resources "/seo", SeoController

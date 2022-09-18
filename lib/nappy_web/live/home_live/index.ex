@@ -17,8 +17,7 @@ defmodule NappyWeb.HomeLive.Index do
     {:ok,
      socket
      |> assign(page: 1)
-     |> assign(page_size: 12)
-     |> fetch(), temporary_assigns: [images: []]}
+     |> assign(page_size: 12), temporary_assigns: [images: []]}
   end
 
   @impl true

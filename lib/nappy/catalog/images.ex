@@ -2,7 +2,7 @@ defmodule Nappy.Catalog.Images do
   use Nappy.Schema
   import Ecto.Changeset
   alias Nappy.Accounts.User
-  alias Nappy.Catalog.{Category, Collection}
+  alias Nappy.Catalog.{Category, Collection, CollectionDescription}
   alias Nappy.Metrics.{ImageAnalytics, ImageMetadata, ImageStatus}
 
   @moduledoc false
@@ -15,6 +15,12 @@ defmodule Nappy.Catalog.Images do
     field :tags, :string
     field :title, :string
     has_many :collections, Collection, foreign_key: :image_id
+
+    many_to_many :collection_description, CollectionDescription,
+      join_through: Collection,
+      on_replace: :delete
+
+    # has_many :collections, Collection
     belongs_to :category, Category
     belongs_to :user, User
     has_one :image_analytics, ImageAnalytics, foreign_key: :image_id

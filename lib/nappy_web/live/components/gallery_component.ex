@@ -17,23 +17,6 @@ defmodule NappyWeb.Components.GalleryComponent do
   def render(assigns) do
     ~H"""
     <div>
-      <ul class="flex justify-center mb-7 mt-4">
-        <a href="#">
-          <li class="border-b-2 border-black py-2 px-4">
-            Featured
-          </li>
-        </a>
-        <a href="#">
-          <li class="py-2 px-4">
-            Popular
-          </li>
-        </a>
-        <a href="#">
-          <li class="py-2 px-4">
-            All
-          </li>
-        </a>
-      </ul>
       <div
         id="infinite-scroll-body"
         phx-update="append"

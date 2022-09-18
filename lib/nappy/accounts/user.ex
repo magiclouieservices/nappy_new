@@ -12,6 +12,7 @@ defmodule Nappy.Accounts.User do
   schema "users" do
     field :email, :string
     field :username, :string
+    field :slug, :string
     field :name, :string
     belongs_to :account_status, AccountStatus
     belongs_to :account_role, AccountRole
@@ -49,12 +50,18 @@ defmodule Nappy.Accounts.User do
       :email,
       :username,
       :name,
+      :slug,
       :avatar_link,
       :password,
       :account_status_id,
       :account_role_id
     ])
-    |> validate_required([:account_role_id, :account_status_id])
+    |> validate_required([
+      :slug,
+      :account_role_id,
+      :account_status_id
+    ])
+    |> unique_constraint(:slug)
     |> validate_username()
     |> validate_email()
     |> validate_password(opts)
