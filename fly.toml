@@ -1,4 +1,4 @@
-# fly.toml file generated for nappy-staging on 2022-09-02T08:20:09+08:00
+# fly.toml file generated for nappy-staging on 2022-09-19T07:00:57+08:00
 
 app = "nappy-staging"
 kill_signal = "SIGTERM"
@@ -6,7 +6,7 @@ kill_timeout = 5
 processes = []
 
 [deploy]
-  release_command = "/app/bin/migrate"
+  # release_command = "/app/bin/migrate"
 
 [env]
   PHX_HOST = "nappy-staging.fly.dev"

@@ -21,7 +21,16 @@ defmodule NappyWeb.CollectionsLive.Show do
      |> assign(page: 1)
      |> assign(page_size: 12)
      |> assign(slug: slug)
-     |> assign(collection: coll_desc), temporary_assigns: [images: []]}
+     |> assign(collection: coll_desc),
+     temporary_assigns: [
+       images: %Scrivener.Page{
+         page_number: 1,
+         page_size: 12,
+         total_entries: 0,
+         total_pages: 1,
+         entries: []
+       }
+     ]}
   end
 
   @impl true
