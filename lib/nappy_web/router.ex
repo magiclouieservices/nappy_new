@@ -33,6 +33,10 @@ defmodule NappyWeb.Router do
     get "/collections", CollectionsController, :index
     live "/collection/:slug", CollectionsLive.Show, :show
 
+    # categories
+    get "/categories", CategoryController, :index
+    live "/category/:slug", CategoryLive.Show, :show
+
     # resources "/legal", LegalController
     # resources "/seo", SeoController
     # resources "/subscribers", SubscriberController
