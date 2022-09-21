@@ -216,6 +216,22 @@ defmodule Nappy.Catalog do
     Repo.all(Category)
   end
 
+  def paginate_category(slug, params \\ [page: 1]) do
+    category_id =
+      Category
+      |> where(slug: ^slug)
+      |> select([c], c.id)
+      |> Repo.one()
+
+    Images
+    |> where(image_status_id: ^Metrics.get_image_status_id(:active))
+    |> or_where(image_status_id: ^Metrics.get_image_status_id(:featured))
+    |> where(category_id: ^category_id)
+    |> order_by(fragment("RANDOM()"))
+    |> preload([:user, :image_metadata])
+    |> Repo.paginate(params)
+  end
+
   @doc """
   Gets a single category.
 
@@ -487,23 +503,6 @@ defmodule Nappy.Catalog do
       updated_at: i.updated_at
     })
     |> Repo.paginate(params)
-
-    # coll_desc_id =
-    #   CollectionDescription
-    #   |> where(slug: ^slug)
-    #   |> select([cd], cd.id)
-    #   |> Repo.one()
-
-    # image_query =
-    #   Images
-    #   |> where(image_status_id: ^Metrics.get_image_status_id(:active))
-    #   |> or_where(image_status_id: ^Metrics.get_image_status_id(:featured))
-    #   |> preload([:user, :image_metadata])
-
-    # Collection
-    # |> preload(image: ^image_query)
-    # |> where(collection_description_id: ^coll_desc_id)
-    # |> Repo.paginate(params)
   end
 
   @doc """
