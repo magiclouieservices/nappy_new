@@ -1,0 +1,16 @@
+version: "3.7"
+services:
+  web:
+    build: .
+    env_file: "nappy.env"
+    ports:
+      - "4000:4000"
+    restart: "always"
+  migration:
+    build: .
+    env_file: "nappy.env"
+    depends_on:
+      - web
+      - postgres
+    command: bin/migrate
+    restart: "no"

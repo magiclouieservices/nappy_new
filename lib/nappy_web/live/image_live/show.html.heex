@@ -11,6 +11,12 @@
     </h2>
 
     <h3>Tags</h3>
+    <span class="inline-flex items-center rounded-full bg-indigo-100 px-3 py-0.5 text-sm font-medium text-indigo-800">
+      <svg class="-ml-1 mr-1.5 h-2 w-2 text-indigo-400" fill="currentColor" viewBox="0 0 8 8">
+        <circle cx="4" cy="4" r="3" />
+      </svg>
+      <%= Metrics.get_image_status_name(@image.image_status_id) %>
+    </span>
     <ul>
       <%= for tag <- @tags do %>
         <li>- <%= tag %></li>

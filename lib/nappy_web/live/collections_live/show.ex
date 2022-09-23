@@ -6,31 +6,17 @@ defmodule NappyWeb.CollectionsLive.Show do
 
   @moduledoc false
 
-  # @impl true
-  # def handle_params(params, _uri, socket) do
-  #   images = catalog.paginate_images(params)
-  #   {:noreply, assign(socket, :images, images)}
-  # end
-
   @impl true
-  def mount(%{"slug" => slug} = _params, _session, socket) do
+  def handle_params(%{"slug" => slug}, _uri, socket) do
     coll_desc = Catalog.get_collection_description_by_slug(slug)
 
-    {:ok,
+    {:noreply,
      socket
      |> assign(page: 1)
      |> assign(page_size: 12)
      |> assign(slug: slug)
-     |> assign(collection: coll_desc),
-     temporary_assigns: [
-       images: %Scrivener.Page{
-         page_number: 1,
-         page_size: 12,
-         total_entries: 0,
-         total_pages: 1,
-         entries: []
-       }
-     ]}
+     |> assign(collection: coll_desc)
+     |> fetch()}
   end
 
   @impl true
