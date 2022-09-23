@@ -87,6 +87,15 @@ defmodule Nappy.Metrics do
     Repo.one(query)
   end
 
+  def get_image_status_name(status_id) do
+    query =
+      from is in ImageStatus,
+        where: is.id == ^status_id,
+        select: is.name
+
+    Repo.one(query)
+  end
+
   @doc """
   Creates a image_status.
 

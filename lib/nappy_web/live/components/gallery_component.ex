@@ -14,6 +14,18 @@ defmodule NappyWeb.Components.GalleryComponent do
     end
   end
 
+  @doc """
+  Live component of a gallery.
+
+  ## Examples
+
+    <.live_component
+      module={GalleryComponent}
+      id="infinite-gallery-home"
+      images={@images}
+      page={@page}
+    />
+  """
   def render(assigns) do
     ~H"""
     <div>

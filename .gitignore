@@ -40,3 +40,5 @@ npm-debug.log
 slug_paths.txt
 
 *.sql
+
+*.env

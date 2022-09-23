@@ -9,7 +9,7 @@ defmodule Nappy.Catalog do
   alias Nappy.Metrics
   alias Nappy.Repo
 
-  @image_status_names [:all | Ecto.Enum.values(Metrics.ImageStatus, :name)]
+  @image_status_names [:all, :popular | Ecto.Enum.values(Metrics.ImageStatus, :name)]
 
   @doc """
   Returns the list of images.
@@ -24,9 +24,35 @@ defmodule Nappy.Catalog do
     Images
     |> where(image_status_id: ^Metrics.get_image_status_id(:active))
     |> or_where(image_status_id: ^Metrics.get_image_status_id(:featured))
-    |> limit(2)
     |> preload(^preload)
     |> Repo.all()
+  end
+
+  def paginate_images(:popular, params) do
+    Nappy.Metrics.ImageAnalytics
+    |> join(:inner, [ia], i in assoc(ia, :image))
+    |> join(:inner, [_, i], u in assoc(i, :user))
+    |> join(:inner, [_, i, _], im in assoc(i, :image_metadata))
+    |> where([_, i], i.image_status_id == ^Metrics.get_image_status_id(:active))
+    |> or_where([_, i], i.image_status_id == ^Metrics.get_image_status_id(:featured))
+    |> order_by([ia, ...], desc: ia.view_count)
+    |> select([_, i, u, im], %Images{
+      id: i.id,
+      description: i.description,
+      generated_description: i.generated_description,
+      generated_tags: i.generated_tags,
+      slug: i.slug,
+      tags: i.tags,
+      title: i.title,
+      category_id: i.category_id,
+      image_metadata: im,
+      image_status_id: i.image_status_id,
+      user_id: u.id,
+      user: u,
+      inserted_at: i.inserted_at,
+      updated_at: i.updated_at
+    })
+    |> Repo.paginate(params)
   end
 
   def paginate_images(status_name, params)

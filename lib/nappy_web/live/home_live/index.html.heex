@@ -58,23 +58,25 @@
   </div>
 </header>
 <section class="sm:max-w-[640px] md:max-w-[768px] lg:max-w-[1024px] xl:max-w-[1420px] mx-auto">
-  <ul class="flex justify-center mb-7 mt-4">
-    <a href="#">
-      <li class="border-b-2 border-black py-2 px-4">
-        Featured
-      </li>
-    </a>
-    <a href="#">
-      <li class="py-2 px-4">
-        Popular
-      </li>
-    </a>
-    <a href="#">
-      <li class="py-2 px-4">
-        All
-      </li>
-    </a>
-  </ul>
+  <div class="flex justify-center mb-7 mt-4">
+    <%= live_redirect(
+      "Featured",
+      to: Routes.home_index_path(@socket, :index),
+      class: "#{if @filter === :featured, do: ~s(border-b-2 border-black)} py-2 px-4"
+    ) %>
+
+    <%= live_redirect(
+      "Popular",
+      to: Routes.home_index_path(@socket, :index, filter: :popular),
+      class: "#{if @filter === :popular, do: ~s(border-b-2 border-black)} py-2 px-4"
+    ) %>
+
+    <%= live_redirect(
+      "All",
+      to: Routes.home_index_path(@socket, :index, filter: :all),
+      class: "#{if @filter === :all, do: ~s(border-b-2 border-black)} py-2 px-4"
+    ) %>
+  </div>
   <.live_component
     module={GalleryComponent}
     id="infinite-gallery-home"

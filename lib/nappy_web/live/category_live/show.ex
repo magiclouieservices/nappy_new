@@ -12,9 +12,7 @@ defmodule NappyWeb.CategoryLive.Show do
      socket
      |> assign(page: 1)
      |> assign(page_size: 12)
-     |> assign(slug: slug),
-     temporary_assigns: [images: []]
-   }
+     |> assign(slug: slug), temporary_assigns: [images: []]}
   end
 
   @impl true
