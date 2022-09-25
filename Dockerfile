@@ -91,4 +91,3 @@ COPY --from=builder --chown=nobody:root /app/_build/${MIX_ENV}/rel/nappy ./
 USER nobody
 
 CMD ["/app/bin/server"]
-# Appended by flyctl
