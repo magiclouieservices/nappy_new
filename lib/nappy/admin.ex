@@ -4,63 +4,10 @@ defmodule Nappy.Admin do
   """
 
   import Ecto.Query, warn: false
-  import XmlBuilder
 
   alias Nappy.Repo
 
   alias Nappy.Admin.{AdminSettings, Legal, Seo}
-  alias Nappy.Catalog
-
-  def generate_xml do
-    Catalog.list_images()
-    |> Enum.chunk_every(1_000)
-    |> Enum.map(fn children ->
-      Enum.map(children, fn child ->
-        %{
-          loc: "https://nappy.co/#{child.title}-#{child.slug}",
-          lastmod: child.inserted_at
-        }
-      end)
-    end)
-
-    # child = [
-    #   element(:url, [
-    #     element(:loc, "https://nappy.co"),
-    #     element(:loc, "https://nappy.co"),
-    #   ])
-    # ]
-
-    # namespace = %{
-    #   xmlns: "http://www.sitemaps.org/schemas/sitemap/0.9",
-    #   "xmlns:xhtml": "http://www.w3.org/1999/xhtml"
-    # }
-
-    # :urlset
-    # |> element(namespace, children)
-    # |> generate()
-
-    # <?xml version="1.0" encoding="UTF-8"?>
-    # <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">
-    #   <url>
-    #     <loc>https://nappy.co</loc>
-    #     <lastmod>2022-02-14T10:50:58+00:00</lastmod>
-    #     <changefreq>daily</changefreq>
-    #     <priority>0.8</priority>
-    #   </url>
-    # </urlset>
-
-    # <?xml version="1.0" encoding="UTF-8"?>
-    # <sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-    #    <sitemap>
-    #       <loc>http://www.example.com/sitemap1.xml.gz</loc>
-    #       <lastmod>2012-10-01T18:23:17+00:00</lastmod>
-    #    </sitemap>
-    #    <sitemap>
-    #       <loc>http://www.example.com/sitemap2.xml.gz</loc>
-    #       <lastmod>2012-01-01</lastmod>
-    #    </sitemap>
-    # </sitemapindex>
-  end
 
   @doc """
   Returns the list of settings.
