@@ -1,6 +1,7 @@
 defmodule NappyWeb.Components.GalleryComponent do
   use NappyWeb, :live_component
   alias Nappy.{Accounts, Catalog}
+  alias Nappy.Admin.Slug
 
   @moduledoc false
 
@@ -12,6 +13,10 @@ defmodule NappyWeb.Components.GalleryComponent do
       ratio === 1.0 -> "row-span-1"
       true -> "row-span-1"
     end
+  end
+
+  defp slug_link(image) do
+    "#{Slug.slugify(image.title)}-#{image.slug}"
   end
 
   @doc """
@@ -32,12 +37,23 @@ defmodule NappyWeb.Components.GalleryComponent do
       <div
         id="infinite-scroll-body"
         phx-update="append"
-        class="grid grid-cols-3 auto-rows-[32rem] gap-2"
+        class="grid grid-cols-3 auto-rows-[50vh] gap-2"
       >
         <%= for image <- @images do %>
-          <div id={"image-#{image.slug}"} class={"#{calc_span(image.image_metadata)}
-            relative bg-slate-300"}>
-            <a href={Routes.image_show_path(@socket, :show, image.slug)}>
+          <div
+            x-data="{ hidden: true }"
+            id={"image-#{image.slug}"}
+            class={"#{calc_span(image.image_metadata)}
+            relative bg-slate-300"}
+          >
+            <a class="relative" href={Routes.image_show_path(@socket, :show, slug_link(image))}>
+              <div
+                @mouseenter="hidden = false"
+                @mouseleave="hidden = true"
+                :style="hidden ? '' : 'background: linear-gradient(0deg, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0) 20%);'"
+                class="w-full h-full absolute"
+              >
+              </div>
               <img
                 loading="lazy"
                 class="object-cover w-full h-full"
@@ -46,7 +62,10 @@ defmodule NappyWeb.Components.GalleryComponent do
               />
             </a>
             <a
-              class="absolute bottom-4 left-4 flex gap-2 items-center"
+              @mouseenter="hidden = false"
+              @mouseleave="hidden = true"
+              :class="{'hidden': hidden}"
+              class="p-4 text-white absolute bottom-0 left-0 flex gap-2 items-center"
               href={Routes.user_profile_path(@socket, :show, image.user.username)}
             >
               <img

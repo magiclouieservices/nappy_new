@@ -17,7 +17,7 @@
         <button
           @click="open = !open"
           @keydown.escape.window="open = false"
-          @click.away="open = false"
+          @click.outside="open = false"
           class="flex items-center h-8 pl-3 pr-2 focus:outline-none"
         >
           <span>Explore</span>

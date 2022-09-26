@@ -52,7 +52,7 @@ defmodule Nappy.MixProject do
       {:jason, "~> 1.3"},
       {:plug_cowboy, "~> 2.5"},
       {:finch, "~> 0.13"},
-      {:tailwind, "~> 0.1.8", runtime: Mix.env() == :dev},
+      {:tailwind, "~> 0.1.9", runtime: Mix.env() == :dev},
       {:sobelow, "~> 0.11", only: :dev},
       {:credo, "~> 1.6", only: [:dev, :test], runtime: false},
       {:ecto_dev_logger, "~> 0.4"},
@@ -62,8 +62,7 @@ defmodule Nappy.MixProject do
       {:ex_aws_s3, "~> 2.3"},
       {:hackney, "~> 1.18"},
       {:sweet_xml, "~> 0.7.3"},
-      {:honeybadger, "~> 0.7"},
-      {:xml_builder, "~> 2.1"}
+      {:honeybadger, "~> 0.7"}
     ]
   end
 
