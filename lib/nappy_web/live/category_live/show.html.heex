@@ -1,5 +1,6 @@
-<header class="relative mb-2">
+<div class="relative mb-2">
   <img
+    loading="lazy"
     class="w-screen h-40 object-cover"
     src={Routes.static_path(@socket, "/images/header_search.jpg")}
   />
@@ -8,7 +9,7 @@
       <%= @slug %>
     </span>
   </div>
-</header>
+</div>
 <section class="container mx-auto">
   <.live_component
     module={GalleryComponent}

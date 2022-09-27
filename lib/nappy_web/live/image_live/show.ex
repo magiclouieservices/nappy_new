@@ -42,11 +42,7 @@ defmodule NappyWeb.ImageLive.Show do
       # |> put_view(NappyWeb.ErrorView)
       # |> render(:"403")
 
-      raise NappyWeb.ImageLive.NotFoundError
+      raise NappyWeb.NotFoundError
     end
   end
-end
-
-defmodule NappyWeb.ImageLive.NotFoundError do
-  defexception message: "Not found :(", plug_status: 404
 end

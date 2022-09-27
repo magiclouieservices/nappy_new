@@ -1,3 +1,5 @@
+# This is used when deploying to
+# a vps with caddy as web server
 version: "3.7"
 services:
   web:
