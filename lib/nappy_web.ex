@@ -112,3 +112,7 @@ defmodule NappyWeb do
     apply(__MODULE__, which, [])
   end
 end
+
+defmodule NappyWeb.NotFoundError do
+  defexception message: "Not found :(", plug_status: 404
+end

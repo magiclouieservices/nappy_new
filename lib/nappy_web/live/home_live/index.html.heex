@@ -1,5 +1,6 @@
-<header class="relative">
+<div class="relative">
   <img
+    loading="lazy"
     class="w-screen h-96 object-cover"
     src={Routes.static_path(@socket, "/images/header_search.jpg")}
   />
@@ -56,7 +57,7 @@
       </ul>
     </div>
   </div>
-</header>
+</div>
 <section class="container mx-auto">
   <div class="flex justify-center mb-7 mt-4">
     <%= live_redirect(

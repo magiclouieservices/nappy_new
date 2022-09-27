@@ -91,3 +91,9 @@ COPY --from=builder --chown=nobody:root /app/_build/${MIX_ENV}/rel/nappy ./
 USER nobody
 
 CMD ["/app/bin/server"]
+
+# Remove ipv6 and erl_aflags env
+# when deploying via vps
+# Appended by flyctl
+ENV ECTO_IPV6 true
+ENV ERL_AFLAGS "-proto_dist inet6_tcp"

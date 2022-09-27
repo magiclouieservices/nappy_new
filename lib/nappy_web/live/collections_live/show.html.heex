@@ -1,5 +1,6 @@
-<header class="relative">
+<div class="relative">
   <img
+    loading="lazy"
     class="w-screen h-40 object-cover"
     src={Routes.static_path(@socket, "/images/header_search.jpg")}
   />
@@ -14,7 +15,7 @@
       </a>
     </span>
   </div>
-</header>
+</div>
 <div class="container mx-auto mb-8" x-data="{ open: false }">
   <h1 class="text-center font-tiempos-bold text-2xl mt-8 mb-2">
     About this Collection
