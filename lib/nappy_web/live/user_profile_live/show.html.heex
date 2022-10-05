@@ -1,0 +1,81 @@
+<div class="container mx-auto my-8 flex flex-col justify-center items-center">
+  <img
+    class="w-32 rounded-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-900 border border-gray-300"
+    src={Accounts.avatar_url(@socket, @user.avatar_link)}
+    alt="{@user.username}'s profile"
+  />
+  <h1 class="text-center font-tiempos-bold text-2xl mt-4">
+    <%= @user.name %>
+  </h1>
+  <h2 class="text-center text-gray-500 text-lg">
+    @<%= @user.username %>
+  </h2>
+  <%= if @user.social_media.bio do %>
+    <p class="my-2 max-w-[550px] text-center">
+      <%= @user.social_media.bio %>
+    </p>
+  <% end %>
+  <div class="flex gap-6 mt-4 text-gray-500">
+    <%= if @user.social_media.website_link do %>
+      <a href={@user.social_media.website_link} title="Portfolio">
+        <i class="fa-solid fa-camera fa-xl"></i>
+      </a>
+    <% end %>
+    <%= if @user.social_media.twitter_link do %>
+      <a href={@user.social_media.twitter_link} title="Twitter">
+        <i class="fa-brands fa-twitter fa-xl"></i>
+      </a>
+    <% end %>
+    <%= if @user.social_media.instagram_link do %>
+      <a href={@user.social_media.instagram_link} title="Instagram">
+        <i class="fa-brands fa-instagram fa-xl"></i>
+      </a>
+    <% end %>
+    <%= if @user.social_media.facebook_link do %>
+      <a href={@user.social_media.facebook_link} title="Facebook">
+        <i class="fa-brands fa-facebook fa-xl"></i>
+      </a>
+    <% end %>
+    <%= if @user.social_media.contact_email do %>
+      <a href={"mailto:#{@user.social_media.contact_email}"} title="Email">
+        <i class="fa-solid fa-envelope fa-xl"></i>
+      </a>
+    <% end %>
+  </div>
+  <div class="flex gap-6 my-4 text-sm">
+    <div class="flex flex-col items-center justify-center">
+      <span>62</span>
+      <span>Photos</span>
+    </div>
+    <div class="flex flex-col items-center justify-center">
+      <span>61.2k</span>
+      <span>Downloads</span>
+    </div>
+    <div class="flex flex-col items-center justify-center">
+      <span>10</span>
+      <span>Followers</span>
+    </div>
+    <div class="flex flex-col items-center justify-center">
+      <span>0</span>
+      <span>Following</span>
+    </div>
+    <div class="flex flex-col items-center justify-center">
+      <span>2</span>
+      <span>Saves</span>
+    </div>
+    <div class="flex flex-col items-center justify-center">
+      <span>3.7M</span>
+      <span>Views</span>
+    </div>
+  </div>
+</div>
+<section class="container mx-auto">
+  <.live_component
+    module={GalleryComponent}
+    id="infinite-gallery-home"
+    images={@images}
+    page={@page}
+    current_user={@current_user}
+    current_url={@current_url}
+  />
+</section>

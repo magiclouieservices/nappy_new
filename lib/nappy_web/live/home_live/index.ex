@@ -6,19 +6,7 @@ defmodule NappyWeb.HomeLive.Index do
 
   @moduledoc false
   @impl true
-  def mount(%{"filter" => filter}, _uri, socket)
-      when filter in ["popular", "all"] do
-    filter = String.to_existing_atom(filter)
-
-    {
-      :ok,
-      prepare_assigns(socket, filter: filter),
-      temporary_assigns: [images: []]
-    }
-  end
-
-  @impl true
-  def mount(_, _uri, socket) do
+  def mount(_params, _session, socket) do
     {
       :ok,
       prepare_assigns(socket),
@@ -26,18 +14,32 @@ defmodule NappyWeb.HomeLive.Index do
     }
   end
 
-  defp prepare_assigns(socket, filter \\ [filter: :featured]) do
-    socket =
-      socket
-      |> assign(page: 1)
-      |> assign(page_size: 12)
-      |> assign(filter)
+  @impl true
+  def handle_params(%{"filter" => filter}, uri, socket)
+      when filter in ["popular", "all"] do
+    filter = String.to_existing_atom(filter)
 
-    if connected?(socket) do
-      fetch(socket)
-    else
-      socket
-    end
+    {
+      :noreply,
+      prepare_assigns(socket, filter: filter)
+      |> assign(current_url: uri)
+    }
+  end
+
+  @impl true
+  def handle_params(_params, uri, socket) do
+    {
+      :noreply,
+      prepare_assigns(socket)
+      |> assign(current_url: uri)
+    }
+  end
+
+  defp prepare_assigns(socket, filter \\ [filter: :featured]) do
+    socket
+    |> assign(page: 1)
+    |> assign(page_size: 12)
+    |> assign(filter)
   end
 
   @impl true

@@ -10,7 +10,7 @@
     </span>
     <span class="font-bold text-center">
       by
-      <a href={"user/#{@collection.user.username}" |> Nappy.path()}>
+      <a href={Routes.user_profile_show_path(@socket, :show, @collection.user.username)}>
         <%= @collection.user.username %>
       </a>
     </span>
@@ -40,5 +40,7 @@
     id="infinite-gallery-home"
     images={@images}
     page={@page}
+    current_user={@current_user}
+    current_url="/"
   />
 </section>

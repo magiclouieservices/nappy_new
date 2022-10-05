@@ -47,6 +47,10 @@ defmodule Nappy.Metrics do
     # Repo.one(query)
   end
 
+  def get_profile_page_metrics(user) do
+    nil
+  end
+
   @doc """
   Gets a single image_status.
 

@@ -5,6 +5,7 @@ defmodule Nappy.Catalog do
   """
 
   import Ecto.Query, warn: false
+  alias Nappy.Accounts.User
   alias Nappy.Catalog.Images
   alias Nappy.Metrics
   alias Nappy.Repo
@@ -73,6 +74,33 @@ defmodule Nappy.Catalog do
     |> Repo.paginate(params)
   end
 
+  def paginate_user_images(username, params) do
+    User
+    |> join(:inner, [u], i in assoc(u, :images))
+    |> join(:inner, [_, i, _], im in assoc(i, :image_metadata))
+    |> where([_, i], i.image_status_id == ^Metrics.get_image_status_id(:active))
+    |> or_where([_, i], i.image_status_id == ^Metrics.get_image_status_id(:featured))
+    |> where(username: ^username)
+    |> order_by(fragment("RANDOM()"))
+    |> select([u, i, im], %Images{
+      id: i.id,
+      description: i.description,
+      generated_description: i.generated_description,
+      generated_tags: i.generated_tags,
+      slug: i.slug,
+      tags: i.tags,
+      title: i.title,
+      category_id: i.category_id,
+      image_metadata: im,
+      image_status_id: i.image_status_id,
+      user_id: u.id,
+      user: u,
+      inserted_at: i.inserted_at,
+      updated_at: i.updated_at
+    })
+    |> Repo.paginate(params)
+  end
+
   def image_url_by_id(uuid, opts \\ []) do
     image = get_image!(uuid)
 
@@ -84,12 +112,13 @@ defmodule Nappy.Catalog do
     base_url = Nappy.embed_url()
     path = Nappy.image_paths("approved")
     filename = "#{image.slug}.#{ext}"
+    default_query = "auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2"
 
     if opts !== [] do
       imgix_query = URI.encode_query(opts)
       "#{base_url}#{path}#{filename}?#{imgix_query}"
     else
-      "#{base_url}#{path}#{filename}"
+      "#{base_url}#{path}#{filename}?#{default_query}"
     end
 
     # <img
@@ -146,6 +175,10 @@ defmodule Nappy.Catalog do
     |> where(slug: ^slug)
     |> preload(^opts[:preload])
     |> Repo.one()
+  end
+
+  def get_related_image(slug) do
+    nil
   end
 
   @doc """

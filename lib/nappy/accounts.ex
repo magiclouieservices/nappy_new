@@ -27,7 +27,10 @@ defmodule Nappy.Accounts do
   end
 
   def get_user_by_username(username) when is_binary(username) do
-    Repo.get_by(User, username: username)
+    User
+    |> where(username: ^username)
+    |> preload(:social_media)
+    |> Repo.one!()
   end
 
   def get_username_by_id(id) when is_integer(id) do
