@@ -7,7 +7,7 @@ defmodule NappyWeb.CollectionsLive.Show do
   @moduledoc false
 
   @impl true
-  def mount(%{"slug" => slug}, _uri, socket) do
+  def mount(%{"slug" => slug} = params, _session, socket) do
     coll_desc = Catalog.get_collection_description_by_slug(slug)
 
     socket =
@@ -16,11 +16,6 @@ defmodule NappyWeb.CollectionsLive.Show do
       |> assign(page_size: 12)
       |> assign(slug: slug)
       |> assign(collection: coll_desc)
-
-    socket =
-      if connected?(socket),
-        do: fetch(socket),
-        else: socket
 
     {:ok, socket, temporary_assigns: [images: []]}
   end

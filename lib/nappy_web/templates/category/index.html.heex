@@ -30,12 +30,12 @@
 <section class="container mx-auto py-4">
   <div class="grid grid-cols-3 gap-4">
     <%= for category <- @categories do %>
-      <a class="block" href={"category/#{category.slug}" |> path()}>
+      <a class="block" href={Routes.category_show_path(@conn, :show, category.slug)}>
         <div class="relative">
           <img
             loading="lazy"
             class="object-cover"
-            src={Nappy.Catalog.image_url_by_id(category.thumbnail, w: 850, auto: "format")}
+            src={Nappy.Catalog.image_url_by_id(category.thumbnail)}
             alt={category.name}
           />
           <div class="absolute inset-0 z-1 bg-[rgba(0,0,0,.3)]">

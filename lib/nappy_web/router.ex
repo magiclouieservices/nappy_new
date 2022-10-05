@@ -21,21 +21,17 @@ defmodule NappyWeb.Router do
   scope "/", NappyWeb do
     pipe_through :browser
 
-    live "/", HomeLive.Index, :index
-
-    # specific image
-    live "/photo/:slug", ImageLive.Show, :show
-
-    # user profile
-    get "/user/:username", UserProfileController, :show
-
-    # collections
+    # get "/user/:username", UserProfileController, :show
     get "/collections", CollectionsController, :index
-    live "/collection/:slug", CollectionsLive.Show, :show
-
-    # categories
     get "/categories", CategoryController, :index
-    live "/category/:slug", CategoryLive.Show, :show
+
+    live_session :check_auth, on_mount: [{NappyWeb.LiveAuth, :check_auth}] do
+      live "/", HomeLive.Index, :index
+      live "/photo/:slug", ImageLive.Show, :show
+      live "/collection/:slug", CollectionsLive.Show, :show
+      live "/category/:slug", CategoryLive.Show, :show
+      live "/user/:username", UserProfileLive.Show, :show
+    end
 
     # resources "/legal", LegalController
     # resources "/seo", SeoController

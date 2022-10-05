@@ -8,7 +8,7 @@
 
     <h2>
       Photographer: <%= link(@image.user.username,
-        to: Routes.user_profile_path(@conn, :show, @image.user.username)
+        to: Routes.user_profile_show_path(@conn, :show, @image.user.username)
       ) %>
     </h2>
 

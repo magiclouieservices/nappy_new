@@ -7,7 +7,7 @@
   </a>
 
   <ul class="flex items-center gap-7">
-    <%= unless Phoenix.Controller.current_path(@conn) === Routes.home_index_path(@conn, :index) do %>
+    <%= unless Nappy.get_root_path(@conn) === "/" do %>
       <li>
         <i class="text-gray-900 fa-solid fa-magnifying-glass"></i>
       </li>

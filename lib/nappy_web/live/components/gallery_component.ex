@@ -41,12 +41,19 @@ defmodule NappyWeb.Components.GalleryComponent do
       >
         <%= for image <- @images do %>
           <div
-            x-data="{ hidden: true }"
+            x-data="{ hidden: true, open: false }"
             id={"image-#{image.slug}"}
             class={"#{calc_span(image.image_metadata)}
             relative bg-slate-300"}
           >
-            <a class="relative" href={Routes.image_show_path(@socket, :show, slug_link(image))}>
+            <a
+              @click.prevent
+              @click={
+                "open = !open; window.history.replaceState({}, '', '#{Routes.image_show_path(@socket, :show, slug_link(image))}')"
+              }
+              class="relative"
+              href={Routes.image_show_path(@socket, :show, slug_link(image))}
+            >
               <div
                 @mouseenter="hidden = false"
                 @mouseleave="hidden = true"
@@ -57,7 +64,7 @@ defmodule NappyWeb.Components.GalleryComponent do
               <img
                 loading="lazy"
                 class="object-cover w-full h-full"
-                src={Catalog.image_url(image, w: 850, auto: "format")}
+                src={Catalog.image_url(image)}
                 alt={image.title}
               />
             </a>
@@ -65,8 +72,8 @@ defmodule NappyWeb.Components.GalleryComponent do
               @mouseenter="hidden = false"
               @mouseleave="hidden = true"
               :class="{'hidden': hidden}"
-              class="p-4 text-white absolute bottom-0 left-0 flex gap-2 items-center"
-              href={Routes.user_profile_path(@socket, :show, image.user.username)}
+              class="p-4 text-white absolute bottom-0 left-0 flex gap-2 items-center hover:underline"
+              href={Routes.user_profile_show_path(@socket, :show, image.user.username)}
             >
               <img
                 class="rounded-full w-9 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-900"
@@ -74,6 +81,128 @@ defmodule NappyWeb.Components.GalleryComponent do
               />
               <span><%= image.user.username %></span>
             </a>
+            <!-- Modal -->
+            <div
+              x-show="open"
+              style="display: none"
+              x-on:keydown.escape.prevent.stop={
+                "open = false; window.history.replaceState({}, '', '#{@current_url}')"
+              }
+              role="dialog"
+              aria-modal="true"
+              x-id={"['modal-#{image.slug}']"}
+              :aria-labelledby={"$id('modal-#{image.slug}')"}
+              class="fixed inset-0 z-10 overflow-y-auto"
+            >
+              <!-- Overlay -->
+              <div x-show="open" x-transition.opacity class="fixed inset-0 bg-black bg-opacity-50">
+              </div>
+              <!-- Panel -->
+              <div
+                x-show="open"
+                x-transition
+                @click={"open = false; window.history.replaceState({}, '', '#{@current_url}')"}
+                class="relative flex min-h-screen items-center justify-center p-12"
+              >
+                <!-- Close button -->
+                <button
+                  @click={"open = false; window.history.replaceState({}, '', '#{@current_url}')"}
+                  type="button"
+                  class="inline-flex text-white absolute left-4 top-4 flex flex-shrink-0 bg-border-gray-100 rounded focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 z-50"
+                >
+                  <svg aria-hidden class="h-10 w-10" viewBox="0 0 20 20" fill="currentColor">
+                    <path
+                      fill-rule="evenodd"
+                      d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
+                      clip-rule="evenodd"
+                    >
+                    </path>
+                  </svg>
+                  <span class="sr-only">Close popup</span>
+                </button>
+                <!-- End close button -->
+                <div
+                  x-on:click.stop
+                  x-trap.noscroll.inert="open"
+                  class="container relative w-full overflow-y-auto rounded bg-white p-8 shadow-lg"
+                >
+                  <!-- Full page popup -->
+                  <div class="flex justify-between">
+                    <a
+                      class="flex gap-2 rounded items-center focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 hover:underline"
+                      href={Routes.user_profile_show_path(@socket, :show, image.user.username)}
+                    >
+                      <img
+                        class="rounded-full w-9 border"
+                        src={Accounts.avatar_url(@socket, image.user.avatar_link)}
+                      />
+                      <span><%= image.user.username %></span>
+                    </a>
+
+                    <div class="flex gap-2">
+                      <button
+                        type="button"
+                        class="inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2"
+                      >
+                        <i class="fa-solid fa-circle-dollar-to-slot"></i>
+                      </button>
+                      <button
+                        type="button"
+                        class="inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2"
+                      >
+                        <i class="fa-solid fa-reply fa-flip-horizontal"></i>
+                      </button>
+                      <%= if @current_user != nil do %>
+                        <button
+                          type="button"
+                          class="inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2"
+                        >
+                          <i class="fa-regular fa-heart"></i>
+                        </button>
+                      <% else %>
+                        <a
+                          class="inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2"
+                          href={Routes.user_session_path(@socket, :create)}
+                        >
+                          <i class="fa-regular fa-heart"></i>
+                        </a>
+                      <% end %>
+                      <button
+                        type="button"
+                        class="inline-flex gap-2 justify-center items-center rounded-md bg-green-600 px-4 py-2 text-xs text-white shadow-sm focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2"
+                      >
+                        <span>Download</span>
+                        <i class="fa-solid fa-chevron-down"></i>
+                      </button>
+                    </div>
+                  </div>
+
+                  <div class="my-4 flex justify-center">
+                    <img
+                      class="object-cover h-[75vh]"
+                      src={Catalog.image_url(image)}
+                      alt={image.title}
+                    />
+                  </div>
+
+                  <div class="flex gap-8 justify-center">
+                    <span>
+                      <i class="fa-solid fa-eye"></i> 53.0k Views
+                    </span>
+                    <span>
+                      <i class="fa-solid fa-heart"></i> 23 Saves
+                    </span>
+                    <span>
+                      <i class="fa-solid fa-download"></i> 1.2k Downloads
+                    </span>
+                    <span>
+                      <i class="fa-solid fa-circle-info"></i> more info
+                    </span>
+                  </div>
+                  <!-- End of full page popup -->
+                </div>
+              </div>
+            </div>
           </div>
         <% end %>
       </div>
