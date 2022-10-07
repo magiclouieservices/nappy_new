@@ -1,4 +1,6 @@
 defmodule Nappy do
+  alias Nappy.Admin.Slug
+
   @moduledoc """
   Nappy keeps the contexts that define your domain
   and business logic.
@@ -15,14 +17,12 @@ defmodule Nappy do
     Application.get_env(:nappy, :runtime)[:support_email]
   end
 
-  def get_current_url do
-    # %{"hello" => "world", "asdf" => "asdf"}
-    # |> Plug.Conn.Query.encode()
-    NappyWeb.Endpoint.struct_url()
-  end
-
   def get_root_path(conn) do
     URI.parse(Phoenix.Controller.current_path(conn)).path
+  end
+
+  def slug_link(image) do
+    "#{Slug.slugify(image.title)}-#{image.slug}"
   end
 
   def path(path) do

@@ -7,14 +7,36 @@ defmodule NappyWeb.CategoryLive.Show do
   @moduledoc false
 
   @impl true
-  def mount(%{"slug" => slug} = params, _session, socket) do
+  def mount(_params, _session, socket) do
+    socket =
+      socket
+      |> assign(page: 1)
+      |> assign(page_size: 12)
+
+    {:ok, socket, temporary_assigns: [images: []]}
+  end
+
+  @impl true
+  def handle_params(%{"slug" => slug}, uri, socket) do
     socket =
       socket
       |> assign(page: 1)
       |> assign(page_size: 12)
       |> assign(slug: slug)
+      |> assign(current_url: uri)
 
-    {:ok, socket, temporary_assigns: [images: []]}
+    {:noreply, socket}
+  end
+
+  @impl true
+  def handle_params(_params, uri, socket) do
+    socket =
+      socket
+      |> assign(page: 1)
+      |> assign(page_size: 12)
+      |> assign(current_url: uri)
+
+    {:noreply, socket}
   end
 
   @impl true

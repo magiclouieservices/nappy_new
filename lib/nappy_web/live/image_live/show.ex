@@ -3,6 +3,7 @@ defmodule NappyWeb.ImageLive.Show do
 
   alias Nappy.Admin.Slug
   alias Nappy.{Catalog, Metrics}
+  alias NappyWeb.Components.RelatedImagesComponent
 
   @moduledoc false
 

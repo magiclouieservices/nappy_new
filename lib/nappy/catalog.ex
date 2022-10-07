@@ -22,20 +22,24 @@ defmodule Nappy.Catalog do
 
   """
   def list_images(preload \\ []) do
+    active = Metrics.get_image_status_id(:active)
+    featured = Metrics.get_image_status_id(:featured)
+
     Images
-    |> where(image_status_id: ^Metrics.get_image_status_id(:active))
-    |> or_where(image_status_id: ^Metrics.get_image_status_id(:featured))
+    |> where([i], i.image_status_id in ^[active, featured])
     |> preload(^preload)
     |> Repo.all()
   end
 
   def paginate_images(:popular, params) do
+    active = Metrics.get_image_status_id(:active)
+    featured = Metrics.get_image_status_id(:featured)
+
     Nappy.Metrics.ImageAnalytics
     |> join(:inner, [ia], i in assoc(ia, :image))
     |> join(:inner, [_, i], u in assoc(i, :user))
     |> join(:inner, [_, i, _], im in assoc(i, :image_metadata))
-    |> where([_, i], i.image_status_id == ^Metrics.get_image_status_id(:active))
-    |> or_where([_, i], i.image_status_id == ^Metrics.get_image_status_id(:featured))
+    |> where([_, i, _, _], i.image_status_id in ^[active, featured])
     |> order_by([ia, ...], desc: ia.view_count)
     |> select([_, i, u, im], %Images{
       id: i.id,
@@ -59,11 +63,13 @@ defmodule Nappy.Catalog do
   def paginate_images(status_name, params)
       when is_atom(status_name) and
              status_name in @image_status_names do
+    active = Metrics.get_image_status_id(:active)
+    featured = Metrics.get_image_status_id(:featured)
+
     case status_name do
       :all ->
         Images
-        |> where(image_status_id: ^Metrics.get_image_status_id(:active))
-        |> or_where(image_status_id: ^Metrics.get_image_status_id(:featured))
+        |> where([i], i.image_status_id in ^[active, featured])
 
       _ ->
         Images
@@ -75,11 +81,13 @@ defmodule Nappy.Catalog do
   end
 
   def paginate_user_images(username, params) do
+    active = Metrics.get_image_status_id(:active)
+    featured = Metrics.get_image_status_id(:featured)
+
     User
     |> join(:inner, [u], i in assoc(u, :images))
     |> join(:inner, [_, i, _], im in assoc(i, :image_metadata))
-    |> where([_, i], i.image_status_id == ^Metrics.get_image_status_id(:active))
-    |> or_where([_, i], i.image_status_id == ^Metrics.get_image_status_id(:featured))
+    |> where([_, i, _, _], i.image_status_id in ^[active, featured])
     |> where(username: ^username)
     |> order_by(fragment("RANDOM()"))
     |> select([u, i, im], %Images{
@@ -146,7 +154,8 @@ defmodule Nappy.Catalog do
   def get_image!(id), do: Repo.get!(Images, id)
 
   @doc """
-  Get an Image based from slug
+  Get an Image based from slug. Do note that
+  it gets all images regardless of status.
 
   ## Examples
 
@@ -157,28 +166,56 @@ defmodule Nappy.Catalog do
       %Images{}
 
       iex> get_image_by_slug("don't exists")
-      Ecto.NoResultsError
+      nil
 
   """
   def get_image_by_slug(slug, opts \\ [preload: [], select: nil])
       when is_binary(slug) do
-    active = Metrics.get_image_status_id(:active)
-    featured = Metrics.get_image_status_id(:featured)
-
     if opts[:select] do
       select(Images, ^opts[:select])
     else
       select(Images, [i], i)
     end
-    |> where(image_status_id: ^active)
-    |> or_where(image_status_id: ^featured)
     |> where(slug: ^slug)
     |> preload(^opts[:preload])
     |> Repo.one()
   end
 
-  def get_related_image(slug) do
-    nil
+  def get_related_images(%Images{} = image) do
+    active = Metrics.get_image_status_id(:active)
+    featured = Metrics.get_image_status_id(:featured)
+
+    tag =
+      image.tags
+      |> String.split(",", trim: true)
+      |> Enum.take_random(1)
+
+    related_images =
+      Images
+      |> where([i], i.id != ^image.id)
+      |> where(category_id: ^image.category_id)
+      |> where([i], i.image_status_id in ^[active, featured])
+
+    related_images
+    |> where([i], like(i.tags, ^"%#{tag}%"))
+    |> order_by(fragment("RANDOM()"))
+    |> limit(5)
+    |> Repo.aggregate(:count, :id)
+    |> Kernel.<(5)
+    |> case do
+      true ->
+        related_images
+        |> order_by(fragment("RANDOM()"))
+        |> limit(5)
+        |> Repo.all()
+
+      false ->
+        related_images
+        |> where([i], like(i.tags, ^"%#{tag}%"))
+        |> order_by(fragment("RANDOM()"))
+        |> limit(5)
+        |> Repo.all()
+    end
   end
 
   @doc """
@@ -276,6 +313,9 @@ defmodule Nappy.Catalog do
   end
 
   def paginate_category(slug, params \\ [page: 1]) do
+    active = Metrics.get_image_status_id(:active)
+    featured = Metrics.get_image_status_id(:featured)
+
     category_id =
       Category
       |> where(slug: ^slug)
@@ -283,8 +323,7 @@ defmodule Nappy.Catalog do
       |> Repo.one()
 
     Images
-    |> where(image_status_id: ^Metrics.get_image_status_id(:active))
-    |> or_where(image_status_id: ^Metrics.get_image_status_id(:featured))
+    |> where([i], i.image_status_id in ^[active, featured])
     |> where(category_id: ^category_id)
     |> order_by(fragment("RANDOM()"))
     |> preload([:user, :image_metadata])
@@ -490,10 +529,12 @@ defmodule Nappy.Catalog do
 
   """
   def list_collection_description do
+    active = Metrics.get_image_status_id(:active)
+    featured = Metrics.get_image_status_id(:featured)
+
     image_query =
       Images
-      |> where(image_status_id: ^Metrics.get_image_status_id(:active))
-      |> or_where(image_status_id: ^Metrics.get_image_status_id(:featured))
+      |> where([i], i.image_status_id in ^[active, featured])
 
     collection_query =
       Collection
@@ -530,6 +571,9 @@ defmodule Nappy.Catalog do
   end
 
   def paginate_collection(slug, params \\ [page: 1]) do
+    active = Metrics.get_image_status_id(:active)
+    featured = Metrics.get_image_status_id(:featured)
+
     coll_desc_id =
       from(cd in CollectionDescription,
         where: cd.slug == ^slug,
@@ -541,8 +585,7 @@ defmodule Nappy.Catalog do
     |> join(:inner, [c], i in assoc(c, :image))
     |> join(:inner, [_, i], u in assoc(i, :user))
     |> join(:inner, [_, i, _], im in assoc(i, :image_metadata))
-    |> where([_, i], i.image_status_id == ^Metrics.get_image_status_id(:active))
-    |> or_where([_, i], i.image_status_id == ^Metrics.get_image_status_id(:featured))
+    |> where([_, i, _, _], i.image_status_id in ^[active, featured])
     |> where(collection_description_id: ^coll_desc_id)
     |> order_by(fragment("RANDOM()"))
     |> select([_, i, u, im], %Images{

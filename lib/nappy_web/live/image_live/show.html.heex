@@ -1,5 +1,5 @@
 <div class="container mx-auto">
-  <%= if @status === "approved" do %>
+  <%= if @status in ["approved", "featured"] do %>
     <img class="max-w-[40vw]" src={Catalog.image_url(@image)} alt={@image.title} />
 
     <h1>
@@ -25,5 +25,11 @@
         <li>- <%= tag %></li>
       <% end %>
     </ul>
+
+    <.live_component
+      module={RelatedImagesComponent}
+      id={"related-image-#{@image.slug}"}
+      image={@image}
+    />
   <% end %>
 </div>

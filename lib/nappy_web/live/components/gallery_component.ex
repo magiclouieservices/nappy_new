@@ -1,7 +1,7 @@
 defmodule NappyWeb.Components.GalleryComponent do
   use NappyWeb, :live_component
   alias Nappy.{Accounts, Catalog}
-  alias Nappy.Admin.Slug
+  alias NappyWeb.Components.RelatedImagesComponent
 
   @moduledoc false
 
@@ -13,10 +13,6 @@ defmodule NappyWeb.Components.GalleryComponent do
       ratio === 1.0 -> "row-span-1"
       true -> "row-span-1"
     end
-  end
-
-  defp slug_link(image) do
-    "#{Slug.slugify(image.title)}-#{image.slug}"
   end
 
   @doc """
@@ -49,10 +45,10 @@ defmodule NappyWeb.Components.GalleryComponent do
             <a
               @click.prevent
               @click={
-                "open = !open; window.history.replaceState({}, '', '#{Routes.image_show_path(@socket, :show, slug_link(image))}')"
+                "open = !open; window.history.replaceState({}, '', '#{Routes.image_show_path(@socket, :show, Nappy.slug_link(image))}')"
               }
               class="relative"
-              href={Routes.image_show_path(@socket, :show, slug_link(image))}
+              href={Routes.image_show_path(@socket, :show, Nappy.slug_link(image))}
             >
               <div
                 @mouseenter="hidden = false"
@@ -81,7 +77,6 @@ defmodule NappyWeb.Components.GalleryComponent do
               />
               <span><%= image.user.username %></span>
             </a>
-            <!-- Modal -->
             <div
               x-show="open"
               style="display: none"
@@ -94,17 +89,14 @@ defmodule NappyWeb.Components.GalleryComponent do
               :aria-labelledby={"$id('modal-#{image.slug}')"}
               class="fixed inset-0 z-10 overflow-y-auto"
             >
-              <!-- Overlay -->
               <div x-show="open" x-transition.opacity class="fixed inset-0 bg-black bg-opacity-50">
               </div>
-              <!-- Panel -->
               <div
                 x-show="open"
                 x-transition
                 @click={"open = false; window.history.replaceState({}, '', '#{@current_url}')"}
                 class="relative flex min-h-screen items-center justify-center p-12"
               >
-                <!-- Close button -->
                 <button
                   @click={"open = false; window.history.replaceState({}, '', '#{@current_url}')"}
                   type="button"
@@ -120,13 +112,11 @@ defmodule NappyWeb.Components.GalleryComponent do
                   </svg>
                   <span class="sr-only">Close popup</span>
                 </button>
-                <!-- End close button -->
                 <div
                   x-on:click.stop
                   x-trap.noscroll.inert="open"
                   class="container relative w-full overflow-y-auto rounded bg-white p-8 shadow-lg"
                 >
-                  <!-- Full page popup -->
                   <div class="flex justify-between">
                     <a
                       class="flex gap-2 rounded items-center focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 hover:underline"
@@ -199,7 +189,12 @@ defmodule NappyWeb.Components.GalleryComponent do
                       <i class="fa-solid fa-circle-info"></i> more info
                     </span>
                   </div>
-                  <!-- End of full page popup -->
+
+                  <.live_component
+                    module={RelatedImagesComponent}
+                    id={"related-image-#{image.slug}"}
+                    image={image}
+                  />
                 </div>
               </div>
             </div>
