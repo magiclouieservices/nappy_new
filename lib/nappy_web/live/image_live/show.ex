@@ -7,14 +7,17 @@ defmodule NappyWeb.ImageLive.Show do
 
   @moduledoc false
 
-  # @impl true
-  # def handle_params(params, _uri, socket) do
-  #   images = catalog.paginate_images(params)
-  #   {:noreply, assign(socket, :images, images)}
-  # end
+  @impl true
+  def mount(_params, _session, socket) do
+    {:ok,
+     socket
+     |> assign(status: nil)
+     |> assign(ext: nil)
+     |> assign(tags: []), temporary_assigns: [image: []]}
+  end
 
   @impl true
-  def handle_params(%{"slug" => slug_path}, _session, socket) do
+  def handle_params(%{"slug" => slug_path}, _uri, socket) do
     list = String.split(slug_path, "-", trim: true)
     slug = List.last(list)
     title = Enum.filter(list, &(&1 !== slug)) |> Enum.join(" ")
@@ -45,5 +48,14 @@ defmodule NappyWeb.ImageLive.Show do
 
       raise NappyWeb.NotFoundError
     end
+  end
+
+  @impl true
+  def handle_params(_params, _uri, socket) do
+    {:noreply,
+     socket
+     |> assign(status: nil)
+     |> assign(ext: nil)
+     |> assign(tags: [])}
   end
 end
