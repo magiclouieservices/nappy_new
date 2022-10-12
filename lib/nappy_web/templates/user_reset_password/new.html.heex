@@ -8,7 +8,7 @@
       </div>
       <div class="mt-8">
         <div class="mt-6">
-          <.form let={f} for={:user} action={Routes.user_reset_password_path(@conn, :create)}>
+          <.form :let={f} for={:user} action={Routes.user_reset_password_path(@conn, :create)}>
             <div>
               <%= label(f, :email, class: "block text-sm font-medium text-gray-700") %>
               <div class="mt-1">

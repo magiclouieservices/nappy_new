@@ -43,17 +43,17 @@ defmodule NappyWeb.Components.GalleryComponent do
             relative bg-slate-300"}
           >
             <a
-              @click.prevent
-              @click={
+              x-on:click.prevent
+              x-on:click={
                 "open = !open; window.history.replaceState({}, '', '#{Routes.image_show_path(@socket, :show, Nappy.slug_link(image))}')"
               }
               class="relative"
               href={Routes.image_show_path(@socket, :show, Nappy.slug_link(image))}
             >
               <div
-                @mouseenter="hidden = false"
-                @mouseleave="hidden = true"
-                :style="hidden ? '' : 'background: linear-gradient(0deg, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0) 20%);'"
+                x-on:mouseenter="hidden = false"
+                x-on:mouseleave="hidden = true"
+                x-bind:style="hidden ? '' : 'background: linear-gradient(0deg, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0) 20%);'"
                 class="w-full h-full absolute"
               >
               </div>
@@ -65,9 +65,9 @@ defmodule NappyWeb.Components.GalleryComponent do
               />
             </a>
             <a
-              @mouseenter="hidden = false"
-              @mouseleave="hidden = true"
-              :class="{'hidden': hidden}"
+              x-on:mouseenter="hidden = false"
+              x-on:mouseleave="hidden = true"
+              x-bind:class="{'hidden': hidden}"
               class="p-4 text-white absolute bottom-0 left-0 flex gap-2 items-center hover:underline"
               href={Routes.user_profile_show_path(@socket, :show, image.user.username)}
             >
@@ -86,7 +86,7 @@ defmodule NappyWeb.Components.GalleryComponent do
               role="dialog"
               aria-modal="true"
               x-id={"['modal-#{image.slug}']"}
-              :aria-labelledby={"$id('modal-#{image.slug}')"}
+              x-bind:aria-labelledby={"$id('modal-#{image.slug}')"}
               class="fixed inset-0 z-10 overflow-y-auto"
             >
               <div x-show="open" x-transition.opacity class="fixed inset-0 bg-black bg-opacity-50">
@@ -94,11 +94,11 @@ defmodule NappyWeb.Components.GalleryComponent do
               <div
                 x-show="open"
                 x-transition
-                @click={"open = false; window.history.replaceState({}, '', '#{@current_url}')"}
+                x-on:click={"open = false; window.history.replaceState({}, '', '#{@current_url}')"}
                 class="relative flex min-h-screen items-center justify-center p-12"
               >
                 <button
-                  @click={"open = false; window.history.replaceState({}, '', '#{@current_url}')"}
+                  x-on:click={"open = false; window.history.replaceState({}, '', '#{@current_url}')"}
                   type="button"
                   class="inline-flex text-white absolute left-4 top-4 flex flex-shrink-0 bg-border-gray-100 rounded focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 z-50"
                 >

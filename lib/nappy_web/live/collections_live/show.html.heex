@@ -22,13 +22,13 @@
   </h1>
   <div
     class="container mx-auto w-2/3 py-4 overflow-hidden"
-    :class="open ? '' : 'h-16'"
-    :style="open ? '' : '-webkit-mask-image: -webkit-gradient(linear, 0% 0%, 0% 100%, from(rgb(0, 0, 0)), to(rgba(0, 0, 0, 0)));'"
+    x-bind:class="open ? '' : 'h-16'"
+    x-bind:style="open ? '' : '-webkit-mask-image: -webkit-gradient(linear, 0% 0%, 0% 100%, from(rgb(0, 0, 0)), to(rgba(0, 0, 0, 0)));'"
   >
     <%= raw(@collection.description) %>
   </div>
   <button
-    @click="open = ! open"
+    x-on:click="open = ! open"
     x-text="open ? 'Read less' : 'Read more'"
     class="my-2 flex mx-auto font-bold underline"
   >
