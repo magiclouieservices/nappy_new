@@ -7,7 +7,7 @@
         </h2>
       </div>
       <div class="mt-6">
-        <.form let={f} for={:user} action={Routes.user_confirmation_path(@conn, :create)}>
+        <.form :let={f} for={:user} action={Routes.user_confirmation_path(@conn, :create)}>
           <div>
             <%= label(f, :email, class: "block text-sm font-medium text-gray-700") %>
             <div class="mt-1">

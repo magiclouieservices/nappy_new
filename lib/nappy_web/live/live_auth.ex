@@ -1,9 +1,8 @@
 defmodule NappyWeb.LiveAuth do
   import Phoenix.LiveView
+  import Phoenix.Component
 
   alias Nappy.Accounts
-  alias Nappy.Accounts.User
-  alias NappyWeb.Router.Helpers, as: Routes
 
   @moduledoc false
 

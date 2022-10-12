@@ -1,7 +1,7 @@
 <section class="py-20">
   <.form
+    :let={f}
     multipart
-    let={f}
     for={@conn}
     action={Routes.upload_path(@conn, :bulk_create)}
     class="container mx-auto w-3/5"

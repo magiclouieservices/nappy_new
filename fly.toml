@@ -1,4 +1,4 @@
-# fly.toml file generated for nappy-staging on 2022-09-27T11:25:44+08:00
+# fly.toml file generated for nappy-staging on 2022-10-12T15:50:47+08:00
 
 app = "nappy-staging"
 kill_signal = "SIGTERM"
