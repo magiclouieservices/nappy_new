@@ -23,6 +23,21 @@ docker container cp path/to/import.sql container_name:/docker-entrypoint-initdb.
 MIX_ENV=dev iex -S mix phx.server
 ```
 
+### Check secrets
+
+This repo uses [zricethezav/gitleaks](https://github.com/zricethezav/gitleaks)
+
+```bash
+# e.g. macos
+brew install gitleaks
+
+# then run
+gitleaks detect
+
+# Note: you can also add the
+# command above for pre-commit
+```
+
 ### Fly.io specifics
 
 ```bash

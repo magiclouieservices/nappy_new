@@ -3,6 +3,11 @@ name: CI
 on:
   pull_request:
   push:
+  schedule:
+    # * is a special character in YAML
+    # so you have to quote this string.
+    # every midnight and 18:00
+    - cron: '0 0,18 * * *'
 
 jobs:
   check-commit-message:
@@ -14,6 +19,17 @@ jobs:
     steps:
       - name: print message via cli
         run: echo "no need to build, based from commit message"
+
+  scan:
+    name: gitleaks
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+      - uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   test:
     name: Elixir v${{ matrix.elixir }}/OTP v${{ matrix.otp }}
