@@ -17,22 +17,25 @@ defmodule NappyWeb.Components.RelatedImagesComponent do
   """
   def render(assigns) do
     ~H"""
-    <div class="flex gap-2">
-      <%= for related_img <- related_images(@image) do %>
-        <div class="bg-slate-300 grow h-72 basis-56">
-          <a
-            class="relative"
-            href={Routes.image_show_path(@socket, :show, Nappy.slug_link(related_img))}
-          >
-            <img
-              loading="lazy"
-              class="object-cover w-full h-full"
-              src={Catalog.image_url(related_img)}
-              alt={related_img.title}
-            />
-          </a>
-        </div>
-      <% end %>
+    <div class="my-8">
+      <p class="font-tiempos-bold text-center text-3xl">Related Photos</p>
+      <div class="flex gap-2 my-2">
+        <%= for related_img <- related_images(@image) do %>
+          <div class="bg-slate-300 grow h-72 basis-56">
+            <a
+              class="relative"
+              href={Routes.image_show_path(@socket, :show, Nappy.slug_link(related_img))}
+            >
+              <img
+                loading="lazy"
+                class="object-cover w-full h-full"
+                src={Catalog.image_url(related_img)}
+                alt={related_img.title}
+              />
+            </a>
+          </div>
+        <% end %>
+      </div>
     </div>
     """
   end

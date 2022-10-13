@@ -24,7 +24,10 @@ defmodule Nappy.Application do
       # Start a worker by calling: Nappy.Worker.start_link(arg)
       # {Nappy.Worker, arg}
       # Finch for swoosh api client
-      {Finch, name: Swoosh.Finch}
+      {Finch, name: Swoosh.Finch},
+
+      # caching response
+      {Cachex, name: :nappy_cache}
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html

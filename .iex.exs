@@ -11,6 +11,7 @@ alias Nappy.Catalog.{Category, Collection, CollectionDescription}
 alias Nappy.Catalog.Images
 alias Nappy.Metrics.{ImageAnalytics, ImageMetadata, ImageStatus}
 alias Nappy.Newsletter.{Referrer, Subscriber}
+alias Nappy.SponsoredImages
 alias NappyWeb.Router.Helpers, as: Routes
 alias NappyWeb.Endpoint
 alias NappyWeb.Uploaders.Avatar

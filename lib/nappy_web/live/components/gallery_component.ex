@@ -1,18 +1,21 @@
 defmodule NappyWeb.Components.GalleryComponent do
   use NappyWeb, :live_component
-  alias Nappy.{Accounts, Catalog}
+  alias Nappy.Accounts
+  alias Nappy.Catalog
+  alias Nappy.SponsoredImages
   alias NappyWeb.Components.RelatedImagesComponent
+  alias NappyWeb.Components.SponsoredImagesComponent
 
   @moduledoc false
 
-  defp calc_span(metadata) do
-    ratio = Float.floor(metadata.width / metadata.height, 2)
+  def handle_event("show_images", %{"slug" => slug, "tags" => tags}, socket) do
+    images = sponsored_images(slug, tags)
 
-    cond do
-      ratio <= 0.79 -> "row-span-2"
-      ratio === 1.0 -> "row-span-1"
-      true -> "row-span-1"
-    end
+    socket =
+      socket
+      |> assign(sponsored_images: images)
+
+    {:noreply, socket}
   end
 
   @doc """
@@ -28,6 +31,9 @@ defmodule NappyWeb.Components.GalleryComponent do
     />
   """
   def render(assigns) do
+    placeholder = Enum.map(1..5, fn _ -> "#" end)
+    assigns = assign_new(assigns, :sponsored_images, fn -> placeholder end)
+
     ~H"""
     <div>
       <div
@@ -39,10 +45,13 @@ defmodule NappyWeb.Components.GalleryComponent do
           <div
             x-data="{ hidden: true, open: false }"
             id={"image-#{image.slug}"}
-            class={"#{calc_span(image.image_metadata)}
-            relative bg-slate-300"}
+            class={"#{calc_span(image.image_metadata)} relative bg-slate-300"}
           >
             <a
+              phx-click="show_images"
+              phx-value-slug={image.slug}
+              phx-value-tags={image.tags}
+              phx-target={@myself}
               x-on:click.prevent
               x-on:click={
                 "open = !open; window.history.replaceState({}, '', '#{Routes.image_show_path(@socket, :show, Nappy.slug_link(image))}')"
@@ -195,6 +204,12 @@ defmodule NappyWeb.Components.GalleryComponent do
                     id={"related-image-#{image.slug}"}
                     image={image}
                   />
+                  <.live_component
+                    module={SponsoredImagesComponent}
+                    id={"sponsored-image-#{image.slug}"}
+                    sponsored_images={@sponsored_images}
+                    image={image}
+                  />
                 </div>
               </div>
             </div>
@@ -204,5 +219,24 @@ defmodule NappyWeb.Components.GalleryComponent do
       <div id="infinite-scroll-marker" phx-hook="InfiniteScroll" data-page={@page}></div>
     </div>
     """
+  end
+
+  defp calc_span(metadata) do
+    ratio = Float.floor(metadata.width / metadata.height, 2)
+
+    cond do
+      ratio <= 0.79 -> "row-span-2"
+      ratio === 1.0 -> "row-span-1"
+      true -> "row-span-1"
+    end
+  end
+
+  defp sponsored_images(slug, tags) do
+    tag =
+      tags
+      |> String.split(",", trim: true)
+      |> hd()
+
+    SponsoredImages.get_images(slug, tag)
   end
 end

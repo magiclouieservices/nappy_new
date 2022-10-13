@@ -62,7 +62,9 @@ defmodule Nappy.MixProject do
       {:ex_aws_s3, "~> 2.3"},
       {:hackney, "~> 1.18"},
       {:sweet_xml, "~> 0.7.3"},
-      {:honeybadger, "~> 0.7"}
+      {:honeybadger, "~> 0.7"},
+      {:req, "~> 0.3.1"},
+      {:cachex, "~> 3.4"}
     ]
   end
 
