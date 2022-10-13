@@ -31,5 +31,11 @@
       id={"related-image-#{@image.slug}"}
       image={@image}
     />
+    <.live_component
+      module={SponsoredImagesComponent}
+      id={"sponsored-image-#{@image.slug}"}
+      sponsored_images={@sponsored_images}
+      image={@image}
+    />
   <% end %>
 </div>

@@ -13,6 +13,8 @@ defmodule Nappy do
     Application.get_env(:nappy, :runtime)[:app_name]
   end
 
+  def cache_name, do: :nappy_cache
+
   def support_email do
     Application.get_env(:nappy, :runtime)[:support_email]
   end
@@ -27,6 +29,14 @@ defmodule Nappy do
 
   def path(path) do
     "#{NappyWeb.Endpoint.url()}/#{path}"
+  end
+
+  def getty_api_key do
+    Application.get_env(:nappy, :runtime)[:getty_api_key]
+  end
+
+  def getty_api_secret do
+    Application.get_env(:nappy, :runtime)[:getty_api_secret]
   end
 
   def notifications_email do

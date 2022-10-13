@@ -21,6 +21,10 @@ if System.get_env("PHX_SERVER") do
 end
 
 config :nappy, :runtime,
+  getty_api_key: System.get_env("GETTY_API_KEY"),
+  getty_api_secret: System.get_env("GETTY_API_SECRET")
+
+config :nappy, :runtime,
   app_name: "Nappy",
   embed_url: "https://devnappy.imgix.net",
   subscription_url: "https://email.boogie.co/subscribe",
