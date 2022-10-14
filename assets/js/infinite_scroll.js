@@ -3,7 +3,7 @@ export default InfiniteScroll = {
   loadMore(entries) {
     const target = entries[0];
     if (target.isIntersecting && this.pending == this.page()) {
-      this.pending = this.page() + 1;
+      this.pending = this.page();
       this.pushEvent("load-more", {});
     }
   },

@@ -28,10 +28,10 @@
   </ul>
 </section>
 <section class="container mx-auto py-4">
-  <div class="grid grid-cols-3 gap-4">
+  <div class="grid grid-cols-3 auto-rows-min gap-4">
     <%= for category <- @categories do %>
       <a class="block" href={Routes.category_show_path(@conn, :show, category.slug)}>
-        <div class="relative">
+        <div class="relative bg-slate-300">
           <img
             loading="lazy"
             class="object-cover"

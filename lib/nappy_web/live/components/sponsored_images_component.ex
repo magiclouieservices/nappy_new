@@ -23,16 +23,18 @@ defmodule NappyWeb.Components.SponsoredImagesComponent do
         <%= for sponsored_img <- @sponsored_images do %>
           <div class="bg-slate-300 grow h-72 basis-56">
             <%= unless sponsored_img === "#" do %>
-              <div class="bg-slate-300 grow h-72 basis-56">
-                <a class="relative" href={sponsored_img["referral_link"]}>
-                  <img
-                    loading="lazy"
-                    class="object-cover w-full h-full"
-                    src={sponsored_img["image_src"]}
-                    alt={sponsored_img["image_alt"]}
-                  />
-                </a>
-              </div>
+              <a
+                class="relative"
+                href={sponsored_img["referral_link"]}
+                title={sponsored_img["image_alt"]}
+              >
+                <img
+                  loading="lazy"
+                  class="object-cover w-full h-full"
+                  src={sponsored_img["image_src"]}
+                  alt={sponsored_img["image_alt"]}
+                />
+              </a>
             <% end %>
           </div>
         <% end %>
