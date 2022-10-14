@@ -181,7 +181,9 @@ defmodule Nappy.Catalog do
     |> Repo.one()
   end
 
-  def get_related_images(%Images{} = image) do
+  def get_related_images(slug) do
+    image = Repo.get_by!(Images, slug: slug)
+
     active = Metrics.get_image_status_id(:active)
     featured = Metrics.get_image_status_id(:featured)
 

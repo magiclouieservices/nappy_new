@@ -4,7 +4,7 @@ defmodule NappyWeb.ImageLive.Show do
   alias Nappy.Admin.Slug
   alias Nappy.Catalog
   alias Nappy.Metrics
-  alias Nappy.SponsoredImages
+  alias NappyWeb.Components.GalleryComponent
   alias NappyWeb.Components.RelatedImagesComponent
   alias NappyWeb.Components.SponsoredImagesComponent
 
@@ -21,7 +21,8 @@ defmodule NappyWeb.ImageLive.Show do
      |> assign(tags: []),
      temporary_assigns: [
        image: [],
-       sponsored_images: [placeholder]
+       sponsored_images: placeholder,
+       related_images: placeholder
      ]}
   end
 
@@ -44,7 +45,8 @@ defmodule NappyWeb.ImageLive.Show do
         ext = image.image_metadata.extension_type
         status = Metrics.get_status_name(image.image_status_id)
         tags = Catalog.image_tags_as_list(image.tags, image.generated_tags)
-        sponsored_images = sponsored_images(image.slug, image.tags)
+        sponsored_images = GalleryComponent.sponsored_images(image.slug, image.tags)
+        related_images = GalleryComponent.related_images(image.slug)
 
         socket =
           socket
@@ -53,6 +55,7 @@ defmodule NappyWeb.ImageLive.Show do
           |> assign(ext: ext)
           |> assign(tags: tags)
           |> assign(sponsored_images: sponsored_images)
+          |> assign(related_images: related_images)
 
         {:noreply, socket}
       end
@@ -73,14 +76,5 @@ defmodule NappyWeb.ImageLive.Show do
      |> assign(status: nil)
      |> assign(ext: nil)
      |> assign(tags: [])}
-  end
-
-  defp sponsored_images(slug, tags) do
-    tag =
-      tags
-      |> String.split(",", trim: true)
-      |> hd()
-
-    SponsoredImages.get_images(slug, tag)
   end
 end

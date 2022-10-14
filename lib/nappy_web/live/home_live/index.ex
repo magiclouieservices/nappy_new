@@ -5,12 +5,22 @@ defmodule NappyWeb.HomeLive.Index do
   alias NappyWeb.Components.GalleryComponent
 
   @moduledoc false
+
   @impl true
   def mount(_params, _session, socket) do
+    placeholder =
+      if connected?(socket) do
+        []
+      else
+        Enum.map(1..12, fn _ -> "#" end)
+      end
+
     {
       :ok,
       prepare_assigns(socket),
-      temporary_assigns: [images: []]
+      temporary_assigns: [
+        images: placeholder
+      ]
     }
   end
 

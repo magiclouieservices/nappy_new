@@ -10,13 +10,15 @@ defmodule NappyWeb.UserProfileLive.Show do
 
   @impl true
   def mount(_params, _session, socket) do
+    placeholder = Enum.map(1..12, fn _ -> "#" end)
+
     socket =
       socket
       |> assign(page: 1)
       |> assign(page_size: 12)
       |> assign(user: nil)
 
-    {:ok, socket, temporary_assigns: [images: []]}
+    {:ok, socket, temporary_assigns: [images: placeholder]}
   end
 
   @impl true

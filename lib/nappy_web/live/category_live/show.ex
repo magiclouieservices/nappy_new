@@ -8,12 +8,19 @@ defmodule NappyWeb.CategoryLive.Show do
 
   @impl true
   def mount(_params, _session, socket) do
+    placeholder =
+      if connected?(socket) do
+        []
+      else
+        Enum.map(1..12, fn _ -> "#" end)
+      end
+
     socket =
       socket
       |> assign(page: 1)
       |> assign(page_size: 12)
 
-    {:ok, socket, temporary_assigns: [images: []]}
+    {:ok, socket, temporary_assigns: [images: placeholder]}
   end
 
   @impl true

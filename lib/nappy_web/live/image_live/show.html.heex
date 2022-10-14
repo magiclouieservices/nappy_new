@@ -29,13 +29,12 @@
     <.live_component
       module={RelatedImagesComponent}
       id={"related-image-#{@image.slug}"}
-      image={@image}
+      related_images={@related_images}
     />
     <.live_component
       module={SponsoredImagesComponent}
       id={"sponsored-image-#{@image.slug}"}
       sponsored_images={@sponsored_images}
-      image={@image}
     />
   <% end %>
 </div>
