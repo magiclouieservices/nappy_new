@@ -6,7 +6,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="robots" content="NOINDEX, NOFOLLOW" />
     <%= csrf_meta_tag() %>
-    <title><%= Nappy.app_name() %></title>
+    <%= live_title_tag(assigns[:page_title] || "Nappy",
+      suffix: " | Beautifully Diverse Stock Photos"
+    ) %>
     <link
       phx-track-static
       rel="stylesheet"

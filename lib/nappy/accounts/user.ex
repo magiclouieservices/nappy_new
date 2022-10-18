@@ -59,7 +59,8 @@ defmodule Nappy.Accounts.User do
     |> validate_required([
       :slug,
       :account_role_id,
-      :account_status_id
+      :account_status_id,
+      :username
     ])
     |> unique_constraint(:slug)
     |> validate_username()
@@ -69,7 +70,6 @@ defmodule Nappy.Accounts.User do
 
   defp validate_username(changeset) do
     changeset
-    |> validate_required([:username])
     |> validate_length(:username, min: 3, max: 30)
     |> validate_format(:username, ~r/^[a-zA-Z0-9]+$/, message: "only letters and numbers allowed")
     |> unsafe_validate_unique(:username, Nappy.Repo)
@@ -124,6 +124,16 @@ defmodule Nappy.Accounts.User do
       %{changes: %{email: _}} = changeset -> changeset
       %{} = changeset -> add_error(changeset, :email, "did not change")
     end
+  end
+
+  @doc """
+  A user changeset for changing the username/name.
+  """
+  def user_changeset(user, attrs) do
+    user
+    |> cast(attrs, [:name, :username])
+    |> validate_username()
+    |> validate_required([:username])
   end
 
   @doc """
