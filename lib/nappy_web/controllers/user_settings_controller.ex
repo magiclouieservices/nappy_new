@@ -6,31 +6,46 @@ defmodule NappyWeb.UserSettingsController do
 
   plug :assign_email_and_password_changesets
 
-  def index(conn, _params) do
-    redirect(conn, to: "/users/settings/account")
+  def edit(conn, _params) do
+    render(conn, "edit.html")
   end
 
-  def account(conn, _params) do
-    {template, action_name} = get_inner_template(conn)
+  def update(conn, %{"action" => "update_user"} = params) do
+    user = conn.assigns.current_user
 
-    render(conn, "index.html", template: template, action_name: action_name)
+    case Accounts.update_user(user, params) do
+      {:ok, _user} ->
+        conn
+        |> put_flash(:info, "Updated successfully")
+        |> redirect(to: Routes.user_settings_path(conn, :edit))
+
+      {:error, changeset} ->
+        render(conn, "edit.html", user_changeset: changeset)
+    end
   end
 
-  def password(conn, _params) do
-    {template, action_name} = get_inner_template(conn)
+  def update(conn, %{"action" => "update_social_media"} = params) do
+    %{"social_media" => %{"contact_email" => contact_email}} = params
 
-    render(conn, "index.html", template: template, action_name: action_name)
-  end
+    params = %{
+      bio: params["bio"],
+      contact_email: contact_email,
+      facebook_link: params["facebook_link"],
+      instagram_link: params["instagram_link"],
+      twitter_link: params["twitter_link"],
+      website_link: params["website_link"]
+    }
 
-  defp get_inner_template(conn) do
-    action_name = action_name(conn)
+    user_id = conn.assigns.current_user.id
 
-    case action_name do
-      :account ->
-        {"account.html", action_name}
+    case Accounts.update_social_media(user_id, params) do
+      {:ok, _user} ->
+        conn
+        |> put_flash(:info, "Updated successfully")
+        |> redirect(to: Routes.user_settings_path(conn, :edit))
 
-      :password ->
-        {"password.html", action_name}
+      {:error, changeset} ->
+        render(conn, "edit.html", social_media_changeset: changeset)
     end
   end
 
@@ -51,7 +66,7 @@ defmodule NappyWeb.UserSettingsController do
           :info,
           "A link to confirm your email change has been sent to the new address."
         )
-        |> redirect(to: Routes.user_settings_path(conn, :index))
+        |> redirect(to: Routes.user_settings_path(conn, :edit))
 
       {:error, changeset} ->
         render(conn, "edit.html", email_changeset: changeset)
@@ -66,7 +81,7 @@ defmodule NappyWeb.UserSettingsController do
       {:ok, user} ->
         conn
         |> put_flash(:info, "Password updated successfully.")
-        |> put_session(:user_return_to, Routes.user_settings_path(conn, :index))
+        |> put_session(:user_return_to, Routes.user_settings_path(conn, :edit))
         |> UserAuth.log_in_user(user)
 
       {:error, changeset} ->
@@ -79,12 +94,12 @@ defmodule NappyWeb.UserSettingsController do
       :ok ->
         conn
         |> put_flash(:info, "Email changed successfully.")
-        |> redirect(to: Routes.user_settings_path(conn, :index))
+        |> redirect(to: Routes.user_settings_path(conn, :edit))
 
       :error ->
         conn
         |> put_flash(:error, "Email change link is invalid or it has expired.")
-        |> redirect(to: Routes.user_settings_path(conn, :index))
+        |> redirect(to: Routes.user_settings_path(conn, :edit))
     end
   end
 
@@ -94,5 +109,7 @@ defmodule NappyWeb.UserSettingsController do
     conn
     |> assign(:email_changeset, Accounts.change_user_email(user))
     |> assign(:password_changeset, Accounts.change_user_password(user))
+    |> assign(:user_changeset, Accounts.change_user(user))
+    |> assign(:social_media_changeset, Accounts.change_social_media(user.id))
   end
 end

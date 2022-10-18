@@ -116,10 +116,7 @@ defmodule NappyWeb.Router do
     get "/bulk-upload", UploadController, :bulk_new
     post "/bulk-upload", UploadController, :bulk_create
 
-    # get "/users/settings", UserSettingsController, :edit
-    get "/users/settings", UserSettingsController, :index
-    get "/users/settings/account", UserSettingsController, :account
-    get "/users/settings/password", UserSettingsController, :password
+    get "/users/settings", UserSettingsController, :edit
     put "/users/settings", UserSettingsController, :update
     get "/users/settings/confirm_email/:token", UserSettingsController, :confirm_email
   end

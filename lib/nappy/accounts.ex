@@ -4,8 +4,13 @@ defmodule Nappy.Accounts do
   """
 
   import Ecto.Query, warn: false
+  alias Nappy.Accounts.AccountRole
+  alias Nappy.Accounts.AccountStatus
+  alias Nappy.Accounts.SocialMedia
+  alias Nappy.Accounts.User
+  alias Nappy.Accounts.UserNotifier
+  alias Nappy.Accounts.UserToken
   alias Nappy.Repo
-  alias Nappy.Accounts.{AccountRole, AccountStatus, SocialMedia, User, UserNotifier, UserToken}
   alias NappyWeb.Router.Helpers, as: Routes
 
   ## Database getters
@@ -204,6 +209,17 @@ defmodule Nappy.Accounts do
     User.email_changeset(user, attrs)
   end
 
+  def change_user(user, attrs \\ %{}) do
+    User.user_changeset(user, attrs)
+  end
+
+  def change_social_media(user_id, attrs \\ %{}) do
+    SocialMedia
+    |> where(user_id: ^user_id)
+    |> Repo.one()
+    |> SocialMedia.changeset(attrs)
+  end
+
   @doc """
   Emulates that the email will change without actually changing
   it in the database.
@@ -308,6 +324,36 @@ defmodule Nappy.Accounts do
     |> case do
       {:ok, %{user: user}} -> {:ok, user}
       {:error, :user, changeset, _} -> {:error, changeset}
+    end
+  end
+
+  def update_user(user, attrs) do
+    changeset =
+      user
+      |> User.user_changeset(attrs)
+
+    Ecto.Multi.new()
+    |> Ecto.Multi.update(:user, changeset)
+    |> Repo.transaction()
+    |> case do
+      {:ok, %{user: user}} -> {:ok, user}
+      {:error, :user, changeset, _} -> {:error, changeset}
+    end
+  end
+
+  def update_social_media(user_id, attrs) do
+    changeset =
+      SocialMedia
+      |> where(user_id: ^user_id)
+      |> Repo.one()
+      |> SocialMedia.changeset(attrs)
+
+    Ecto.Multi.new()
+    |> Ecto.Multi.update(:social_media, changeset)
+    |> Repo.transaction()
+    |> case do
+      {:ok, %{social_media: social_media}} -> {:ok, social_media}
+      {:error, :social_media, changeset, _} -> {:error, changeset}
     end
   end
 
