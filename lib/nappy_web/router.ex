@@ -113,8 +113,8 @@ defmodule NappyWeb.Router do
 
     get "/upload", UploadController, :new
     post "/upload", UploadController, :create
-    get "/bulk-upload", UploadController, :bulk_new
-    post "/bulk-upload", UploadController, :bulk_create
+    # get "/bulk-upload", UploadController, :bulk_new
+    # post "/bulk-upload", UploadController, :bulk_create
 
     get "/users/settings", UserSettingsController, :edit
     put "/users/settings", UserSettingsController, :update

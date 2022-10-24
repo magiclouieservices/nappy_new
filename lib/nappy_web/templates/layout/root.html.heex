@@ -42,15 +42,6 @@
       src={Routes.static_path(@conn, "/assets/js/app.js")}
     >
     </script>
-    <%= if Phoenix.Controller.current_path(@conn) === Routes.upload_path(@conn, :new) do %>
-      <script
-        defer
-        phx-track-static
-        type="text/javascript"
-        src={Routes.static_path(@conn, "/assets/js/tags.js")}
-      >
-      </script>
-    <% end %>
   </head>
   <body>
     <div class="border-b border-slate-20">
@@ -66,4 +57,22 @@
     <hr class="mt-8" />
     <%= render("copyright.html") %>
   </body>
+  <%= if Phoenix.Controller.current_path(@conn) === "/upload" do %>
+    <script src="https://cdn.jsdelivr.net/npm/@yaireo/tagify">
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/@yaireo/tagify/dist/tagify.polyfills.min.js">
+    </script>
+    <link
+      href="https://cdn.jsdelivr.net/npm/@yaireo/tagify/dist/tagify.css"
+      rel="stylesheet"
+      type="text/css"
+    />
+    <script>
+      // The DOM element you wish to replace with Tagify
+      var input = document.querySelector('input[name=input-tags]');
+
+      // initialize Tagify on the above input node reference
+      new Tagify(input)
+    </script>
+  <% end %>
 </html>

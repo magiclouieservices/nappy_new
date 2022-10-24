@@ -11,6 +11,13 @@ defmodule NappyWeb.UserSettingsController do
   end
 
   def update(conn, %{"action" => "update_user"} = params) do
+    %{"user" => %{"name" => name}, "username" => username} = params
+
+    params = %{
+      name: name,
+      username: username
+    }
+
     user = conn.assigns.current_user
 
     case Accounts.update_user(user, params) do

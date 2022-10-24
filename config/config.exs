@@ -44,7 +44,6 @@ config :esbuild,
   default: [
     args: ~w(
       js/app.js
-      js/tags.js
       fonts/tiempos.css
       fonts/solid.min.css
       fonts/fontawesome.min.css

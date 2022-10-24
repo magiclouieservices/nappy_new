@@ -71,7 +71,7 @@
               class:
                 "relative cursor-pointer bg-white text-lg font-tiempos-bold text-green-600 hover:text-green-500 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-green-500"
             ) %>
-            <%= file_input(f, :photo_file, class: "sr-only") %>
+            <%= file_input(f, :photo_file, class: "sr-only", required: true) %>
           </div>
           <p class="text-lg font-tiempos-bold">
             The photo must be greater than or equal to: 1024x768 - 50MB
@@ -85,7 +85,8 @@
         <%= text_input(f, :photo_title,
           class:
             "mt-1 appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-gray-500 focus:border-gray-500 sm:text-sm",
-          placeholder: "i.e. Woman eating ice cream or Child with dog"
+          placeholder: "i.e. Woman eating ice cream or Child with dog",
+          required: true
         ) %>
       </div>
       <div class="my-6">
@@ -97,15 +98,12 @@
         ) %>
       </div>
       <div class="my-6">
-        <label for="tags" class="font-semibold">Tags</label>
-        <div id="tags" class="flex items-center">
-          <input
-            class="mt-1 appearance-none block px-3 py-2 border-none border-transparent focus:outline-none focus:ring-transparent focus:border-transparent sm:text-sm"
-            type="text"
-            id="add_tag"
-            placeholder="Add a tag"
-          />
-        </div>
+        <label for="input-tags" class="font-semibold">Tags</label>
+        <input
+          id="input-tags"
+          name="input-tags"
+          class="mt-1 appearance-none block w-full border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-gray-500 focus:border-gray-500 sm:text-sm"
+        />
       </div>
 
       <div class="flex justify-center">
