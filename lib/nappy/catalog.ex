@@ -118,7 +118,7 @@ defmodule Nappy.Catalog do
   def image_url(%Images{} = image, opts \\ []) do
     ext = Metrics.get_image_extension(image.id)
     base_url = Nappy.embed_url()
-    path = Nappy.image_paths("approved")
+    path = Nappy.image_paths()
     filename = "#{image.slug}.#{ext}"
     default_query = "auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2"
 

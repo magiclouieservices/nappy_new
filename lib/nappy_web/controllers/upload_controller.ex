@@ -26,9 +26,13 @@ defmodule NappyWeb.UploadController do
       with {:ok, _} <- request do
         image_status_id = Metrics.get_image_status_id(:pending)
         category_id = Catalog.get_category_by_name(params["photo_category"])
-        tags = params["photo_tags"]
         title = params["photo_title"]
         user_id = conn.assigns.current_user.id
+
+        tags =
+          params["input-tags"]
+          |> Jason.decode!()
+          |> Enum.map_join(",", fn %{"value" => tag} -> tag end)
 
         attrs = %{
           image_status_id: image_status_id,
@@ -45,7 +49,7 @@ defmodule NappyWeb.UploadController do
 
     file_extension = Path.extname(file.filename)
     slug = Slug.random_alphanumeric()
-    dest_path = "photos/pending/#{slug}#{file_extension}"
+    dest_path = "photos/#{slug}#{file_extension}"
     path = Map.put(%{}, slug, [file.path, dest_path])
 
     path
@@ -54,16 +58,13 @@ defmodule NappyWeb.UploadController do
 
     conn
     |> put_flash(:info, "Photo currently in pending, we'll notify you once approved.")
-    |> redirect(to: "/")
+    |> redirect(to: "/upload")
 
     # |> redirect(to: "/photos/#{slug}")
   end
 
   def bulk_create(conn, params) do
-    # IO.inspect(conn, label: "conn")
-    # IO.inspect(params, label: "params")
     file = params["photo_file"]
-    # IO.inspect(file, label: "file")
 
     bulk_upload = fn {slug, [src_path, dest_path]} ->
       request =
@@ -97,7 +98,7 @@ defmodule NappyWeb.UploadController do
         slug = Slug.random_alphanumeric()
         file_extension = Path.extname(f.filename)
         src_path = f.path
-        dest_path = "photos/pending/#{slug}#{file_extension}"
+        dest_path = "photos/#{slug}#{file_extension}"
         Map.put(acc, slug, [src_path, dest_path])
       end)
 

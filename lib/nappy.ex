@@ -63,16 +63,8 @@ defmodule Nappy do
     }
   end
 
-  def image_paths(image_status) do
-    path =
-      case image_status do
-        "approved" -> "approved"
-        "pending" -> "pending"
-        "denied" -> "denied"
-        _ -> "404.jpg"
-      end
-
-    "/photos/#{path}/"
+  def image_paths do
+    "/photos/"
   end
 
   def uploads_priv_dir do
