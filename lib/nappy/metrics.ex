@@ -4,9 +4,10 @@ defmodule Nappy.Metrics do
   """
 
   import Ecto.Query, warn: false
+  alias Nappy.Catalog.Images
+  alias Nappy.Metrics.ImageMetadata
+  alias Nappy.Metrics.ImageStatus
   alias Nappy.Repo
-
-  alias Nappy.Metrics.{ImageMetadata, ImageStatus}
 
   @doc """
   Returns the list of image_status.
@@ -47,8 +48,36 @@ defmodule Nappy.Metrics do
     # Repo.one(query)
   end
 
+  def translate_units(num) do
+    kilo = &Float.floor(&1 / 1_000, 1)
+    mega = &Float.floor(&1 / 1_000_000, 1)
+
+    cond do
+      num < 1_000 ->
+        num
+
+      num < 1_000_000 ->
+        "#{kilo.(num)}K"
+
+      num >= 1_000_000 ->
+        "#{mega.(num)}M"
+    end
+  end
+
   def get_profile_page_metrics(user) do
-    nil
+    active = get_image_status_id(:active)
+    featured = get_image_status_id(:featured)
+
+    Images
+    |> join(:inner, [i], ia in assoc(i, :image_analytics))
+    |> where(user_id: ^user.id)
+    |> where([i, _], i.image_status_id in ^[active, featured])
+    |> select([i, ia], %{
+      image_count: count(i.id),
+      view_count: type(sum(ia.view_count), :integer),
+      download_count: type(sum(ia.download_count), :integer)
+    })
+    |> Repo.one()
   end
 
   @doc """

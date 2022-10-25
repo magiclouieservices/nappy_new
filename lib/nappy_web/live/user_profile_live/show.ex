@@ -22,8 +22,9 @@ defmodule NappyWeb.UserProfileLive.Show do
   end
 
   @impl true
-  def handle_params(%{"username" => username} = params, uri, socket) do
+  def handle_params(%{"username" => username} = _params, uri, socket) do
     user = Accounts.get_user_by_username(username)
+    profile_metrics = Metrics.get_profile_page_metrics(user)
 
     socket =
       socket
@@ -31,6 +32,7 @@ defmodule NappyWeb.UserProfileLive.Show do
       |> assign(page_size: 12)
       |> assign(user: user)
       |> assign(current_url: uri)
+      |> assign(profile_metrics: profile_metrics)
 
     {:noreply, socket}
   end

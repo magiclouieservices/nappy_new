@@ -1,4 +1,4 @@
-<div class="container mx-auto my-8 flex flex-col justify-center items-center">
+<div class="container mx-auto mt-8 mb-4 flex flex-col justify-center items-center">
   <img
     class="w-32 rounded-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-900 border border-gray-300"
     src={Accounts.avatar_url(@socket, @user.avatar_link)}
@@ -18,39 +18,46 @@
   <div class="flex gap-6 mt-4 text-gray-500">
     <%= if @user.social_media.website_link do %>
       <a href={@user.social_media.website_link} title="Portfolio">
-        <i class="fa-solid fa-camera fa-xl"></i>
+        <i class="fa-solid fa-camera"></i>
       </a>
     <% end %>
     <%= if @user.social_media.twitter_link do %>
       <a href={@user.social_media.twitter_link} title="Twitter">
-        <i class="fa-brands fa-twitter fa-xl"></i>
+        <i class="fa-brands fa-twitter"></i>
       </a>
     <% end %>
     <%= if @user.social_media.instagram_link do %>
       <a href={@user.social_media.instagram_link} title="Instagram">
-        <i class="fa-brands fa-instagram fa-xl"></i>
+        <i class="fa-brands fa-instagram"></i>
       </a>
     <% end %>
     <%= if @user.social_media.facebook_link do %>
       <a href={@user.social_media.facebook_link} title="Facebook">
-        <i class="fa-brands fa-facebook fa-xl"></i>
+        <i class="fa-brands fa-facebook"></i>
       </a>
     <% end %>
     <%= if @user.social_media.contact_email do %>
       <a href={"mailto:#{@user.social_media.contact_email}"} title="Email">
-        <i class="fa-solid fa-envelope fa-xl"></i>
+        <i class="fa-solid fa-envelope"></i>
       </a>
     <% end %>
   </div>
   <div class="flex gap-6 my-4 text-sm">
-    <div class="flex flex-col items-center justify-center">
-      <span>62</span>
-      <span>Photos</span>
-    </div>
-    <div class="flex flex-col items-center justify-center">
-      <span>61.2k</span>
-      <span>Downloads</span>
-    </div>
+    <%= if @profile_metrics.image_count > 0 do %>
+      <div class="flex flex-col items-center justify-center">
+        <span class="font-bold"><%= @profile_metrics.image_count %></span>
+        <span>Photos</span>
+      </div>
+    <% end %>
+    <%= if @profile_metrics.download_count > 0 do %>
+      <div class="flex flex-col items-center justify-center">
+        <span class="font-bold">
+          <%= Metrics.translate_units(@profile_metrics.download_count) %>
+        </span>
+        <span>Downloads</span>
+      </div>
+    <% end %>
+    <!--
     <div class="flex flex-col items-center justify-center">
       <span>10</span>
       <span>Followers</span>
@@ -63,10 +70,13 @@
       <span>2</span>
       <span>Saves</span>
     </div>
-    <div class="flex flex-col items-center justify-center">
-      <span>3.7M</span>
-      <span>Views</span>
-    </div>
+    -->
+    <%= if @profile_metrics.view_count > 0 do %>
+      <div class="flex flex-col items-center justify-center">
+        <span class="font-bold"><%= Metrics.translate_units(@profile_metrics.view_count) %></span>
+        <span>Views</span>
+      </div>
+    <% end %>
   </div>
 </div>
 <section class="container mx-auto">
