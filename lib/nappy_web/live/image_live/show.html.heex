@@ -1,40 +1,91 @@
-<div class="container mx-auto">
-  <%= if @status in ["approved", "featured"] do %>
-    <img class="max-w-[40vw]" src={Catalog.image_url(@image)} alt={@image.title} />
+<div class="container relative mx-auto w-full overflow-y-auto rounded p-8">
+  <div class="flex justify-between">
+    <a
+      class="flex gap-2 rounded items-center focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 hover:underline"
+      href={Routes.user_profile_show_path(@socket, :show, @image.user.username)}
+    >
+      <img
+        class="rounded-full w-9 border"
+        src={Accounts.avatar_url(@socket, @image.user.avatar_link)}
+      />
+      <span><%= @image.user.username %></span>
+    </a>
 
-    <h1>
-      Title: <%= @image.title %>
-    </h1>
-
-    <h2>
-      Photographer: <%= link(@image.user.username,
-        to: Routes.user_profile_show_path(@socket, :show, @image.user.username),
-        class: "hover:underline"
-      ) %>
-    </h2>
-
-    <h3>Tags</h3>
-    <span class="inline-flex items-center rounded-full bg-indigo-100 px-3 py-0.5 text-sm font-medium text-indigo-800">
-      <svg class="-ml-1 mr-1.5 h-2 w-2 text-indigo-400" fill="currentColor" viewBox="0 0 8 8">
-        <circle cx="4" cy="4" r="3" />
-      </svg>
-      <%= Metrics.get_image_status_name(@image.image_status_id) %>
-    </span>
-    <ul>
-      <%= for tag <- @tags do %>
-        <li>- <%= tag %></li>
+    <div class="flex gap-2">
+      <button
+        type="button"
+        class="inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2"
+      >
+        <i class="fa-solid fa-circle-dollar-to-slot"></i>
+      </button>
+      <button
+        type="button"
+        class="inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2"
+      >
+        <i class="fa-solid fa-reply fa-flip-horizontal"></i>
+      </button>
+      <%= if @current_user != nil do %>
+        <button
+          type="button"
+          class="inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2"
+        >
+          <i class="fa-regular fa-heart"></i>
+        </button>
+      <% else %>
+        <a
+          class="inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2"
+          href={Routes.user_session_path(@socket, :create)}
+        >
+          <i class="fa-regular fa-heart"></i>
+        </a>
       <% end %>
-    </ul>
+      <button
+        type="button"
+        class="inline-flex gap-2 justify-center items-center rounded-md bg-green-600 px-4 py-2 text-xs text-white shadow-sm focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2"
+      >
+        <span>Download</span>
+        <i class="fa-solid fa-chevron-down"></i>
+      </button>
+    </div>
+  </div>
+  <div class="my-4 flex justify-center">
+    <img class="object-cover h-[75vh]" src={Catalog.image_url(@image)} alt={@image.title} />
+  </div>
 
-    <.live_component
-      module={RelatedImagesComponent}
-      id={"related-image-#{@image.slug}"}
-      related_images={@related_images}
-    />
-    <.live_component
-      module={SponsoredImagesComponent}
-      id={"sponsored-image-#{@image.slug}"}
-      sponsored_images={@sponsored_images}
-    />
-  <% end %>
+  <div class="flex my-8 gap-8 justify-center">
+    <span :if={@metrics.view_count > 0}>
+      <i class="fa-solid fa-eye"></i>
+      <%= Metrics.translate_units(@metrics.view_count) %> Views
+    </span>
+    <!--
+      <span>
+        <i class="fa-solid fa-heart"></i>
+        23
+        Saves
+      </span>
+      -->
+    <span :if={@metrics.download_count > 0}>
+      <i class="fa-solid fa-download"></i>
+      <%= Metrics.translate_units(@metrics.download_count) %> Downloads
+    </span>
+    <.live_component module={MoreInfoComponent} id="more-info" image={@image} tags={@tags} />
+  </div>
+
+  <.live_component
+    module={RelatedImagesComponent}
+    id={"related-image-#{@image.slug}"}
+    related_images={@related_images}
+  />
+
+  <.live_component
+    module={SponsoredImagesComponent}
+    id={"sponsored-image-#{@image.slug}"}
+    sponsored_images={@sponsored_images}
+  />
+
+  <div class="my-8 flex justify-center">
+    <span class="py-1 px-20 bg-black text-white text-center">
+      Premium photos by iStock | Use code NAPPY15 for 15% off
+    </span>
+  </div>
 </div>
