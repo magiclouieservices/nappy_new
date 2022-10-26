@@ -1,10 +1,12 @@
 defmodule NappyWeb.ImageLive.Show do
   use NappyWeb, :live_view
 
+  alias Nappy.Accounts
   alias Nappy.Admin.Slug
   alias Nappy.Catalog
   alias Nappy.Metrics
   alias NappyWeb.Components.GalleryComponent
+  alias NappyWeb.Components.MoreInfoComponent
   alias NappyWeb.Components.RelatedImagesComponent
   alias NappyWeb.Components.SponsoredImagesComponent
 
@@ -47,6 +49,7 @@ defmodule NappyWeb.ImageLive.Show do
         tags = Catalog.image_tags_as_list(image.tags, image.generated_tags)
         sponsored_images = GalleryComponent.sponsored_images(image.slug, image.tags)
         related_images = GalleryComponent.related_images(image.slug)
+        metrics = Metrics.get_metrics_by_image_id(image.id)
 
         socket =
           socket
@@ -56,6 +59,7 @@ defmodule NappyWeb.ImageLive.Show do
           |> assign(tags: tags)
           |> assign(sponsored_images: sponsored_images)
           |> assign(related_images: related_images)
+          |> assign(metrics: metrics)
 
         {:noreply, socket}
       end

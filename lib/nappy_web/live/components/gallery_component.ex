@@ -2,7 +2,9 @@ defmodule NappyWeb.Components.GalleryComponent do
   use NappyWeb, :live_component
   alias Nappy.Accounts
   alias Nappy.Catalog
+  alias Nappy.Metrics
   alias Nappy.SponsoredImages
+  alias NappyWeb.Components.MoreInfoComponent
   alias NappyWeb.Components.RelatedImagesComponent
   alias NappyWeb.Components.SponsoredImagesComponent
 
@@ -194,17 +196,27 @@ defmodule NappyWeb.Components.GalleryComponent do
 
                     <div class="flex gap-8 justify-center">
                       <span>
-                        <i class="fa-solid fa-eye"></i> 53.0k Views
+                        <i class="fa-solid fa-eye"></i>
+                        <%= get_metrics(image.id).view_count %>
                       </span>
+                      <!--
                       <span>
                         <i class="fa-solid fa-heart"></i> 23 Saves
                       </span>
+                      -->
                       <span>
-                        <i class="fa-solid fa-download"></i> 1.2k Downloads
+                        <i class="fa-solid fa-download"></i>
+                        <%= get_metrics(image.id).download_count %>
                       </span>
                       <span>
                         <i class="fa-solid fa-circle-info"></i> more info
                       </span>
+                      <.live_component
+                        module={MoreInfoComponent}
+                        id={"more-info-#{image.slug}"}
+                        image={image}
+                        tags={Catalog.image_tags_as_list(image.tags, image.generated_tags)}
+                      />
                     </div>
 
                     <.live_component
@@ -252,5 +264,16 @@ defmodule NappyWeb.Components.GalleryComponent do
       |> hd()
 
     SponsoredImages.get_images(slug, tag)
+  end
+
+  def get_metrics(image_id) do
+    metrics = Metrics.get_metrics_by_image_id(image_id)
+    view_count = Metrics.translate_units(metrics.view_count)
+    download_count = Metrics.translate_units(metrics.download_count)
+
+    %{
+      view_count: view_count,
+      download_count: download_count
+    }
   end
 end
