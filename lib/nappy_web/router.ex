@@ -24,6 +24,7 @@ defmodule NappyWeb.Router do
     # get "/user/:username", UserProfileController, :show
     get "/collections", CollectionsController, :index
     get "/categories", CategoryController, :index
+    live "/popular-searches", PopularSearchesLive.Show, :show
 
     live_session :check_auth, on_mount: [{NappyWeb.LiveAuth, :check_auth}] do
       live "/", HomeLive.Index, :index
@@ -31,6 +32,8 @@ defmodule NappyWeb.Router do
       live "/collection/:slug", CollectionsLive.Show, :show
       live "/category/:slug", CategoryLive.Show, :show
       live "/user/:username", UserProfileLive.Show, :show
+      live "/search", SearchLive.Show, :show
+      live "/search/:query", SearchLive.Show, :show
     end
 
     # resources "/legal", LegalController

@@ -1,0 +1,26 @@
+<section class="container mx-auto py-8">
+  <h1 class="font-tiempos-bold text-3xl text-center">
+    Popular Searches
+  </h1>
+  <p class="text-center">
+    The most popular search terms on <%= Nappy.app_name() %>
+  </p>
+
+  <ul class="pt-8 grid grid-cols-4 auto-rows-[18rem] gap-4">
+    <li
+      class="relative rounded-lg bg-slate-300"
+      :for={image <- @images}>
+      <a href={Routes.search_show_path(@socket, :show, get_first_tag(image.tags))}>
+        <img
+          loading="lazy"
+          class="object-cover rounded-lg w-full h-full"
+          src={Catalog.image_url(image)}
+          alt={image.title}
+        />
+        <span class="absolute rounded-lg inset-0 flex gap-2 items-center justify-center bg-[rgba(0,0,0,.5)] text-white text-3xl font-tiempos-bold">
+          <%= get_first_tag(image.tags) %>
+        </span>
+      </a>
+    </li>
+  </ul>
+</section>

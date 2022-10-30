@@ -21,7 +21,7 @@ defmodule NappyWeb.Components.RelatedImagesComponent do
       <p class="font-tiempos-bold text-center text-3xl">Related Photos</p>
       <div class="flex gap-2 my-2">
         <%= for related_img <- @related_images do %>
-          <div class="bg-slate-300 grow h-72 basis-56">
+          <div class="bg-slate-300 grow h-48 basis-56">
             <%= unless related_img === "#" do %>
               <a
                 class="relative"

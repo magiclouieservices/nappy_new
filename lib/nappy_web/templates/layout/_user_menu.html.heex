@@ -7,9 +7,16 @@
   </a>
 
   <ul class="flex items-center gap-6">
-    <%= unless Nappy.get_root_path(@conn) === "/" do %>
+    <%= unless Nappy.get_root_path(@conn) === "/" or String.match?(Nappy.get_root_path(@conn), ~r/\/search/u) do %>
       <li>
+        <!--
         <i class="text-gray-900 fa-solid fa-magnifying-glass"></i>
+        -->
+        <%= live_render(
+          @conn,
+          NappyWeb.SearchLive.NavbarSearch,
+          session: %{}
+        ) %>
       </li>
     <% end %>
     <li>

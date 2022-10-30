@@ -11,7 +11,7 @@ defmodule NappyWeb.Components.GalleryComponent do
   @moduledoc false
 
   def handle_event("show_images", %{"slug" => slug, "tags" => tags}, socket) do
-    sponsored_images = sponsored_images(slug, tags)
+    sponsored_images = SponsoredImages.get_images(slug, tags)
     related_images = related_images(slug)
 
     socket =
@@ -54,7 +54,7 @@ defmodule NappyWeb.Components.GalleryComponent do
             <div
               x-data="{ hidden: true, open: false }"
               id={"image-#{image.slug}"}
-              class={"#{calc_span(image.image_metadata)} relative bg-slate-300"}
+              class={"#{calc_span(image.image_metadata)} relative bg-slate-300 rounded"}
             >
               <a
                 phx-click="show_images"
@@ -73,12 +73,12 @@ defmodule NappyWeb.Components.GalleryComponent do
                   x-on:mouseenter="hidden = false"
                   x-on:mouseleave="hidden = true"
                   x-bind:style="hidden ? '' : 'background: linear-gradient(0deg, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0) 20%);'"
-                  class="w-full h-full absolute"
+                  class="w-full h-full absolute rounded"
                 >
                 </div>
                 <img
                   loading="lazy"
-                  class="object-cover w-full h-full"
+                  class="object-cover w-full h-full rounded"
                   src={Catalog.image_url(image)}
                   alt={image.title}
                 />
@@ -106,7 +106,7 @@ defmodule NappyWeb.Components.GalleryComponent do
                 aria-modal="true"
                 x-id={"['modal-#{image.slug}']"}
                 x-bind:aria-labelledby={"$id('modal-#{image.slug}')"}
-                class="fixed inset-0 z-10 overflow-y-auto"
+                class="fixed inset-0 z-10 overflow-y-auto rounded"
               >
                 <div x-show="open" x-transition.opacity class="fixed inset-0 bg-black bg-opacity-50">
                 </div>
@@ -197,7 +197,7 @@ defmodule NappyWeb.Components.GalleryComponent do
                     <div class="flex gap-8 justify-center">
                       <span>
                         <i class="fa-solid fa-eye"></i>
-                        <%= get_metrics(image.id).view_count %>
+                        <%= get_metrics(image).view_count %>
                       </span>
                       <!--
                       <span>
@@ -206,10 +206,7 @@ defmodule NappyWeb.Components.GalleryComponent do
                       -->
                       <span>
                         <i class="fa-solid fa-download"></i>
-                        <%= get_metrics(image.id).download_count %>
-                      </span>
-                      <span>
-                        <i class="fa-solid fa-circle-info"></i> more info
+                        <%= get_metrics(image).download_count %>
                       </span>
                       <.live_component
                         module={MoreInfoComponent}
@@ -234,11 +231,17 @@ defmodule NappyWeb.Components.GalleryComponent do
               </div>
             </div>
           <% else %>
-            <div class="row-span-1 relative bg-slate-300"></div>
+            <div class="row-span-1 relative bg-slate-300 rounded"></div>
           <% end %>
         <% end %>
       </div>
       <div id="infinite-scroll-marker" phx-hook="InfiniteScroll" data-page={@page}></div>
+      <div class="mt-8 text-center text-sm">
+        Looking for something specific?
+        <a target="_blank" rel="noreferer noopener" class="underline" href="https://nappy.kampsite.co">
+          Request a photo
+        </a>
+      </div>
     </div>
     """
   end
@@ -257,19 +260,9 @@ defmodule NappyWeb.Components.GalleryComponent do
     Catalog.get_related_images(slug)
   end
 
-  def sponsored_images(slug, tags) do
-    tag =
-      tags
-      |> String.split(",", trim: true)
-      |> hd()
-
-    SponsoredImages.get_images(slug, tag)
-  end
-
-  def get_metrics(image_id) do
-    metrics = Metrics.get_metrics_by_image_id(image_id)
-    view_count = Metrics.translate_units(metrics.view_count)
-    download_count = Metrics.translate_units(metrics.download_count)
+  def get_metrics(image) do
+    view_count = Metrics.translate_units(image.image_analytics.view_count)
+    download_count = Metrics.translate_units(image.image_analytics.download_count)
 
     %{
       view_count: view_count,

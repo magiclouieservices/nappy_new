@@ -64,7 +64,11 @@ defmodule NappyWeb.Components.MoreInfoComponent do
         <p class="my-2">Title: <%= @image.title %></p>
         <p class="mt-2">Tags:</p>
         <%= for tag <- @tags do %>
-          <a href="#" class="inline-block m-0.5 px-1.5 py-0.5 rounded-full border border-white hover:underline">
+          <a
+            target="_blank"
+            rel="noreferer noopener"
+            href={Routes.search_show_path(@socket, :show, tag)}
+            class="inline-block m-0.5 px-1.5 py-0.5 rounded-full border border-white hover:underline">
             <%= tag %>
           </a>
         <% end %>

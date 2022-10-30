@@ -1,0 +1,51 @@
+<div class="relative">
+  <img
+    loading="lazy"
+    class="w-screen h-40 object-cover"
+    src={Routes.static_path(@socket, "/images/header_search.jpg")}
+  />
+  <div class="absolute inset-0 z-1 flex flex-col gap-4 justify-center items-center text-white bg-[rgba(0,0,0,.5)]">
+    <span class="max-w-[32rem] text-4xl font-tiempos-bold text-center">
+      Search
+    </span>
+    <.live_component
+      module={HeaderSearchComponent}
+      id="header-search"
+    />
+  </div>
+</div>
+<div class="container mx-auto pt-12">
+  <.live_component
+    module={SponsoredImagesComponent}
+    id={"sponsored-image"}
+    sponsored_images={@sponsored_images}
+    :if={not Enum.empty?(@sponsored_images)}
+  />
+  <%= if Enum.empty?(@images) do %>
+    <h1 class="mb-8 text-center font-tiempos-bold text-3xl">
+      <%= "No Results Found for #{@query}" %>
+    </h1>
+    <div class="mt-8 text-center text-sm">
+      Looking for something specific?
+      <a
+        target="_blank"
+        rel="noreferer noopener"
+        class="underline"
+        href="https://nappy.kampsite.co">
+        Request a photo
+      </a>
+    </div>
+  <% else %>
+    <h1 class="mb-8 text-center font-tiempos-bold text-3xl">
+      <%= "#{@query} photos" %>
+    </h1>
+    <.live_component
+      module={GalleryComponent}
+      id="infinite-gallery-home"
+      images={@images}
+      page={@page}
+      current_user={@current_user}
+      current_url={@current_url}
+    />
+  <% end %>
+</div>
