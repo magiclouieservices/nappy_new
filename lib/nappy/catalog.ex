@@ -31,6 +31,49 @@ defmodule Nappy.Catalog do
     |> Repo.all()
   end
 
+  def get_trend_search_bar do
+    active = Metrics.get_image_status_id(:active)
+    featured = Metrics.get_image_status_id(:featured)
+
+    Images
+    |> where([i], i.image_status_id in ^[active, featured])
+    |> order_by(fragment("RANDOM()"))
+    |> limit(6)
+    |> Repo.all()
+  end
+
+  def get_popular_searches do
+    active = Metrics.get_image_status_id(:active)
+    featured = Metrics.get_image_status_id(:featured)
+
+    Images
+    |> join(:inner, [i], ia in assoc(i, :image_analytics))
+    |> where([i, _], i.image_status_id in ^[active, featured])
+    |> order_by([_, ia], desc: ia.view_count)
+    |> limit(20)
+    |> Repo.all()
+  end
+
+  def get_popular_keywords(max_num_of_keywords) do
+    active = Metrics.get_image_status_id(:active)
+    featured = Metrics.get_image_status_id(:featured)
+
+    Images
+    |> join(:inner, [i], ia in assoc(i, :image_analytics))
+    |> where([i, _], i.image_status_id in ^[active, featured])
+    |> order_by([_, ia], desc: ia.view_count)
+    |> limit(^max_num_of_keywords)
+    |> select([i, _], i.tags)
+    |> Repo.all()
+    |> Enum.reduce([], fn tag, acc ->
+      tag
+      |> String.split(",", trim: true)
+      |> Kernel.++(acc)
+    end)
+    |> Enum.uniq()
+    |> Enum.take_random(max_num_of_keywords)
+  end
+
   def paginate_images(:popular, params) do
     active = Metrics.get_image_status_id(:active)
     featured = Metrics.get_image_status_id(:featured)
@@ -39,9 +82,10 @@ defmodule Nappy.Catalog do
     |> join(:inner, [ia], i in assoc(ia, :image))
     |> join(:inner, [_, i], u in assoc(i, :user))
     |> join(:inner, [_, i, _], im in assoc(i, :image_metadata))
-    |> where([_, i, _, _], i.image_status_id in ^[active, featured])
+    |> join(:inner, [_, i, _, _], ia in assoc(i, :image_analytics))
+    |> where([_, i, _, _, _], i.image_status_id in ^[active, featured])
     |> order_by([ia, ...], desc: ia.view_count)
-    |> select([_, i, u, im], %Images{
+    |> select([_, i, u, im, ia], %Images{
       id: i.id,
       description: i.description,
       generated_description: i.generated_description,
@@ -50,6 +94,7 @@ defmodule Nappy.Catalog do
       tags: i.tags,
       title: i.title,
       category_id: i.category_id,
+      image_analytics: ia,
       image_metadata: im,
       image_status_id: i.image_status_id,
       user_id: u.id,
@@ -76,7 +121,7 @@ defmodule Nappy.Catalog do
         |> where(image_status_id: ^Metrics.get_image_status_id(status_name))
     end
     |> order_by(fragment("RANDOM()"))
-    |> preload([:user, :image_metadata])
+    |> preload([:user, :image_metadata, :image_analytics])
     |> Repo.paginate(params)
   end
 
@@ -86,11 +131,12 @@ defmodule Nappy.Catalog do
 
     User
     |> join(:inner, [u], i in assoc(u, :images))
-    |> join(:inner, [_, i, _], im in assoc(i, :image_metadata))
+    |> join(:inner, [_, i], im in assoc(i, :image_metadata))
+    |> join(:inner, [_, i, _], ia in assoc(i, :image_analytics))
     |> where([_, i, _, _], i.image_status_id in ^[active, featured])
     |> where(username: ^username)
     |> order_by(fragment("RANDOM()"))
-    |> select([u, i, im], %Images{
+    |> select([u, i, im, ia], %Images{
       id: i.id,
       description: i.description,
       generated_description: i.generated_description,
@@ -99,6 +145,7 @@ defmodule Nappy.Catalog do
       tags: i.tags,
       title: i.title,
       category_id: i.category_id,
+      image_analytics: ia,
       image_metadata: im,
       image_status_id: i.image_status_id,
       user_id: u.id,
@@ -328,7 +375,7 @@ defmodule Nappy.Catalog do
     |> where([i], i.image_status_id in ^[active, featured])
     |> where(category_id: ^category_id)
     |> order_by(fragment("RANDOM()"))
-    |> preload([:user, :image_metadata])
+    |> preload([:user, :image_metadata, :image_analytics])
     |> Repo.paginate(params)
   end
 
@@ -587,10 +634,11 @@ defmodule Nappy.Catalog do
     |> join(:inner, [c], i in assoc(c, :image))
     |> join(:inner, [_, i], u in assoc(i, :user))
     |> join(:inner, [_, i, _], im in assoc(i, :image_metadata))
+    |> join(:inner, [_, i, _, _], ia in assoc(i, :image_analytics))
     |> where([_, i, _, _], i.image_status_id in ^[active, featured])
     |> where(collection_description_id: ^coll_desc_id)
     |> order_by(fragment("RANDOM()"))
-    |> select([_, i, u, im], %Images{
+    |> select([_, i, u, im, ia], %Images{
       id: i.id,
       description: i.description,
       generated_description: i.generated_description,
@@ -599,6 +647,7 @@ defmodule Nappy.Catalog do
       tags: i.tags,
       title: i.title,
       category_id: i.category_id,
+      image_analytics: ia,
       image_metadata: im,
       image_status_id: i.image_status_id,
       user_id: u.id,

@@ -5,6 +5,7 @@ defmodule NappyWeb.ImageLive.Show do
   alias Nappy.Admin.Slug
   alias Nappy.Catalog
   alias Nappy.Metrics
+  alias Nappy.SponsoredImages
   alias NappyWeb.Components.GalleryComponent
   alias NappyWeb.Components.MoreInfoComponent
   alias NappyWeb.Components.RelatedImagesComponent
@@ -42,14 +43,13 @@ defmodule NappyWeb.ImageLive.Show do
         image_show_path = Routes.image_show_path(socket, :show, "#{path}-#{slug}")
         {:noreply, push_redirect(socket, to: image_show_path)}
       else
-        preload = [:user, :image_metadata, collections: :collection_description]
+        preload = [:user, :image_metadata, :image_analytics]
         image = Catalog.get_image_by_slug(slug, preload: preload, select: nil)
         ext = image.image_metadata.extension_type
         status = Metrics.get_status_name(image.image_status_id)
         tags = Catalog.image_tags_as_list(image.tags, image.generated_tags)
-        sponsored_images = GalleryComponent.sponsored_images(image.slug, image.tags)
+        sponsored_images = SponsoredImages.get_images(image.slug, image.tags)
         related_images = GalleryComponent.related_images(image.slug)
-        metrics = Metrics.get_metrics_by_image_id(image.id)
 
         socket =
           socket
@@ -59,7 +59,6 @@ defmodule NappyWeb.ImageLive.Show do
           |> assign(tags: tags)
           |> assign(sponsored_images: sponsored_images)
           |> assign(related_images: related_images)
-          |> assign(metrics: metrics)
 
         {:noreply, socket}
       end

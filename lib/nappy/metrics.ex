@@ -341,16 +341,6 @@ defmodule Nappy.Metrics do
   """
   def get_image_analytics!(id), do: Repo.get!(ImageAnalytics, id)
 
-  def get_metrics_by_image_id(image_id) do
-    ImageAnalytics
-    |> where(image_id: ^image_id)
-    |> select([
-      :download_count,
-      :view_count
-    ])
-    |> Repo.one()
-  end
-
   @doc """
   Creates a image_analytics.
 

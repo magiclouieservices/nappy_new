@@ -3,7 +3,12 @@ defmodule Nappy.SponsoredImages do
 
   @default_ttl_seconds "1599"
 
-  def get_images(key_name, tag, page_size \\ 5) do
+  def get_images(key_name, tags, page_size \\ 5) do
+    tag =
+      tags
+      |> String.split(",", trim: true)
+      |> hd()
+
     cache_name = "#{key_name}-#{tag}"
     cache = Nappy.cache_name() |> Cachex.get(cache_name)
 

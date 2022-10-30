@@ -53,9 +53,9 @@
   </div>
 
   <div class="flex my-8 gap-8 justify-center">
-    <span :if={@metrics.view_count > 0}>
+    <span :if={@image.image_analytics.view_count > 0}>
       <i class="fa-solid fa-eye"></i>
-      <%= Metrics.translate_units(@metrics.view_count) %> Views
+      <%= Metrics.translate_units(@image.image_analytics.view_count) %> Views
     </span>
     <!--
       <span>
@@ -64,9 +64,9 @@
         Saves
       </span>
       -->
-    <span :if={@metrics.download_count > 0}>
+    <span :if={@image.image_analytics.download_count > 0}>
       <i class="fa-solid fa-download"></i>
-      <%= Metrics.translate_units(@metrics.download_count) %> Downloads
+      <%= Metrics.translate_units(@image.image_analytics.download_count) %> Downloads
     </span>
     <.live_component module={MoreInfoComponent} id="more-info" image={@image} tags={@tags} />
   </div>
@@ -82,10 +82,4 @@
     id={"sponsored-image-#{@image.slug}"}
     sponsored_images={@sponsored_images}
   />
-
-  <div class="my-8 flex justify-center">
-    <span class="py-1 px-20 bg-black text-white text-center">
-      Premium photos by iStock | Use code NAPPY15 for 15% off
-    </span>
-  </div>
 </div>

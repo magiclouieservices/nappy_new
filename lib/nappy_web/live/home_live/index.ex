@@ -3,6 +3,7 @@ defmodule NappyWeb.HomeLive.Index do
 
   alias Nappy.Catalog
   alias NappyWeb.Components.GalleryComponent
+  alias NappyWeb.Components.HomeHeaderComponent
 
   @moduledoc false
 
@@ -45,16 +46,23 @@ defmodule NappyWeb.HomeLive.Index do
     }
   end
 
+  @impl true
+  def handle_event("load-more", _unsigned_params, %{assigns: assigns} = socket) do
+    {:noreply, assign(socket, page: assigns.page + 1) |> fetch()}
+  end
+
+  @impl true
+  def handle_event("search", %{"search" => %{"search_phrase" => query}}, socket) do
+    route = Routes.search_show_path(socket, :show, query)
+
+    {:noreply, redirect(socket, to: route)}
+  end
+
   defp prepare_assigns(socket, filter \\ [filter: :featured]) do
     socket
     |> assign(page: 1)
     |> assign(page_size: 12)
     |> assign(filter)
-  end
-
-  @impl true
-  def handle_event("load-more", _unsigned_params, %{assigns: assigns} = socket) do
-    {:noreply, assign(socket, page: assigns.page + 1) |> fetch()}
   end
 
   defp fetch(%{assigns: %{filter: filter, page: page, page_size: page_size}} = socket) do

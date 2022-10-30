@@ -1,0 +1,26 @@
+<div class="container mx-auto">
+  <.form
+    :let={f}
+    for={:search}
+    phx-change="search"
+  >
+    <%= label f, :search_phrase, class: "tag-label" do %>
+    <%= text_input f,
+        :search_phrase,
+        class: "tag-input",
+        phx_debounce: 500,
+        placeholder: "search for images"
+    %>
+    <% end %>
+  </.form>
+
+  <div :for={image <- @images}>
+    <span class="inline border rounded">
+      <img
+        class="object-cover w-24"
+        src={Catalog.image_url(image)}
+        alt={image.title} />
+      <%= image.title %>
+    </span>
+  </div>
+</div>
