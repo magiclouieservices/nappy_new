@@ -1,5 +1,6 @@
 # Nappy
 
+<!--
 ### **NOTE BEFORE COMMITTING TO GIT!!!**
 
 Please remove this line from `lib/nappy/release.ex`, as it's going to remove all data before bringing the repo up.
@@ -8,6 +9,7 @@ Please remove this line from `lib/nappy/release.ex`, as it's going to remove all
 # from migrate/0 function
 {:ok, _, _} = Ecto.Migrator.with_repo(repo, &Ecto.Migrator.run(&1, :down, all: true))
 ```
+-->
 
 ### Dev environment, on first cloning of repo:
 
