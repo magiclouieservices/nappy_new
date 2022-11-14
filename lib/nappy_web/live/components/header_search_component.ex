@@ -39,7 +39,7 @@ defmodule NappyWeb.Components.HeaderSearchComponent do
             type="text"
             placeholder="Search for photos"
             class="appearance-none block w-96 rounded border-gray-300 placeholder-gray-500 focus:outline-none focus:ring-gray-500 focus:border-gray-500 text-black"
-          >
+          />
           <div
             x-cloak
             x-show="open"
@@ -66,7 +66,8 @@ defmodule NappyWeb.Components.HeaderSearchComponent do
         <% end %>
         <button
           phx-submit="search"
-          class="absolute inset-y-0 right-0 flex items-center px-3 text-gray-500 hover:text-green-500">
+          class="absolute inset-y-0 right-0 flex items-center px-3 text-gray-500 hover:text-green-500"
+        >
           <i class="fa-solid fa-magnifying-glass"></i>
         </button>
       </.form>

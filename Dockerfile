@@ -22,7 +22,7 @@ ARG RUNNER_IMAGE="debian:${DEBIAN_VERSION}"
 FROM ${BUILDER_IMAGE} as builder
 
 # install build dependencies
-RUN apt-get update -y && apt-get install -y build-essential git npm \
+RUN apt-get update -y && apt-get install -y libvips-dev git npm \
     && apt-get clean && rm -f /var/lib/apt/lists/*_*
 
 # prepare build dir
@@ -69,7 +69,7 @@ RUN mix release
 # the compiled release and other runtime necessities
 FROM ${RUNNER_IMAGE}
 
-RUN apt-get update -y && apt-get install -y libstdc++6 openssl libncurses5 locales \
+RUN apt-get update -y && apt-get install -y libstdc++6 libvips-dev openssl libncurses5 locales \
   && apt-get clean && rm -f /var/lib/apt/lists/*_*
 
 # Set the locale
@@ -95,5 +95,5 @@ CMD ["/app/bin/server"]
 # Remove ipv6 and erl_aflags env
 # when deploying via vps
 # Appended by flyctl
-ENV ECTO_IPV6 true
-ENV ERL_AFLAGS "-proto_dist inet6_tcp"
+# ENV ECTO_IPV6 true
+# ENV ERL_AFLAGS "-proto_dist inet6_tcp"

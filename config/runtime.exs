@@ -21,16 +21,22 @@ if System.get_env("PHX_SERVER") do
 end
 
 config :nappy, :runtime,
-  getty_api_key: System.get_env("GETTY_API_KEY"),
-  getty_api_secret: System.get_env("GETTY_API_SECRET")
-
-config :nappy, :runtime,
   app_name: "Nappy",
-  embed_url: "https://devnappy.imgix.net",
+  getty_api_key: System.get_env("GETTY_API_KEY"),
+  getty_api_secret: System.get_env("GETTY_API_SECRET"),
   subscription_url: "https://email.boogie.co/subscribe",
   support_email: "support@nappy.co",
   notifications_email: "notifications@nappy.co",
-  bucket_name: System.get_env("BUCKET_NAME")
+  embed_url: System.get_env("IMGIX_URL", "https://devnappy.imgix.net"),
+  image_path: System.get_env("WASABI_IMAGE_PATH", "nappy-prod/photos/")
+
+config :ex_aws, :s3,
+  access_key_id: System.get_env("WASABI_ACCESS_KEY_ID", "minio-root-user"),
+  secret_access_key: System.get_env("WASABI_SECRET_ACCESS_KEY", "minio-root-password"),
+  region: System.get_env("WASABI_REGION", "us-east-1"),
+  bucket_name: System.get_env("BUCKET_NAME", "nappy"),
+  scheme: System.get_env("WASABI_SCHEME", "http://"),
+  host: System.get_env("WASABI_HOST", "localhost")
 
 if config_env() == :prod do
   config :honeybadger,
@@ -38,16 +44,6 @@ if config_env() == :prod do
     environment_name: :prod,
     use_logger: true,
     api_key: System.get_env("HONEYBADGER_API_KEY")
-
-  config :ex_aws,
-    access_key_id: System.get_env("WASABI_ACCESS_KEY_ID"),
-    secret_access_key: System.get_env("WASABI_SECRET_ACCESS_KEY"),
-    region: System.get_env("WASABI_REGION")
-
-  config :ex_aws, :s3,
-    scheme: "https://",
-    # port: 9000,
-    host: System.get_env("WASABI_HOST")
 
   database_url =
     System.get_env("DATABASE_URL") ||

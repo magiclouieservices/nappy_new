@@ -62,6 +62,7 @@ defmodule Nappy.Search do
   end
 
   defp _query(query, ""), do: query
+
   defp _query(query, search_string) do
     from image in query,
       join: id_and_rank in matching_search_ids_and_ranks(search_string),
@@ -72,11 +73,11 @@ defmodule Nappy.Search do
 
   defp normalize(search_string) do
     search_string
-    |> String.downcase
+    |> String.downcase()
     |> String.replace(~r/\n/, " ")
     |> String.replace(~r/\t/, " ")
     |> String.replace(~r/\s{2,}/, " ")
-    |> String.trim
+    |> String.trim()
   end
 
   @doc """
@@ -95,7 +96,8 @@ defmodule Nappy.Search do
   """
   def search_image(search_term) do
     Images
-    |> where(fragment(
+    |> where(
+      fragment(
         "to_tsvector('english', title || ' ' || tags || ' ' || coalesce(title, ' ')) @@ to_tsquery(?)",
         ^prefix_search(search_term)
       )

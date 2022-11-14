@@ -9,7 +9,7 @@ defmodule Nappy.Admin.Slug do
   """
 
   @alphabet Enum.to_list(?a..?z) ++ Enum.to_list(?A..?Z) ++ Enum.to_list(?0..?9)
-  @length 12
+  @length 18
 
   @doc """
   Generate random alphanumeric strings of a certain length.

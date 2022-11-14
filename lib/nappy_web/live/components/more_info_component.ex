@@ -17,7 +17,8 @@ defmodule NappyWeb.Components.MoreInfoComponent do
   """
   def render(assigns) do
     ~H"""
-    <span x-data="{open: false,
+    <span
+      x-data="{open: false,
         toggle() {
           if (this.open) {
             return this.close()
@@ -48,9 +49,8 @@ defmodule NappyWeb.Components.MoreInfoComponent do
         x-bind:aria-controls="$id('dropdown-button')"
         type="button"
       >
-      <i class="fa-solid fa-circle-info"></i> more info
+        <i class="fa-solid fa-circle-info"></i> more info
       </button>
-
       <!-- Panel -->
       <div
         x-ref="panel"
@@ -68,11 +68,12 @@ defmodule NappyWeb.Components.MoreInfoComponent do
             target="_blank"
             rel="noreferer noopener"
             href={Routes.search_show_path(@socket, :show, tag)}
-            class="inline-block m-0.5 px-1.5 py-0.5 rounded-full border border-white hover:underline">
+            class="inline-block m-0.5 px-1.5 py-0.5 rounded-full border border-white hover:underline"
+          >
             <%= tag %>
           </a>
         <% end %>
-        <hr class="mt-4 mb-2 bg-white">
+        <hr class="mt-4 mb-2 bg-white" />
         <i class="fa-brands fa-creative-commons-zero"></i>
         public domain
       </div>

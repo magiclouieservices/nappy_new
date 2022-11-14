@@ -8,10 +8,7 @@ defmodule NappyWeb.SearchLive.FuzzySearch do
 
   @impl true
   def mount(_params, _session, socket) do
-    {:ok,
-      socket,
-      temporary_assigns: [images: []]
-    }
+    {:ok, socket, temporary_assigns: [images: []]}
   end
 
   @impl true
@@ -34,7 +31,8 @@ defmodule NappyWeb.SearchLive.FuzzySearch do
   end
 
   @impl true
-  def handle_event("search", %{"search" => %{"search_phrase" => search_phrase}}, socket) when search_phrase == "" do
+  def handle_event("search", %{"search" => %{"search_phrase" => search_phrase}}, socket)
+      when search_phrase == "" do
     socket =
       socket
       |> assign(images: [])

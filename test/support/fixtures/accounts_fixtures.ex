@@ -1,16 +1,20 @@
 defmodule Nappy.AccountsFixtures do
+  alias Nappy.Repo
+
   @moduledoc """
   This module defines test helpers for creating
   entities via the `Nappy.Accounts` context.
   """
 
+  def username, do: "username"
   def unique_user_email, do: "user#{System.unique_integer()}@example.com"
-  def valid_user_password, do: "hello world!"
+  def valid_user_password, do: "Helloworld!123"
 
   def valid_user_attributes(attrs \\ %{}) do
     Enum.into(attrs, %{
-      email: unique_user_email(),
-      password: valid_user_password()
+      "username" => username(),
+      "email" => unique_user_email(),
+      "password" => valid_user_password()
     })
   end
 

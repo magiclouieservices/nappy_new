@@ -8,18 +8,15 @@
     <span class="max-w-[32rem] text-4xl font-tiempos-bold text-center">
       Search
     </span>
-    <.live_component
-      module={HeaderSearchComponent}
-      id="header-search"
-    />
+    <.live_component module={HeaderSearchComponent} id="header-search" />
   </div>
 </div>
 <div class="container mx-auto pt-12">
   <.live_component
-    module={SponsoredImagesComponent}
-    id={"sponsored-image"}
-    sponsored_images={@sponsored_images}
     :if={not Enum.empty?(@sponsored_images)}
+    module={SponsoredImagesComponent}
+    id="sponsored-image"
+    sponsored_images={@sponsored_images}
   />
   <%= if Enum.empty?(@images) do %>
     <h1 class="mb-8 text-center font-tiempos-bold text-3xl">
@@ -31,7 +28,8 @@
         target="_blank"
         rel="noreferer noopener"
         class="underline"
-        href="https://nappy.kampsite.co">
+        href="https://nappy.kampsite.co"
+      >
         Request a photo
       </a>
     </div>

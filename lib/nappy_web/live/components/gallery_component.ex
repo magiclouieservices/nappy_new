@@ -222,6 +222,7 @@ defmodule NappyWeb.Components.GalleryComponent do
                       related_images={@related_images}
                     />
                     <.live_component
+                      :if={length(@sponsored_images) > 1}
                       module={SponsoredImagesComponent}
                       id={"sponsored-image-#{image.slug}"}
                       sponsored_images={@sponsored_images}

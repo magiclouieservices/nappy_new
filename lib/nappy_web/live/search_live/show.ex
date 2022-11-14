@@ -25,9 +25,7 @@ defmodule NappyWeb.SearchLive.Show do
 
   @impl true
   def handle_params(_params, _uri, socket) do
-    {:noreply,
-      push_navigate(socket, to: "/", replace: true)
-    }
+    {:noreply, push_navigate(socket, to: "/", replace: true)}
   end
 
   @impl true

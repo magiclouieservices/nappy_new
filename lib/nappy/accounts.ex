@@ -10,6 +10,7 @@ defmodule Nappy.Accounts do
   alias Nappy.Accounts.User
   alias Nappy.Accounts.UserNotifier
   alias Nappy.Accounts.UserToken
+  alias Nappy.Admin.Slug
   alias Nappy.Repo
   alias NappyWeb.Router.Helpers, as: Routes
 
@@ -139,10 +140,6 @@ defmodule Nappy.Accounts do
     AccountStatus.changeset(account_status, attrs)
   end
 
-  def add_social_media(%SocialMedia{} = social_media, user_id) do
-    SocialMedia.changeset(social_media, %{user_id: user_id})
-  end
-
   ## User registration
 
   @doc """
@@ -165,14 +162,16 @@ defmodule Nappy.Accounts do
       attrs
       |> Map.put("account_status_id", pending)
       |> Map.put("account_role_id", normal)
+      |> Map.put("slug", Slug.random_alphanumeric())
 
     with {:ok, user} <-
            %User{}
            |> User.registration_changeset(attrs)
            |> Repo.insert(),
          {:ok, _social_media} <-
-           %SocialMedia{}
-           |> add_social_media(user.id)
+           user
+           |> Ecto.build_assoc(:social_media, %{})
+           |> SocialMedia.changeset(%{})
            |> Repo.insert() do
       {:ok, user}
     else

@@ -17,11 +17,11 @@ alias NappyWeb.Router.Helpers, as: Routes
 alias NappyWeb.Endpoint
 alias NappyWeb.Uploaders.Avatar
 
-IEx.configure(
-  inspect: [
-    limit: :infinity,
-    printable_limit: :infinity
-  ]
-)
+# IEx.configure(
+#   inspect: [
+#     limit: :infinity,
+#     printable_limit: :infinity
+#   ]
+# )
 
 Logger.info("Most modules are aliased now, with ecto, routes and endpoint")

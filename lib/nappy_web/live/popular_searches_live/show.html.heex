@@ -7,9 +7,7 @@
   </p>
 
   <ul class="pt-8 grid grid-cols-4 auto-rows-[18rem] gap-4">
-    <li
-      class="relative rounded-lg bg-slate-300"
-      :for={image <- @images}>
+    <li :for={image <- @images} class="relative rounded-lg bg-slate-300">
       <a href={Routes.search_show_path(@socket, :show, get_first_tag(image.tags))}>
         <img
           loading="lazy"

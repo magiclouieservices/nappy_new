@@ -1,13 +1,19 @@
 defmodule Nappy.SponsoredImages do
   @moduledoc false
 
+  @behaviour Nappy.SponsoredImagesBehaviour
+
   @default_ttl_seconds "1599"
 
+  alias Nappy.SponsoredImagesBehaviour
+
+  @impl SponsoredImagesBehaviour
+  @spec get_images(String.t(), String.t()) :: [map()]
   def get_images(key_name, tags, page_size \\ 5) do
     tag =
       tags
       |> String.split(",", trim: true)
-      |> hd()
+      |> Enum.random()
 
     cache_name = "#{key_name}-#{tag}"
     cache = Nappy.cache_name() |> Cachex.get(cache_name)
@@ -73,6 +79,8 @@ defmodule Nappy.SponsoredImages do
     end
   end
 
+  @impl SponsoredImagesBehaviour
+  @spec get_access_key(String.t()) :: String.t()
   def get_access_key(key_name) do
     cache = Nappy.cache_name() |> Cachex.get(key_name)
 

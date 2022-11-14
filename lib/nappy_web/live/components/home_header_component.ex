@@ -28,15 +28,8 @@ defmodule NappyWeb.Components.HomeHeaderComponent do
         <span class="max-w-[32rem] text-4xl font-tiempos-bold text-center">
           Beautiful photos of Black and Brown people, for free.
         </span>
-        <.live_component
-          module={HeaderSearchComponent}
-          id="header-search"
-          class="mt-1 text-black"
-        />
-        <.live_component
-          module={TrendingKeywordsComponent}
-          id="trending-keywords"
-        />
+        <.live_component module={HeaderSearchComponent} id="header-search" class="mt-1 text-black" />
+        <.live_component module={TrendingKeywordsComponent} id="trending-keywords" />
       </div>
     </div>
     """

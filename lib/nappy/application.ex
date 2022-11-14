@@ -7,8 +7,6 @@ defmodule Nappy.Application do
 
   @impl true
   def start(_type, _args) do
-    Logger.add_backend(Sentry.LoggerBackend)
-
     # (Dev only): alternative logger for Ecto queries
     Ecto.DevLogger.install(Nappy.Repo)
 

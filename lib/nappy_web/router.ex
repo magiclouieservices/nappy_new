@@ -52,14 +52,14 @@ defmodule NappyWeb.Router do
     #       |> String.split("\n", trim: true)
     #   end
 
-    paths =
-      "priv/repo/slug_paths.txt"
-      |> File.read!()
-      |> String.split("\n", trim: true)
+    # paths =
+    #   "priv/repo/slug_paths.txt"
+    #   |> File.read!()
+    #   |> String.split("\n", trim: true)
 
-    for path <- paths do
-      get "/#{path}", CustomPageController, :index
-    end
+    # for path <- paths do
+    #   get "/#{path}", CustomPageController, :index
+    # end
   end
 
   # Other scopes may use custom stacks.

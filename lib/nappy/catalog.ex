@@ -5,9 +5,13 @@ defmodule Nappy.Catalog do
   """
 
   import Ecto.Query, warn: false
+  alias ExAws.S3
   alias Nappy.Accounts.User
+  alias Nappy.Admin.Slug
   alias Nappy.Catalog.Images
   alias Nappy.Metrics
+  alias Nappy.Metrics.ImageAnalytics
+  alias Nappy.Metrics.ImageMetadata
   alias Nappy.Repo
 
   @image_status_names [:all, :popular | Ecto.Enum.values(Metrics.ImageStatus, :name)]
@@ -163,7 +167,8 @@ defmodule Nappy.Catalog do
   end
 
   def image_url(%Images{} = image, opts \\ []) do
-    ext = Metrics.get_image_extension(image.id)
+    # http://localhost:4566/your-funny-bucket-name/you-weird-file-name
+    ext = Metrics.get_image_extension(image.id) || "jpg"
     base_url = Nappy.embed_url()
     path = Nappy.image_paths()
     filename = "#{image.slug}.#{ext}"
@@ -280,9 +285,68 @@ defmodule Nappy.Catalog do
 
   """
   def create_image(attrs \\ %{}) do
-    %Images{}
-    |> Images.changeset(attrs)
-    |> Repo.insert()
+    Repo.transaction(fn ->
+      created_image =
+        %Images{}
+        |> Images.changeset(attrs)
+        |> Repo.insert!()
+
+      stringify = fn bitstring ->
+        bitstring
+        |> to_charlist()
+        |> Enum.filter(&(&1 !== 0))
+        |> to_string()
+      end
+
+      {:ok, image} = Image.open(attrs.path)
+
+      image_metadata_attrs =
+        case Image.exif(image) do
+          {:ok, data} ->
+            {:ok, stat} = File.stat(attrs.path)
+
+            model = stringify.(data.model)
+            camera_software = stringify.(data.software)
+
+            %{
+              image_id: created_image.id,
+              extension_type: attrs.ext,
+              height: data.exif.exif_image_height,
+              width: data.exif.exif_image_width,
+              # converts to float
+              file_size: stat.size * 1.0,
+              focal: data.exif.focal_length,
+              aperture: data.exif.f_number,
+              camera_software: camera_software,
+              device_model: model,
+              iso: data.exif.iso_speed_ratings,
+              shutter_speed: data.exif.exposure_time
+              # color_palette:
+            }
+
+          {:error, _reason} ->
+            {:ok, stat} = File.stat(attrs.path)
+
+            %{
+              image_id: created_image.id,
+              extension_type: attrs.ext,
+              height: Image.height(image),
+              width: Image.width(image),
+              # converts to float
+              file_size: stat.size * 1.0
+            }
+        end
+
+      created_image
+      |> Ecto.build_assoc(:image_metadata, image_metadata_attrs)
+      |> ImageMetadata.changeset(image_metadata_attrs)
+      |> Repo.insert()
+
+      created_image
+      |> Ecto.build_assoc(:image_analytics, %{})
+      |> ImageAnalytics.changeset(%{})
+      |> Repo.insert()
+    end)
   end
 
   @doc """
@@ -315,8 +379,21 @@ defmodule Nappy.Catalog do
       {:error, %Ecto.Changeset{}}
 
   """
-  def delete_image(%Images{} = image) do
-    Repo.delete(image)
+  def delete_image(%Images{} = image, bucket_name \\ Nappy.bucket_name()) do
+    # Repo.delete(image)
+    ext = Metrics.get_image_extension(image.id)
+    filename = "photos/#{image.slug}.#{ext}"
+
+    case Repo.delete(image) do
+      {:ok, image} ->
+        bucket_name
+        |> S3.delete_object(filename)
+        |> ExAws.request()
+
+      {:error, changeset} ->
+        changeset
+        # IO.inspect(changeset, label: "error changeset from deleting image")
+    end
   end
 
   @doc """
@@ -344,6 +421,70 @@ defmodule Nappy.Catalog do
 
     List.flatten(tags, generated_tags)
     |> Enum.uniq()
+  end
+
+  @spec single_upload(String.t(), map()) :: [String.t()]
+  def single_upload(bucket_name, params) do
+    do_upload(bucket_name, params)
+  end
+
+  @spec bulk_upload(String.t(), map()) :: [String.t()]
+  def bulk_upload(bucket_name, params) do
+    do_upload(bucket_name, params, 10)
+  end
+
+  defp do_upload(bucket_name, params, concurrency \\ 1) do
+    upload = fn {slug, field} ->
+      image_status_id = Metrics.get_image_status_id(:pending)
+      category_id = get_category_by_name(field.category)
+
+      attrs = %{
+        category_id: category_id,
+        dest: field.dest,
+        ext: field.ext,
+        image_status_id: image_status_id,
+        path: field.source,
+        slug: slug,
+        title: field.title,
+        tags: field.tags,
+        user_id: field.user_id
+      }
+
+      with {:ok, image} <- create_image(attrs) do
+        field.source
+        |> S3.Upload.stream_file()
+        |> S3.upload(bucket_name, field.dest)
+        |> ExAws.request()
+      end
+    end
+
+    input_file = if is_struct(params.file), do: [params.file], else: params.file
+
+    paths =
+      Enum.reduce(input_file, %{}, fn f, acc ->
+        slug = Slug.random_alphanumeric()
+        <<".", ext::binary>> = Path.extname(f.filename)
+        src_path = f.path
+        dest_path = "photos/#{slug}.#{ext}"
+
+        params = %{
+          category: params.category,
+          dest: dest_path,
+          ext: ext,
+          source: src_path,
+          tags: params.tags,
+          title: params.title,
+          user_id: params.user_id
+        }
+
+        Map.put(acc, slug, params)
+      end)
+
+    paths
+    |> Task.async_stream(upload, max_concurrency: concurrency, timeout: 600_000)
+    |> Stream.run()
+
+    Enum.map(paths, fn {slug, _field} -> slug end)
   end
 
   alias Nappy.Catalog.Category
@@ -420,7 +561,7 @@ defmodule Nappy.Catalog do
   def create_category(attrs \\ %{}) do
     %Category{}
     |> Category.changeset(attrs)
-    |> Repo.insert()
+    |> Repo.insert!()
   end
 
   @doc """
