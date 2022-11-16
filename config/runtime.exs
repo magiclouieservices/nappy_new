@@ -28,7 +28,7 @@ config :nappy, :runtime,
   support_email: "support@nappy.co",
   notifications_email: "notifications@nappy.co",
   embed_url: System.get_env("IMGIX_URL", "https://devnappy.imgix.net/"),
-  image_path: System.get_env("WASABI_IMAGE_PATH", "nappy/photos/")
+  image_path: System.get_env("WASABI_IMAGE_PATH", "nappy-prod/photos/")
 
 config :ex_aws, :s3,
   access_key_id: System.get_env("WASABI_ACCESS_KEY_ID", "minio-root-user"),
@@ -44,6 +44,23 @@ if config_env() == :prod do
     environment_name: :prod,
     use_logger: true,
     api_key: System.get_env("HONEYBADGER_API_KEY")
+
+  config :logger,
+    # or other Logger level
+    level: :info,
+    backends: [LogflareLogger.HttpBackend]
+
+  config :logflare_logger_backend,
+    url: System.get_env("LOGFLARE_URL"),
+    # Default LogflareLogger level is :info. Note that log messages are filtered by the :logger application first
+    level: :info,
+    api_key: System.get_env("LOGFLARE_API_KEY"),
+    source_id: System.get_env("LOGFLARE_SOURCE_ID"),
+    # minimum time in ms before a log batch is sent
+    flush_interval: 1_000,
+    # maximum number of events before a log batch is sent
+    max_batch_size: 50,
+    metadata: :all
 
   database_url =
     System.get_env("DATABASE_URL") ||

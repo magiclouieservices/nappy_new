@@ -1,17 +1,34 @@
 defmodule NappyWeb.FallbackController do
   use Phoenix.Controller
 
-  def call(conn, {:error, :not_found}) do
-    conn
-    |> put_status(:not_found)
-    |> put_view(NappyWeb.ErrorView)
-    |> render(:"404")
+  alias Plug.Conn.Status
+
+  defexception [:message, :plug_status]
+
+  @doc """
+  HTTP status codes can be found [here](https://hexdocs.pm/plug/Plug.Conn.Status.html)
+  Used to raise an error (render error page) for LiveView.
+
+  ## Examples
+    alias Plug.Conn.Status
+
+    raise NappyWeb.FallbackController, Status.code(:not_found)
+
+  """
+  def exception(message) do
+    %__MODULE__{
+      message: Status.reason_phrase(message),
+      plug_status: message
+    }
   end
 
-  def call(conn, {:error, :unauthorized}) do
+  @impl true
+  def call(conn, {:error, status_name}) do
+    status_code = Status.code(status_name)
+
     conn
-    |> put_status(403)
+    |> put_status(status_name)
     |> put_view(NappyWeb.ErrorView)
-    |> render(:"403")
+    |> render("#{status_code}.html")
   end
 end

@@ -10,6 +10,7 @@ defmodule NappyWeb.ImageLive.Show do
   alias NappyWeb.Components.MoreInfoComponent
   alias NappyWeb.Components.RelatedImagesComponent
   alias NappyWeb.Components.SponsoredImagesComponent
+  alias Plug.Conn.Status
 
   @moduledoc false
 
@@ -63,12 +64,7 @@ defmodule NappyWeb.ImageLive.Show do
         {:noreply, socket}
       end
     else
-      # socket
-      # |> put_status(403)
-      # |> put_view(NappyWeb.ErrorView)
-      # |> render(:"403")
-
-      raise NappyWeb.NotFoundError
+      raise NappyWeb.FallbackController, Status.code(:not_found)
     end
   end
 

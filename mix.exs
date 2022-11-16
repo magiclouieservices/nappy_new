@@ -56,7 +56,7 @@ defmodule Nappy.MixProject do
       {:sobelow, "~> 0.11", only: :dev},
       {:credo, "~> 1.6", only: [:dev, :test], runtime: false},
       {:ecto_dev_logger, "~> 0.7"},
-      {:image, "~> 0.13.1"},
+      {:image, "~> 0.14.2"},
       {:scrivener_ecto, "~> 2.7"},
       {:ex_aws, "~> 2.3"},
       {:ex_aws_s3, "~> 2.3"},
@@ -65,7 +65,8 @@ defmodule Nappy.MixProject do
       {:honeybadger, "~> 0.19.0"},
       {:req, "~> 0.3.1"},
       {:cachex, "~> 3.4"},
-      {:mox, "~> 1.0", only: :test}
+      {:mox, "~> 1.0", only: :test},
+      {:logflare_logger_backend, "~> 0.11.0"}
     ]
   end
 

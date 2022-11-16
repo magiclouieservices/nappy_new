@@ -42,9 +42,7 @@ services:
       - ./minio-persistence:/data
 ```
 
-Also, you have to update runtime.exs (line 30-31, `embed_url`) in order to
-
-see your uploaded photos, pass some env vars then `docker-compose up -d`:
+Also, you have to update runtime.exs (line 30-31, `embed_url`) in order to see your uploaded photos, pass some env vars then `docker-compose up -d`:
 
 ```elixir
 config :nappy, :runtime,
@@ -56,15 +54,7 @@ config :nappy, :runtime,
 
 ## S3 local upload behavior
 
-Currently, all the images are pulled from imgIX. You need to follow
-
-this section if you want to try to **upload an image** and view it. We
-
-download the whole bucket (15+ Gb as of this commit) in order to test it
-
-locally. Don't forget to change line 30 in `runtime.exs` to
-
-`http://localhost:9000`.
+Currently, all the images are pulled from imgIX. You need to follow this section if you want to try to **upload an image** and view it. We download the whole bucket (15+ Gb as of this commit) in order to test it locally. Don't forget to change line 30 in `runtime.exs` to `http://localhost:9000`.
 
 ### Setting up aws credentials:
 
@@ -87,9 +77,7 @@ aws_secret_access_key=wasabisecretaccesskey
 
 > 15.1 Gb S3 bucket (2059 images as of this commit)
 
-This is an inefficient way (and I currently know) of
-
-copying remote s3 to our minio local bucket.
+This is an inefficient way (and I currently know) of copying remote s3 to our minio local bucket.
 
 ```bash
 # make sure the containers from compose file are up first.
@@ -128,15 +116,9 @@ config :nappy, :runtime,
 
 ## Testing release build for Apple silicon host machine.
 
-This is for testing what **prod** release build looks like when running.
+This is for testing what **prod** release build looks like when running. Please comment the last 2 lines of Dockerfile.
 
-Please comment the last 2 lines of Dockerfile. **Note**: Don't
-
-forget to uncomment it back before committing. The reason for
-
-that is it throws `Protocol 'inet6_tcp': register/listen error: eaddrnotavail`
-
-error which we're not using for local development.
+**Note**: Don't forget to uncomment it back before committing. The reason for that is it throws `Protocol 'inet6_tcp': register/listen error: eaddrnotavail` error which we're not using for local development.
 
 ```docker
 # Remove ipv6 and erl_aflags env
@@ -146,15 +128,9 @@ error which we're not using for local development.
 # ENV ERL_AFLAGS "-proto_dist inet6_tcp"
 ```
 
-Next, we need to use a linux distro in order to build the release
+Next, we need to use a linux distro in order to build the release for executing it in our `docker-compose.yml` file.
 
-for executing it in our `docker-compose.yml` file. The reason for
-
-that is because when running `mix release`, it uses our current OS
-
-arch which is different from our Docker builder image. Since our
-
-Dockerfile is using `prod` env, we'll generate a release based on that:
+The reason for that is because when running `mix release`, it uses our current OS arch which is different from our Docker builder image. Since our Dockerfile is using `prod` env, we'll generate a release based on that:
 
 ```bash
 # For this example I'm pulling an Elixir 1.14 image

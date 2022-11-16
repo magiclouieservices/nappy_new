@@ -4,36 +4,37 @@ defmodule Nappy.CatalogFixtures do
   entities via the `Nappy.Catalog` context.
   """
 
+  alias Nappy.AccountsFixtures
+  alias Nappy.Catalog
+  alias Nappy.Metrics
+
   @doc """
-  Generate a image.
+  Generate a image. Do note image_analytics, image_metadata
+  and other associations aren't loaded in this fixture.
   """
   def image_fixture(attrs \\ %{}) do
+    category_id = Catalog.get_category_by_name("Other")
+    image_status_id = Metrics.get_image_status_id(:pending)
+    user = AccountsFixtures.user_fixture()
+
     {:ok, image} =
       attrs
       |> Enum.into(%{
+        category_id: category_id,
         description: "some description",
+        ext: "jpg",
+        image_status_id: image_status_id,
         generated_description: "some generated_description",
         generated_tags: "some generated_tags",
-        tags: "some tags",
-        title: "some title"
+        path: File.cwd!() |> Path.join("priv/static/images/image.jpg"),
+        slug: "test_slug",
+        tags: "test_tag",
+        title: "some title",
+        user_id: user.id
       })
-      |> Nappy.Catalog.create_image()
+      |> Catalog.create_image()
 
     image
-  end
-
-  @doc """
-  Generate a image_status.
-  """
-  def image_status_fixture(attrs \\ %{}) do
-    {:ok, image_status} =
-      attrs
-      |> Enum.into(%{
-        name: "some name"
-      })
-      |> Nappy.Catalog.create_image_status()
-
-    image_status
   end
 
   @doc """
@@ -53,7 +54,7 @@ defmodule Nappy.CatalogFixtures do
         slug: unique_category_slug(),
         thumbnail: "some thumbnail"
       })
-      |> Nappy.Catalog.create_category()
+      |> Catalog.create_category()
 
     category
   end
@@ -84,27 +85,5 @@ defmodule Nappy.CatalogFixtures do
       |> Nappy.Catalog.create_collection_description()
 
     collection_description
-  end
-
-  @doc """
-  Generate a unique product sku.
-  """
-  def unique_product_sku, do: System.unique_integer([:positive])
-
-  @doc """
-  Generate a product.
-  """
-  def product_fixture(attrs \\ %{}) do
-    {:ok, product} =
-      attrs
-      |> Enum.into(%{
-        description: "some description",
-        name: "some name",
-        sku: unique_product_sku(),
-        unit_price: 120.5
-      })
-      |> Nappy.Catalog.create_product()
-
-    product
   end
 end

@@ -77,5 +77,8 @@ jobs:
       - name: test sponsored images
         run: mix test --trace test/nappy_web/api/sponsored_images_test.exs
 
+      - name: test specific image page
+        run: mix test --trace test/nappy_web/live/image_live_test.exs
+
       - name: run static analysis
         run: mix credo --all --strict
