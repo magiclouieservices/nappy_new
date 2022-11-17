@@ -13,14 +13,14 @@ defmodule Nappy.CatalogFixtures do
   and other associations aren't loaded in this fixture.
   """
   def image_fixture(attrs \\ %{}) do
-    category_id = Catalog.get_category_by_name("Other")
+    category = Catalog.get_category_by_name("Other")
     image_status_id = Metrics.get_image_status_id(:pending)
     user = AccountsFixtures.user_fixture()
 
     {:ok, image} =
       attrs
       |> Enum.into(%{
-        category_id: category_id,
+        category_id: category.id,
         description: "some description",
         ext: "jpg",
         image_status_id: image_status_id,

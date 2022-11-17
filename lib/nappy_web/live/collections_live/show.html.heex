@@ -43,4 +43,8 @@
     current_user={@current_user}
     current_url={@current_url}
   />
+
+  <%= unless Enum.empty?(@related_tags) do %>
+    <.live_component module={RelatedTagsComponent} id="related-tags" related_tags={@related_tags} />
+  <% end %>
 </section>

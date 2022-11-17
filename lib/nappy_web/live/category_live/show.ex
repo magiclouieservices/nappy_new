@@ -3,6 +3,8 @@ defmodule NappyWeb.CategoryLive.Show do
 
   alias Nappy.Catalog
   alias NappyWeb.Components.GalleryComponent
+  alias NappyWeb.Components.RelatedTagsComponent
+  alias Plug.Conn.Status
 
   @moduledoc false
 
@@ -25,14 +27,25 @@ defmodule NappyWeb.CategoryLive.Show do
 
   @impl true
   def handle_params(%{"slug" => slug}, uri, socket) do
-    socket =
-      socket
-      |> assign(page: 1)
-      |> assign(page_size: 12)
-      |> assign(slug: slug)
-      |> assign(current_url: uri)
+    category = Catalog.get_category(slug: slug)
 
-    {:noreply, socket}
+    case category do
+      nil ->
+        raise NappyWeb.FallbackController, Status.code(:not_found)
+
+      _ ->
+        related_tags = Catalog.consolidate_tags_by_category(category.id)
+
+        socket =
+          socket
+          |> assign(page: 1)
+          |> assign(page_size: 12)
+          |> assign(slug: slug)
+          |> assign(current_url: uri)
+          |> assign(related_tags: related_tags)
+
+        {:noreply, socket}
+    end
   end
 
   @impl true

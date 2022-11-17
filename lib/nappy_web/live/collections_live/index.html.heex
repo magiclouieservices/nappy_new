@@ -1,7 +1,7 @@
 <header class="relative">
   <img
     class="w-screen h-40 object-cover"
-    src={Routes.static_path(@conn, "/images/header_search.jpg")}
+    src={Routes.static_path(@socket, "/images/header_search.jpg")}
   />
   <div class="absolute inset-0 z-1 flex flex-col gap-1 justify-center items-center text-white bg-[rgba(0,0,0,.5)]">
     <span class="max-w-[32rem] text-4xl font-tiempos-bold text-center">
@@ -17,12 +17,14 @@
     The People Also Search
   </span>
   <ul class="flex gap-2">
-    <%= for keyword <- ["group", "nyc", "nature", "ice cream", "hands", "cup", "mature", "treadmill", "palm tree"] do %>
+    <%= for related_tag <- @related_tags do %>
       <a
-        href="#"
+        target="_blank"
+        rel="nofollow noreferer"
+        href={Routes.search_show_path(@socket, :show, related_tag)}
         class="inline-flex items-center px-2 py-1 border border-gray-300 rounded-md text-gray-500 font-light text-sm bg-white hover:bg-black hover:underline hover:text-white focus:outline-none"
       >
-        <li><%= keyword %></li>
+        <li><%= related_tag %></li>
       </a>
     <% end %>
   </ul>
@@ -30,7 +32,7 @@
 <section class="container mx-auto py-4">
   <div class="grid grid-cols-3 auto-rows-min gap-4">
     <%= for item <- @collections do %>
-      <a class="mb-4 block" href={Routes.collections_show_path(@conn, :show, item.slug)}>
+      <a class="mb-4 block" href={Routes.collections_show_path(@socket, :show, item.slug)}>
         <div class="relative bg-slate-300">
           <img
             loading="lazy"

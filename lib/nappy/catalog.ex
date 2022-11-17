@@ -436,10 +436,10 @@ defmodule Nappy.Catalog do
   defp do_upload(bucket_name, params, concurrency \\ 1) do
     upload = fn {slug, field} ->
       image_status_id = Metrics.get_image_status_id(:pending)
-      category_id = get_category_by_name(field.category)
+      category = get_category_by_name(field.category)
 
       attrs = %{
-        category_id: category_id,
+        category_id: category.id,
         dest: field.dest,
         ext: field.ext,
         image_status_id: image_status_id,
@@ -536,14 +536,27 @@ defmodule Nappy.Catalog do
   """
   def get_category!(id), do: Repo.get!(Category, id)
 
-  def get_category_by_name(category_name) do
-    query =
-      from c in Category,
-        where: c.name == ^category_name,
-        where: c.is_enabled == ^true,
-        select: c.id
+  @doc """
+  Gets a single category by a field.
 
-    Repo.one(query)
+  Returns `nil` if the Category does not exist.
+
+  ## Examples
+
+      iex> get_category(id: 123)
+      %Category{}
+
+      iex> get_category(slug: "456")
+      nil
+
+  """
+  def get_category(field), do: Repo.get_by(Category, field)
+
+  def get_category_by_name(category_name) do
+    Category
+    |> where([c], ilike(c.name, ^category_name))
+    |> where([c], c.is_enabled == ^true)
+    |> Repo.one()
   end
 
   @doc """
@@ -797,6 +810,56 @@ defmodule Nappy.Catalog do
       updated_at: i.updated_at
     })
     |> Repo.paginate(params)
+  end
+
+  def consolidate_tags_by_category(category_id, count \\ 24) do
+    active = Metrics.get_image_status_id(:active)
+    featured = Metrics.get_image_status_id(:featured)
+
+    Images
+    |> where([i], i.image_status_id in ^[active, featured])
+    |> where(category_id: ^category_id)
+    |> randomize_and_flatten(3, count, &[String.split(&1.tags, ",") | &2])
+  end
+
+  @doc """
+  Related tags by group of images
+  """
+  @spec consolidate_tags_by_collection(String.t(), integer()) :: [String.t()]
+  def consolidate_tags_by_collection(slug, count \\ 24) do
+    collection_description_id =
+      from(cd in CollectionDescription,
+        where: cd.slug == ^slug,
+        select: cd.id
+      )
+      |> Repo.one()
+
+    image_query = Images |> select([:tags])
+
+    Collection
+    |> where(collection_description_id: ^collection_description_id)
+    |> preload(image: ^image_query)
+    |> randomize_and_flatten(3, count, &[String.split(&1.image.tags, ",") | &2])
+  end
+
+  def random_tags(count \\ 24) do
+    active = Metrics.get_image_status_id(:active)
+    featured = Metrics.get_image_status_id(:featured)
+
+    Images
+    |> where([i], i.image_status_id in ^[active, featured])
+    |> randomize_and_flatten(3, count, &[String.split(&1.tags, ",") | &2])
+  end
+
+  defp randomize_and_flatten(query, limit, count, split_method) do
+    query
+    |> order_by(fragment("RANDOM()"))
+    |> limit(^limit)
+    |> Repo.all()
+    |> Enum.reduce([], &split_method.(&1, &2))
+    |> List.flatten()
+    |> Enum.uniq()
+    |> Enum.take_random(count)
   end
 
   @doc """

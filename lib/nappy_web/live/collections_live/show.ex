@@ -3,6 +3,8 @@ defmodule NappyWeb.CollectionsLive.Show do
 
   alias Nappy.Catalog
   alias NappyWeb.Components.GalleryComponent
+  alias NappyWeb.Components.RelatedTagsComponent
+  alias Plug.Conn.Status
 
   @moduledoc false
 
@@ -27,15 +29,24 @@ defmodule NappyWeb.CollectionsLive.Show do
   def handle_params(%{"slug" => slug}, uri, socket) do
     coll_desc = Catalog.get_collection_description_by_slug(slug)
 
-    socket =
-      socket
-      |> assign(page: 1)
-      |> assign(page_size: 12)
-      |> assign(slug: slug)
-      |> assign(collection: coll_desc)
-      |> assign(current_url: uri)
+    case coll_desc do
+      nil ->
+        raise NappyWeb.FallbackController, Status.code(:not_found)
 
-    {:noreply, socket}
+      _ ->
+        related_tags = Catalog.consolidate_tags_by_collection(slug)
+
+        socket =
+          socket
+          |> assign(page: 1)
+          |> assign(page_size: 12)
+          |> assign(slug: slug)
+          |> assign(collection: coll_desc)
+          |> assign(current_url: uri)
+          |> assign(related_tags: related_tags)
+
+        {:noreply, socket}
+    end
   end
 
   @impl true

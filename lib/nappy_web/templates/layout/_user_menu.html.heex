@@ -50,10 +50,10 @@
           x-transition:leave-end="transform opacity-0 scale-95"
           class="absolute flex w-48 left-[-90%] rounded flex-col py-4 gap-2 items-center justify-center mt-1 bg-black text-white z-50"
         >
-          <a class="hover:text-slate-300" href={Routes.collections_path(@conn, :index)}>
+          <a class="hover:text-slate-300" href={Routes.collections_index_path(@conn, :index)}>
             Collections
           </a>
-          <a class="hover:text-slate-300" href={Routes.category_path(@conn, :index)}>
+          <a class="hover:text-slate-300" href={Routes.category_index_path(@conn, :index)}>
             Categories
           </a>
           <a class="hover:text-slate-300" href="#">For Brands</a>
