@@ -8,13 +8,16 @@ defmodule Nappy.CatalogFixtures do
   alias Nappy.Catalog
   alias Nappy.Metrics
 
+  @image_status_names Ecto.Enum.values(Metrics.ImageStatus, :name)
+
   @doc """
   Generate a image. Do note image_analytics, image_metadata
   and other associations aren't loaded in this fixture.
   """
-  def image_fixture(attrs \\ %{}) do
+  def image_fixture(attrs \\ %{}, image_status \\ :pending)
+      when image_status in [:pending, :active, :denied, :featured] do
     category = Catalog.get_category_by_name("Other")
-    image_status_id = Metrics.get_image_status_id(:pending)
+    image_status_id = Metrics.get_image_status_id(image_status)
     user = AccountsFixtures.user_fixture()
 
     {:ok, image} =
@@ -35,6 +38,33 @@ defmodule Nappy.CatalogFixtures do
       |> Catalog.create_image()
 
     image
+  end
+
+  def uploaded_image_fixture(bucket_name, image_status \\ :pending)
+      when image_status in @image_status_names do
+    user = AccountsFixtures.user_fixture()
+
+    bucket_name
+    |> ExAws.S3.put_bucket("us-east-1")
+    |> ExAws.request()
+
+    params =
+      %{
+        category: "Other",
+        file: %Plug.Upload{
+          path: File.cwd!() |> Path.join("priv/static/images/image.jpg"),
+          content_type: "image/jpeg",
+          filename: "image.jpg"
+        },
+        tags: "test,testpic",
+        title: "test image"
+      }
+      |> Map.put(:user_id, user.id)
+
+    bucket_name
+    |> Catalog.single_upload(params, image_status)
+    |> hd()
+    |> Catalog.get_image_by_slug()
   end
 
   @doc """

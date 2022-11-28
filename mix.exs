@@ -66,7 +66,8 @@ defmodule Nappy.MixProject do
       {:req, "~> 0.3.1"},
       {:cachex, "~> 3.4"},
       {:mox, "~> 1.0", only: :test},
-      {:logflare_logger_backend, "~> 0.11.0"}
+      {:logflare_logger_backend, "~> 0.11.0"},
+      {:wallaby, "~> 0.30.1", only: :test, runtime: false}
     ]
   end
 

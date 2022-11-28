@@ -13,6 +13,7 @@ defmodule NappyWeb.CategoryLive.Index do
       socket
       |> assign(categories: categories)
       |> assign(related_tags: related_tags)
+      |> assign(page_title: "Categories")
 
     {:ok, socket}
   end

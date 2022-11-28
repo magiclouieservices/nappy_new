@@ -14,7 +14,8 @@ defmodule Nappy.Catalog do
   alias Nappy.Metrics.ImageMetadata
   alias Nappy.Repo
 
-  @image_status_names [:all, :popular | Ecto.Enum.values(Metrics.ImageStatus, :name)]
+  @image_status_names Ecto.Enum.values(Metrics.ImageStatus, :name)
+  @full_list_status_names [:all, :popular | @image_status_names]
 
   @doc """
   Returns the list of images.
@@ -111,7 +112,7 @@ defmodule Nappy.Catalog do
 
   def paginate_images(status_name, params)
       when is_atom(status_name) and
-             status_name in @image_status_names do
+             status_name in @full_list_status_names do
     active = Metrics.get_image_status_id(:active)
     featured = Metrics.get_image_status_id(:featured)
 
@@ -346,6 +347,8 @@ defmodule Nappy.Catalog do
       |> Ecto.build_assoc(:image_analytics, %{})
       |> ImageAnalytics.changeset(%{})
       |> Repo.insert()
+
+      created_image
     end)
   end
 
@@ -424,18 +427,20 @@ defmodule Nappy.Catalog do
   end
 
   @spec single_upload(String.t(), map()) :: [String.t()]
-  def single_upload(bucket_name, params) do
-    do_upload(bucket_name, params)
+  def single_upload(bucket_name, params, image_status \\ :pending)
+      when image_status in @full_list_status_names do
+    do_upload(bucket_name, params, image_status)
   end
 
   @spec bulk_upload(String.t(), map()) :: [String.t()]
-  def bulk_upload(bucket_name, params) do
-    do_upload(bucket_name, params, 10)
+  def bulk_upload(bucket_name, params, image_status \\ :pending)
+      when image_status in @full_list_status_names do
+    do_upload(bucket_name, params, image_status, 10)
   end
 
-  defp do_upload(bucket_name, params, concurrency \\ 1) do
+  defp do_upload(bucket_name, params, image_status, concurrency \\ 1) do
     upload = fn {slug, field} ->
-      image_status_id = Metrics.get_image_status_id(:pending)
+      image_status_id = Metrics.get_image_status_id(image_status)
       category = get_category_by_name(field.category)
 
       attrs = %{
@@ -455,6 +460,8 @@ defmodule Nappy.Catalog do
         |> S3.Upload.stream_file()
         |> S3.upload(bucket_name, field.dest)
         |> ExAws.request()
+
+        image
       end
     end
 

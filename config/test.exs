@@ -23,7 +23,12 @@ config :ex_aws, :s3, port: 9000
 config :nappy, NappyWeb.Endpoint,
   http: [ip: {127, 0, 0, 1}, port: 4002],
   secret_key_base: "DRoHihTu+5/MeT+x5SeTyBQNhFni0ELmsvFsLxADQa5nfh1vcBCF15iQWHAOItuK",
-  server: false
+  server: true
+
+config :wallaby,
+  otp_app: :nappy
+
+config :nappy, :sandbox, Ecto.Adapters.SQL.Sandbox
 
 # In test we don't send emails.
 config :nappy, Nappy.Mailer, adapter: Swoosh.Adapters.Test

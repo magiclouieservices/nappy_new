@@ -2,6 +2,8 @@ defmodule NappyWeb.ImageLiveTest do
   use ExUnit.Case, async: true
   use NappyWeb.ConnCase
 
+  alias Nappy.CatalogFixtures
+
   import Phoenix.LiveViewTest
   import Nappy.CatalogFixtures
 
@@ -15,15 +17,18 @@ defmodule NappyWeb.ImageLiveTest do
         }
       end)
 
+    ttl = :timer.seconds(1_599)
+    cache_key_name = "test_slug-test_tag"
+
     {:ok, true} =
       Nappy.cache_name()
-      |> Cachex.put("test_slug-test_tag", payload, ttl: :timer.seconds(1_599))
-
-    image_fixture()
+      |> Cachex.put(cache_key_name, payload, ttl: ttl)
 
     on_exit(fn ->
-      {:ok, _count} = Cachex.clear(:nappy_cache)
+      {:ok, _count} = Cachex.clear(Nappy.cache_name())
     end)
+
+    CatalogFixtures.image_fixture(%{}, :featured)
 
     :ok
   end
@@ -55,27 +60,5 @@ defmodule NappyWeb.ImageLiveTest do
 
       assert %NappyWeb.FallbackController{message: "Not Found"} = exception_name
     end
-
-    # test "error: visit a non-existing image page" do
-    #   {:ok, index_live, _html} = live(conn, Routes.product_index_path(conn, :index))
-
-    #   assert index_live |> element("a", "New Product") |> render_click() =~
-    #            "New Product"
-
-    #   assert_patch(index_live, Routes.product_index_path(conn, :new))
-
-    #   assert index_live
-    #          |> form("#product-form", product: @invalid_attrs)
-    #          |> render_change() =~ "can&#39;t be blank"
-
-    #   {:ok, _, html} =
-    #     index_live
-    #     |> form("#product-form", product: @create_attrs)
-    #     |> render_submit()
-    #     |> follow_redirect(conn, Routes.product_index_path(conn, :index))
-
-    #   assert html =~ "Product created successfully"
-    #   assert html =~ "some description"
-    # end
   end
 end

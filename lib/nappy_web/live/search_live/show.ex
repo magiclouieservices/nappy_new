@@ -17,6 +17,7 @@ defmodule NappyWeb.SearchLive.Show do
       socket
       |> assign(query: query)
       |> assign(sponsored_images: sponsored_images)
+      |> assign(page_title: "#{query} Photos")
       |> prepare_assigns(uri)
       |> fetch()
 

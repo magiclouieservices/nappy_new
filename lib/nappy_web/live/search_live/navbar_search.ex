@@ -23,7 +23,17 @@ defmodule NappyWeb.SearchLive.NavbarSearch do
   @impl true
   def render(assigns) do
     ~H"""
-    <div x-data="{open: false, parentOpen: true}" class="flex">
+    <div
+      x-data="{open: false,
+        parentOpen: true,
+        toggle() {
+          this.$refs.button.focus()
+
+          this.open = true
+        },
+      }"
+      class="flex"
+    >
       <.form
         :let={f}
         for={:search}

@@ -9,6 +9,7 @@ defmodule Nappy do
   if it comes from the database, an external API or others.
   """
 
+  def default_title_suffix, do: " | Beautifully Diverse Stock Photos"
   def app_name, do: Application.get_env(:nappy, :runtime)[:app_name]
   def embed_url, do: Application.get_env(:nappy, :runtime)[:embed_url]
   def getty_api_key, do: Application.get_env(:nappy, :runtime)[:getty_api_key]

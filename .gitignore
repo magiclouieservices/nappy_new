@@ -42,6 +42,9 @@ npm-debug.log
 
 slug_paths.txt
 
+# wallaby screenshots
+/screenshots/
+
 *.sql
 
 *.env

@@ -9,31 +9,24 @@ defmodule NappyWeb.HomeLive.Index do
 
   @impl true
   def mount(_params, _session, socket) do
-    placeholder =
-      if connected?(socket) do
-        []
-      else
-        Enum.map(1..12, fn _ -> "#" end)
-      end
+    uri = Routes.home_index_path(socket, :index)
 
     {
       :ok,
-      prepare_assigns(socket),
-      temporary_assigns: [
-        images: placeholder
-      ]
+      prepare_assigns(socket, uri),
+      temporary_assigns: [images: []]
     }
   end
 
   @impl true
   def handle_params(%{"filter" => filter}, uri, socket)
       when filter in ["popular", "all"] do
+    page_title = ~s(#{String.capitalize(filter)} Photos)
     filter = String.to_existing_atom(filter)
 
     {
       :noreply,
-      prepare_assigns(socket, filter: filter)
-      |> assign(current_url: uri)
+      prepare_assigns(socket, uri, page_title, filter: filter)
     }
   end
 
@@ -41,8 +34,7 @@ defmodule NappyWeb.HomeLive.Index do
   def handle_params(_params, uri, socket) do
     {
       :noreply,
-      prepare_assigns(socket)
-      |> assign(current_url: uri)
+      prepare_assigns(socket, uri)
     }
   end
 
@@ -58,11 +50,14 @@ defmodule NappyWeb.HomeLive.Index do
     {:noreply, redirect(socket, to: route)}
   end
 
-  defp prepare_assigns(socket, filter \\ [filter: :featured]) do
+  defp prepare_assigns(socket, uri, page_title \\ "Nappy", filter \\ [filter: :featured]) do
     socket
     |> assign(page: 1)
     |> assign(page_size: 12)
+    |> assign(current_url: uri)
+    |> assign(page_title: page_title)
     |> assign(filter)
+    |> fetch()
   end
 
   defp fetch(%{assigns: %{filter: filter, page: page, page_size: page_size}} = socket) do

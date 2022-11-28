@@ -11,6 +11,7 @@ defmodule NappyWeb.PopularSearchesLive.Show do
     socket =
       socket
       |> assign(images: images)
+      |> assign(page_title: "Popular Searches")
 
     {:ok, socket}
   end

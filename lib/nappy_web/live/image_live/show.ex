@@ -60,6 +60,7 @@ defmodule NappyWeb.ImageLive.Show do
           |> assign(tags: tags)
           |> assign(sponsored_images: sponsored_images)
           |> assign(related_images: related_images)
+          |> assign(page_title: image.title)
 
         {:noreply, socket}
       end

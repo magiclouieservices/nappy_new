@@ -4,7 +4,7 @@ defmodule NappyWeb.UploadController do
   alias Nappy.Catalog
 
   def new(conn, _params) do
-    render(conn, "new.html")
+    render(conn, "new.html", page_title: "Submit a photo")
   end
 
   def bulk_new(conn, _params) do

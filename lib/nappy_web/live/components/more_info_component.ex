@@ -28,7 +28,7 @@ defmodule NappyWeb.Components.MoreInfoComponent do
 
           this.open = true
         },
-          close(focusAfter) {
+        close(focusAfter) {
           if (! this.open) return
 
           this.open = false

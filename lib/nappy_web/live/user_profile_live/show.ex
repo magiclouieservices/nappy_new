@@ -9,19 +9,6 @@ defmodule NappyWeb.UserProfileLive.Show do
   @moduledoc false
 
   @impl true
-  def mount(_params, _session, socket) do
-    placeholder = Enum.map(1..12, fn _ -> "#" end)
-
-    socket =
-      socket
-      |> assign(page: 1)
-      |> assign(page_size: 12)
-      |> assign(user: nil)
-
-    {:ok, socket, temporary_assigns: [images: placeholder]}
-  end
-
-  @impl true
   def handle_params(%{"username" => username} = _params, uri, socket) do
     user = Accounts.get_user_by_username(username)
     profile_metrics = Metrics.get_profile_page_metrics(user)
@@ -33,6 +20,8 @@ defmodule NappyWeb.UserProfileLive.Show do
       |> assign(user: user)
       |> assign(current_url: uri)
       |> assign(profile_metrics: profile_metrics)
+      |> assign(page_title: ~s(#{user.username}'s Profile))
+      |> fetch()
 
     {:noreply, socket}
   end

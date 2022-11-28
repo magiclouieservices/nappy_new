@@ -13,6 +13,7 @@ defmodule NappyWeb.CollectionsLive.Index do
       socket
       |> assign(collections: collections)
       |> assign(related_tags: related_tags)
+      |> assign(page_title: "Collections")
 
     {:ok, socket}
   end
