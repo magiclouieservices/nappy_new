@@ -8,17 +8,6 @@ defmodule NappyWeb.HomeLive.Index do
   @moduledoc false
 
   @impl true
-  def mount(_params, _session, socket) do
-    uri = Routes.home_index_path(socket, :index)
-
-    {
-      :ok,
-      prepare_assigns(socket, uri),
-      temporary_assigns: [images: []]
-    }
-  end
-
-  @impl true
   def handle_params(%{"filter" => filter}, uri, socket)
       when filter in ["popular", "all"] do
     page_title = ~s(#{String.capitalize(filter)} Photos)
@@ -61,7 +50,19 @@ defmodule NappyWeb.HomeLive.Index do
   end
 
   defp fetch(%{assigns: %{filter: filter, page: page, page_size: page_size}} = socket) do
-    images = Catalog.paginate_images(filter, page: page, page_size: page_size)
+    payload_name = "homepage_#{filter}"
+    ttl = :timer.hours(1)
+
+    images =
+      if page === 1 do
+        args = [filter, [page: page, page_size: page_size]]
+        mfa = [Catalog, :paginate_images, args]
+
+        Nappy.Caching.paginated_images_payload(mfa, payload_name, ttl)
+      else
+        Catalog.paginate_images(filter, page: page, page_size: page_size)
+      end
+
     assign(socket, images: images)
   end
 end

@@ -40,7 +40,19 @@ defmodule NappyWeb.CollectionsLive.Show do
   end
 
   defp fetch(%{assigns: %{slug: slug, page: page, page_size: page_size}} = socket) do
-    images = Catalog.paginate_collection(slug, page: page, page_size: page_size)
+    payload_name = "collection_#{slug}"
+    ttl = :timer.hours(1)
+
+    images =
+      if page === 1 do
+        args = [slug, [page: page, page_size: page_size]]
+        mfa = [Catalog, :paginate_collection, args]
+
+        Nappy.Caching.paginated_images_payload(mfa, payload_name, ttl)
+      else
+        Catalog.paginate_collection(slug, page: page, page_size: page_size)
+      end
+
     assign(socket, images: images)
   end
 end

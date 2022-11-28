@@ -13,7 +13,16 @@ defmodule Nappy.Catalog.CollectionDescription do
     field :slug, :string
     field :thumbnail, :binary_id
     belongs_to :user, User
-    many_to_many :image, Images, join_through: Collection, on_replace: :delete
+
+    many_to_many :image,
+                 Images,
+                 join_through: Collection,
+                 on_replace: :delete,
+                 join_keys: [
+                   collection_description_id: :id,
+                   image_id: :id
+                 ]
+
     has_many :collections, Collection
 
     timestamps()

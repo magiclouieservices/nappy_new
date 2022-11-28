@@ -16,9 +16,14 @@ defmodule Nappy.Catalog.Images do
     field :title, :string
     has_many :collections, Collection, foreign_key: :image_id
 
-    many_to_many :collection_description, CollectionDescription,
-      join_through: Collection,
-      on_replace: :delete
+    many_to_many :collection_description,
+                 CollectionDescription,
+                 join_through: Collection,
+                 on_replace: :delete,
+                 join_keys: [
+                   collection_description_id: :id,
+                   image_id: :id
+                 ]
 
     # has_many :collections, Collection
     belongs_to :category, Category

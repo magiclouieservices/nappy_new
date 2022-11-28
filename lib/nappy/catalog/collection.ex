@@ -6,8 +6,8 @@ defmodule Nappy.Catalog.Collection do
   @moduledoc false
 
   schema "collections" do
-    belongs_to :image, Images, primary_key: true
-    belongs_to :collection_description, CollectionDescription, primary_key: true
+    belongs_to :image, Images, foreign_key: :image_id
+    belongs_to :collection_description, CollectionDescription
 
     timestamps()
   end

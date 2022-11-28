@@ -30,8 +30,8 @@ defmodule Nappy.CatalogFixtures do
         generated_description: "some generated_description",
         generated_tags: "some generated_tags",
         path: File.cwd!() |> Path.join("priv/static/images/image.jpg"),
-        slug: "test_slug",
-        tags: "test_tag",
+        slug: attrs[:slug] || "test_slug",
+        tags: attrs[:tags] || "test_tag",
         title: "some title",
         user_id: user.id
       })
@@ -105,15 +105,25 @@ defmodule Nappy.CatalogFixtures do
   Generate a collection_description.
   """
   def collection_description_fixture(attrs \\ %{}) do
-    {:ok, collection_description} =
+    image = image_fixture(%{}, :active)
+
+    collection_description =
       attrs
       |> Enum.into(%{
         description: "some description",
         is_enabled: true,
-        title: "some title"
+        title: attrs[:title] || "some title",
+        slug: attrs[:slug] || "coll-desc",
+        user_id: image.user_id,
+        thumbnail: image.id
       })
       |> Nappy.Catalog.create_collection_description()
+      |> elem(1)
+      |> Nappy.Repo.preload(:image)
 
     collection_description
+    |> Ecto.Changeset.change()
+    |> Ecto.Changeset.put_assoc(:image, [image | collection_description.image])
+    |> Nappy.Repo.update!()
   end
 end
