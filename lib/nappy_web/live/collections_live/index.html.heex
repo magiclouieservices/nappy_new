@@ -12,11 +12,11 @@
     </span>
   </div>
 </header>
-<section class="container mx-auto pt-8 pb-4 flex justify-start items-center gap-4">
+<section class="container mx-auto pt-8 pb-4 flex xs:flex-col lg:flex-row justify-start items-center gap-4">
   <span class="font-tiempos-bold text-lg">
     The People Also Search
   </span>
-  <ul class="flex gap-2">
+  <ul class="flex gap-2 xs:flex-wrap justify-center">
     <%= for related_tag <- @related_tags do %>
       <a
         target="_blank"
@@ -24,23 +24,23 @@
         href={Routes.search_show_path(@socket, :show, related_tag)}
         class="inline-flex items-center px-2 py-1 border border-gray-300 rounded-md text-gray-500 font-light text-sm bg-white hover:bg-black hover:underline hover:text-white focus:outline-none"
       >
-        <li><%= related_tag %></li>
+        <li><%= truncate_related_tags(related_tag) %></li>
       </a>
     <% end %>
   </ul>
 </section>
 <section class="container mx-auto py-4">
-  <div class="grid grid-cols-3 auto-rows-min gap-4">
+  <div class="grid lg:grid-cols-3 xs:grid-cols-1 sm:grid-cols-2 auto-rows-min gap-4">
     <%= for item <- @collections do %>
       <a class="mb-4 block" href={Routes.collections_show_path(@socket, :show, item.slug)}>
-        <div class="relative bg-slate-300">
+        <div class="relative rounded-t bg-slate-300">
           <img
             loading="lazy"
-            class="object-cover"
+            class="object-cover rounded-t"
             src={Catalog.image_url_by_id(item.thumbnail)}
             alt={item.title}
           />
-          <div class="absolute inset-0 z-1 bg-[rgba(0,0,0,.2)]">
+          <div class="absolute rounded-t inset-0 z-1 bg-[rgba(0,0,0,.2)]">
             <span class="absolute bottom-2 left-4 flex gap-2 items-center text-white font-tiempos-bold text-xl">
               <%= item.title %>
             </span>

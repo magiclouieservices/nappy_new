@@ -27,9 +27,11 @@ import topbar from "../vendor/topbar"
 import InfiniteScroll from "./infinite_scroll"
 import Alpine from 'alpinejs'
 import focus from '@alpinejs/focus'
+import collapse from '@alpinejs/collapse'
 
 window.Alpine = Alpine
 Alpine.plugin(focus)
+Alpine.plugin(collapse)
 Alpine.start()
 
 let csrfToken = document.querySelector("meta[name='csrf-token']").getAttribute("content")

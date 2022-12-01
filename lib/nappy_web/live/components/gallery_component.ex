@@ -48,7 +48,14 @@ defmodule NappyWeb.Components.GalleryComponent do
       <div
         id="infinite-scroll-body"
         phx-update="append"
-        class="grid grid-cols-3 auto-rows-[50vh] gap-2"
+        class="grid
+          lg:grid-cols-3
+          sm:grid-cols-2
+          xs:grid-cols-1
+          lg:auto-rows-[45vh]
+          md:auto-rows-max
+          xs:auto-rows-min
+          gap-2"
       >
         <%= for image <- @images do %>
           <div
@@ -119,14 +126,19 @@ defmodule NappyWeb.Components.GalleryComponent do
                 x-show="open"
                 x-transition
                 x-on:click={"open = false; window.history.replaceState({}, '', '#{@current_url}'); document.title = title;"}
-                class="relative flex min-h-screen items-center justify-center p-12"
+                class="relative flex items-center justify-center md:p-12 xs:p-2"
               >
                 <button
                   x-on:click={"open = false; window.history.replaceState({}, '', '#{@current_url}')"}
                   type="button"
-                  class="close-popup-button inline-flex text-white absolute left-4 top-4 flex flex-shrink-0 bg-border-gray-100 rounded focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 z-50"
+                  class="close-popup-button inline-flex md:text-white xs:text-black absolute md:left-4 xs:right-4 top-4 flex flex-shrink-0 bg-border-gray-100 rounded focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 z-50"
                 >
-                  <svg aria-hidden class="h-10 w-10" viewBox="0 0 20 20" fill="currentColor">
+                  <svg
+                    aria-hidden
+                    class="md:h-10 md:w-10 xs:h-6 xs:w-6"
+                    viewBox="0 0 20 20"
+                    fill="currentColor"
+                  >
                     <path
                       fill-rule="evenodd"
                       d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
@@ -139,9 +151,9 @@ defmodule NappyWeb.Components.GalleryComponent do
                 <div
                   x-on:click.stop
                   x-trap.noscroll.inert="open"
-                  class="container relative w-full overflow-y-auto rounded bg-white p-8 shadow-lg"
+                  class="relative overflow-y-auto rounded bg-white sm:p-8 xs:p-4 shadow-lg"
                 >
-                  <div class="flex justify-between">
+                  <div class="flex justify-between xs:flex-col sm:flex-row xs:gap-4 sm:gap-2 md:gap-0">
                     <a
                       class="flex gap-2 rounded items-center focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 hover:underline"
                       href={Routes.user_profile_show_path(@socket, :show, image.user.username)}
@@ -193,25 +205,25 @@ defmodule NappyWeb.Components.GalleryComponent do
 
                   <div class="my-4 flex justify-center">
                     <img
-                      class="object-cover h-[75vh]"
+                      class="object-cover md:h-[75vh] sm:w-auto xs:h-auto xs:w-full"
                       src={Catalog.image_url(image)}
                       alt={image.title}
                     />
                   </div>
 
-                  <div class="flex gap-8 justify-center">
-                    <span>
+                  <div class="flex md:gap-8 sm:gap-4 xs:gap-2 sm:justify-center xs:justify-between">
+                    <span class="text-center p-0 m-0 flex sm:flex-row xs:flex-col sm:justify-center xs:justify-between items-center gap-2">
                       <i class="fa-solid fa-eye"></i>
-                      <%= get_metrics(image).view_count %>
+                      <%= get_metrics(image).view_count %> Views
                     </span>
                     <!--
                       <span>
                         <i class="fa-solid fa-heart"></i> 23 Saves
                       </span>
                       -->
-                    <span>
+                    <span class="text-center p-0 m-0 flex sm:flex-row xs:flex-col sm:justify-center xs:justify-between items-center gap-2">
                       <i class="fa-solid fa-download"></i>
-                      <%= get_metrics(image).download_count %>
+                      <%= get_metrics(image).download_count %> Downloads
                     </span>
                     <.live_component
                       module={MoreInfoComponent}

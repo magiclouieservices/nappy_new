@@ -12,11 +12,11 @@
     </span>
   </div>
 </section>
-<section class="container mx-auto pt-8 pb-4 flex justify-start items-center gap-4">
+<section class="container mx-auto pt-8 pb-4 flex xs:flex-col lg:flex-row justify-start items-center gap-4">
   <span class="font-tiempos-bold text-lg">
     The People Also Search
   </span>
-  <ul class="flex gap-2">
+  <ul class="flex gap-2 xs:flex-wrap justify-center">
     <%= for related_tag <- @related_tags do %>
       <a
         target="_blank"
@@ -30,17 +30,17 @@
   </ul>
 </section>
 <section class="container mx-auto py-4">
-  <div class="grid grid-cols-3 auto-rows-min gap-4">
+  <div class="grid lg:grid-cols-3 xs:grid-cols-1 sm:grid-cols-2 auto-rows-min gap-4">
     <%= for category <- @categories do %>
       <a class="block" href={Routes.category_show_path(@socket, :show, category.slug)}>
-        <div class="relative bg-slate-300">
+        <div class="relative rounded bg-slate-300">
           <img
             loading="lazy"
-            class="object-cover"
+            class="object-cover rounded"
             src={Nappy.Catalog.image_url_by_id(category.thumbnail)}
             alt={category.name}
           />
-          <div class="absolute inset-0 z-1 bg-[rgba(0,0,0,.3)]">
+          <div class="absolute rounded inset-0 z-1 bg-[rgba(0,0,0,.3)]">
             <span class="absolute bottom-2 left-4 flex gap-2 items-center text-white font-tiempos-bold text-xl">
               <%= category.name %>
             </span>

@@ -1,5 +1,5 @@
-<div class="container relative mx-auto w-full overflow-y-auto rounded p-8">
-  <div class="flex justify-between">
+<div class="container relative mx-auto w-full overflow-y-auto rounded py-8">
+  <div class="flex justify-between xs:flex-col sm:flex-row xs:gap-4 sm:gap-2 md:gap-0">
     <a
       class="flex gap-2 rounded items-center focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 hover:underline"
       href={Routes.user_profile_show_path(@socket, :show, @image.user.username)}
@@ -11,37 +11,39 @@
       <span><%= @image.user.username %></span>
     </a>
 
-    <div class="flex gap-2">
-      <button
-        type="button"
-        class="inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2"
-      >
-        <i class="fa-solid fa-circle-dollar-to-slot"></i>
-      </button>
-      <button
-        type="button"
-        class="inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2"
-      >
-        <i class="fa-solid fa-reply fa-flip-horizontal"></i>
-      </button>
-      <%= if @current_user != nil do %>
+    <div class="flex gap-2 xs:justify-between sm:justify-end">
+      <div>
         <button
           type="button"
           class="inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2"
         >
-          <i class="fa-regular fa-heart"></i>
+          <i class="fa-solid fa-circle-dollar-to-slot"></i>
         </button>
-      <% else %>
-        <a
+        <button
+          type="button"
           class="inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2"
-          href={Routes.user_session_path(@socket, :create)}
         >
-          <i class="fa-regular fa-heart"></i>
-        </a>
-      <% end %>
+          <i class="fa-solid fa-reply fa-flip-horizontal"></i>
+        </button>
+        <%= if @current_user != nil do %>
+          <button
+            type="button"
+            class="inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2"
+          >
+            <i class="fa-regular fa-heart"></i>
+          </button>
+        <% else %>
+          <a
+            class="inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2"
+            href={Routes.user_session_path(@socket, :create)}
+          >
+            <i class="fa-regular fa-heart"></i>
+          </a>
+        <% end %>
+      </div>
       <button
         type="button"
-        class="inline-flex gap-2 justify-center items-center rounded-md bg-green-600 px-4 py-2 text-xs text-white shadow-sm focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2"
+        class="inline-flex gap-2 justify-center items-center rounded-md bg-green-600 px-4 h-8 text-xs text-white shadow-sm focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 md:ml-4"
       >
         <span>Download</span>
         <i class="fa-solid fa-chevron-down"></i>
@@ -49,11 +51,18 @@
     </div>
   </div>
   <div class="my-4 flex justify-center">
-    <img class="object-cover h-[75vh]" src={Catalog.image_url(@image)} alt={@image.title} />
+    <img
+      class="object-cover md:h-[75vh] xs:h-full"
+      src={Catalog.image_url(@image)}
+      alt={@image.title}
+    />
   </div>
 
-  <div class="flex my-8 gap-8 justify-center">
-    <span :if={@image.image_analytics.view_count > 0}>
+  <div class="my-8 flex gap-8 justify-center">
+    <span
+      :if={@image.image_analytics.view_count > 0}
+      class="text-center p-0 m-0 flex sm:flex-row xs:flex-col sm:justify-center xs:justify-between items-center gap-2"
+    >
       <i class="fa-solid fa-eye"></i>
       <%= Metrics.translate_units(@image.image_analytics.view_count) %> Views
     </span>
@@ -64,7 +73,10 @@
         Saves
       </span>
       -->
-    <span :if={@image.image_analytics.download_count > 0}>
+    <span
+      :if={@image.image_analytics.download_count > 0}
+      class="text-center p-0 m-0 flex sm:flex-row xs:flex-col sm:justify-center xs:justify-between items-center gap-2"
+    >
       <i class="fa-solid fa-download"></i>
       <%= Metrics.translate_units(@image.image_analytics.download_count) %> Downloads
     </span>

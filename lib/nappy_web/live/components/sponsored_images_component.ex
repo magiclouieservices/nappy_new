@@ -19,8 +19,11 @@ defmodule NappyWeb.Components.SponsoredImagesComponent do
     ~H"""
     <div>
       <p class="font-tiempos-bold text-center text-3xl">Sponsored Photos</p>
-      <div class="flex gap-2 my-2">
-        <div :for={sponsored_img <- @sponsored_images} class="bg-slate-300 grow h-48 basis-56">
+      <div class="flex gap-2 xs:my-6 md:my-2">
+        <div
+          :for={{sponsored_img, index_pos} <- Enum.with_index(@sponsored_images)}
+          class={"#{hide_extra_on_mobile(index_pos)} bg-slate-300 h-48 md:w-96 xs:w-auto"}
+        >
           <%= unless sponsored_img === "#" do %>
             <a
               class="relative bg-slate-300"
@@ -51,12 +54,21 @@ defmodule NappyWeb.Components.SponsoredImagesComponent do
       </div>
 
       <div class="my-8 flex justify-center">
-        <span class="py-1 px-20 bg-black text-white text-center">
+        <span class="py-1 md:px-20 xs:px-4 sm:px-12 bg-black text-white text-center">
           Premium photos by iStock | Use code NAPPY15 for 15% off
         </span>
       </div>
     </div>
     """
+  end
+
+  def hide_extra_on_mobile(index_pos) do
+    cond do
+      index_pos === 1 -> "xs:hidden sm:block"
+      index_pos === 2 -> "xs:hidden md:block"
+      index_pos === 3 -> "xs:hidden lg:block"
+      true -> "block"
+    end
   end
 
   def check_last_elem(sponsored_images) do

@@ -18,7 +18,7 @@ defmodule NappyWeb.Components.TrendingKeywordsComponent do
   """
   def render(assigns) do
     ~H"""
-    <div class="flex gap-2 text-lg">
+    <div class="flex gap-2 md:text-lg xs:gap-1 xs:text-base">
       Trending:
       <ul :for={keyword <- keywords(3)} class="text-slate-300 flex gap-2 justify-center items-center">
         <li>

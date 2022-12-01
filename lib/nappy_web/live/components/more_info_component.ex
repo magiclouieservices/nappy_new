@@ -39,7 +39,7 @@ defmodule NappyWeb.Components.MoreInfoComponent do
       x-on:keydown.escape.prevent.stop="close($refs.button)"
       x-on:focusin.window="! $refs.panel.contains($event.target) && close()"
       x-id="['dropdown-button']"
-      class="relative"
+      class="relative xs:flex xs:justify-center"
     >
       <!-- Button -->
       <button
@@ -48,8 +48,10 @@ defmodule NappyWeb.Components.MoreInfoComponent do
         x-bind:aria-expanded="open"
         x-bind:aria-controls="$id('dropdown-button')"
         type="button"
+        class="flex xs:flex-col sm:flex-row gap-2 xs:justify-between xs:items-center"
       >
-        <i class="fa-solid fa-circle-info"></i> more info
+        <i class="fa-solid fa-circle-info"></i>
+        <span>More info</span>
       </button>
       <!-- Panel -->
       <div
@@ -59,7 +61,7 @@ defmodule NappyWeb.Components.MoreInfoComponent do
         x-on:click.outside="close($refs.button)"
         x-bind:id="$id('dropdown-button')"
         style="display: none;"
-        class="absolute z-10 w-[420px] right-0 mt-2 py-2 px-4 bg-black text-white rounded"
+        class="absolute z-10 xs:w-72 sm:w-[420px] right-0 mt-2 py-2 px-4 bg-black text-white rounded"
       >
         <p class="my-2">Title: <%= @image.title %></p>
         <p class="mt-2">Tags:</p>
