@@ -15,7 +15,7 @@ defmodule NappyWeb.SearchLive.MobileNavbarSearch do
       socket
       |> assign(query: mobile_query)
       |> assign(sponsored_images: sponsored_images)
-      |> push_navigate(to: route, replace: true)
+      |> redirect(to: route)
 
     {:noreply, socket}
   end

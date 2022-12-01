@@ -15,7 +15,7 @@ defmodule NappyWeb.SearchLive.NavbarSearch do
       socket
       |> assign(query: query)
       |> assign(sponsored_images: sponsored_images)
-      |> push_navigate(to: route, replace: true)
+      |> redirect(to: route)
 
     {:noreply, socket}
   end
@@ -77,12 +77,9 @@ defmodule NappyWeb.SearchLive.NavbarSearch do
             </ul>
           </div>
         <% end %>
-        <button
-          phx-submit="search"
-          class="absolute inset-y-0 right-0 flex items-center px-3 text-gray-500 hover:text-green-500"
-        >
+        <%= submit [phx_submit: "search", class: "absolute inset-y-0 right-0 flex items-center px-3 text-gray-500 hover:text-green-500"] do %>
           <i class="fa-solid fa-magnifying-glass"></i>
-        </button>
+        <% end %>
       </.form>
       <button
         x-show="parentOpen"
