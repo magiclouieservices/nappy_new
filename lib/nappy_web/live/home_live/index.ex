@@ -33,6 +33,15 @@ defmodule NappyWeb.HomeLive.Index do
   end
 
   @impl true
+  def handle_event("increment_view_count", %{"slug" => slug}, socket) do
+    slug
+    |> Nappy.Metrics.get_image_analytics_by_slug()
+    |> Nappy.Metrics.increment_view_count()
+
+    {:noreply, socket}
+  end
+
+  @impl true
   def handle_event("search", %{"search" => %{"search_phrase" => query}}, socket) do
     route = Routes.search_show_path(socket, :show, query)
 

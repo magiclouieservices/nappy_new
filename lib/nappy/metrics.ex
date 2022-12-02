@@ -341,6 +341,14 @@ defmodule Nappy.Metrics do
   """
   def get_image_analytics!(id), do: Repo.get!(ImageAnalytics, id)
 
+  def get_image_analytics_by_slug(image_slug) when is_binary(image_slug) do
+    Images
+    |> where(slug: ^image_slug)
+    |> preload(:image_analytics)
+    |> Repo.one()
+    |> Map.get(:image_analytics)
+  end
+
   @doc """
   Creates a image_analytics.
 
@@ -500,5 +508,15 @@ defmodule Nappy.Metrics do
   """
   def change_liked_image(%LikedImage{} = liked_image, attrs \\ %{}) do
     LikedImage.changeset(liked_image, attrs)
+  end
+
+  def increment_view_count(%ImageAnalytics{} = image_analytics) do
+    {1, [%ImageAnalytics{view_count: view_count}]} =
+      ImageAnalytics
+      |> where(id: ^image_analytics.id)
+      |> select([:view_count])
+      |> Repo.update_all(inc: [view_count: 1])
+
+    put_in(image_analytics.view_count, view_count)
   end
 end

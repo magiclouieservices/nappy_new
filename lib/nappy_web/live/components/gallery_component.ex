@@ -10,6 +10,7 @@ defmodule NappyWeb.Components.GalleryComponent do
 
   @moduledoc false
 
+  @impl true
   def handle_event("show_images", %{"title" => title, "slug" => slug, "tags" => tags}, socket) do
     sponsored_images = SponsoredImages.get_images(slug, tags)
     related_images = related_images(slug)
@@ -35,6 +36,7 @@ defmodule NappyWeb.Components.GalleryComponent do
       page={@page}
     />
   """
+  @impl true
   def render(assigns) do
     placeholder = Enum.map(1..5, fn _ -> "#" end)
 
@@ -59,6 +61,9 @@ defmodule NappyWeb.Components.GalleryComponent do
       >
         <%= for image <- @images do %>
           <div
+            id={"view-count-#{image.slug}"}
+            phx-hook="ViewCount"
+            data-slug={image.slug}
             x-data="{ hidden: true, open: false, title: document.title }"
             id={"image-#{image.slug}"}
             class={"#{calc_span(image.image_metadata)} relative bg-slate-300 rounded"}

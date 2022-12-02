@@ -5,7 +5,6 @@ defmodule NappyWeb.ImageLiveTest do
   alias Nappy.CatalogFixtures
 
   import Phoenix.LiveViewTest
-  import Nappy.CatalogFixtures
 
   setup do
     payload =
@@ -40,7 +39,7 @@ defmodule NappyWeb.ImageLiveTest do
 
       # only 1 span[x-id] is using in a specific image page:
       # and it's "more-info" button
-      assert index_live |> element("span[x-id]", "more info") |> has_element?()
+      assert index_live |> element("span[x-id]", "More info") |> has_element?()
     end
 
     test "success: redirect a slug to a full path", %{conn: conn} do
