@@ -52,6 +52,12 @@ defmodule NappyWeb.ImageLive.Show do
         sponsored_images = SponsoredImages.get_images(image.slug, image.tags)
         related_images = GalleryComponent.related_images(image.slug)
 
+        if connected?(socket) do
+          slug
+          |> Nappy.Metrics.get_image_analytics_by_slug()
+          |> Nappy.Metrics.increment_view_count()
+        end
+
         socket =
           socket
           |> assign(image: image)
@@ -76,5 +82,14 @@ defmodule NappyWeb.ImageLive.Show do
      |> assign(status: nil)
      |> assign(ext: nil)
      |> assign(tags: [])}
+  end
+
+  @impl true
+  def handle_event("increment_view_count", %{"slug" => slug}, socket) do
+    slug
+    |> Nappy.Metrics.get_image_analytics_by_slug()
+    |> Nappy.Metrics.increment_view_count()
+
+    {:noreply, socket}
   end
 end
