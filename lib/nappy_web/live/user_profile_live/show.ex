@@ -31,6 +31,15 @@ defmodule NappyWeb.UserProfileLive.Show do
     {:noreply, assign(socket, page: assigns.page + 1) |> fetch()}
   end
 
+  @impl true
+  def handle_event("increment_view_count", %{"slug" => slug}, socket) do
+    slug
+    |> Metrics.get_image_analytics_by_slug()
+    |> Metrics.increment_view_count()
+
+    {:noreply, socket}
+  end
+
   defp fetch(%{assigns: %{user: user, page: page, page_size: page_size}} = socket) do
     images = Catalog.paginate_user_images(user.username, page: page, page_size: page_size)
     assign(socket, images: images)

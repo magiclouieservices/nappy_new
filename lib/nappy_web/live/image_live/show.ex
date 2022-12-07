@@ -87,8 +87,8 @@ defmodule NappyWeb.ImageLive.Show do
   @impl true
   def handle_event("increment_view_count", %{"slug" => slug}, socket) do
     slug
-    |> Nappy.Metrics.get_image_analytics_by_slug()
-    |> Nappy.Metrics.increment_view_count()
+    |> Metrics.get_image_analytics_by_slug()
+    |> Metrics.increment_view_count()
 
     {:noreply, socket}
   end

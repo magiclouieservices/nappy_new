@@ -2,6 +2,7 @@ defmodule NappyWeb.HomeLive.Index do
   use NappyWeb, :live_view
 
   alias Nappy.Catalog
+  alias Nappy.Metrics
   alias NappyWeb.Components.GalleryComponent
   alias NappyWeb.Components.HomeHeaderComponent
 
@@ -35,8 +36,8 @@ defmodule NappyWeb.HomeLive.Index do
   @impl true
   def handle_event("increment_view_count", %{"slug" => slug}, socket) do
     slug
-    |> Nappy.Metrics.get_image_analytics_by_slug()
-    |> Nappy.Metrics.increment_view_count()
+    |> Metrics.get_image_analytics_by_slug()
+    |> Metrics.increment_view_count()
 
     {:noreply, socket}
   end
