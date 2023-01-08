@@ -39,6 +39,15 @@ defmodule NappyWeb.Router do
 
       live "/search", SearchLive.Show, :show
       live "/search/:query", SearchLive.Show, :show
+
+      live "/why", CustomPageLive.Why, :why
+      live "/license", CustomPageLive.License, :license
+      live "/terms", CustomPageLive.Terms, :terms
+      live "/faq", CustomPageLive.FAQ, :faq
+      live "/contact", CustomPageLive.Contact, :contact
+
+      live "/new", CustomPageLive.New, :new
+      live "/studio", CustomPageLive.Studio, :studio
     end
 
     # resources "/legal", LegalController

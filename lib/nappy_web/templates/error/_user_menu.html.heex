@@ -44,16 +44,20 @@
           <a class="hover:text-slate-300" href={Routes.category_index_path(@conn, :index)}>
             Categories
           </a>
-          <a class="hover:text-slate-300" href="#">For Brands</a>
+          <a class="hover:text-slate-300" href={Routes.custom_page_why_path(@conn, :why)}>
+            For Brands
+          </a>
           <a class="hover:text-slate-300" href="https://nappy.kampsite.co">Photo Request</a>
-          <a class="hover:text-slate-300" href="#">What's New</a>
+          <a class="hover:text-slate-300" href={Routes.custom_page_new_path(@conn, :new)}>
+            What's New
+          </a>
         </div>
       </div>
     </li>
     <li>
       <a
         class="py-2 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-900"
-        href="#"
+        href={Routes.custom_page_studio_path(@conn, :studio)}
       >
         Studio <span class="rounded-full bg-red-600 text-xs p-1 text-white">New</span>
       </a>
@@ -89,18 +93,40 @@
           x-transition:leave-end="transform opacity-0 scale-95"
           class="absolute flex w-44 left-[-100%] rounded flex-col py-4 gap-2 items-center justify-center mt-1 bg-black text-white z-50"
         >
-          <a class="hover:text-slate-300" href="#">Our Mission</a>
-          <a class="hover:text-slate-300" href="#">License</a>
-          <a class="hover:text-slate-300" href="#">
+          <a class="hover:text-slate-300" href={Routes.custom_page_why_path(@conn, :why)}>
+            Our Mission
+          </a>
+          <a class="hover:text-slate-300" href={Routes.custom_page_license_path(@conn, :license)}>
+            License
+          </a>
+          <a
+            target="_blank"
+            rel="noopener noreferer nofollow"
+            class="hover:text-slate-300"
+            href="https://shop.nappy.co"
+          >
             Store
             <span class="rounded-full bg-red-600 text-xs p-1 text-white">
               New
             </span>
           </a>
-          <a class="hover:text-slate-300" href="#">Studio</a>
-          <a class="hover:text-slate-300" href="#">FAQ</a>
-          <a class="hover:text-slate-300" href="#">Contact</a>
-          <a class="hover:text-slate-300" href="#">By SHADE</a>
+          <a class="hover:text-slate-300" href={Routes.custom_page_studio_path(@conn, :studio)}>
+            Studio
+          </a>
+          <a class="hover:text-slate-300" href={Routes.custom_page_faq_path(@conn, :faq)}>
+            FAQ
+          </a>
+          <a class="hover:text-slate-300" href={Routes.custom_page_contact_path(@conn, :contact)}>
+            Contact
+          </a>
+          <a
+            target="_blank"
+            rel="noopener noreferer nofollow"
+            class="hover:text-slate-300"
+            href="https://shade.co"
+          >
+            By SHADE
+          </a>
         </div>
       </div>
     </li>
