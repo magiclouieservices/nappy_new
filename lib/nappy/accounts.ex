@@ -51,7 +51,7 @@ defmodule Nappy.Accounts do
   def avatar_url(conn_or_socket, avatar_link, opts \\ []) do
     if avatar_link do
       base_url = Nappy.embed_url()
-      avatar_link = "#{base_url}/avatars/#{avatar_link}"
+      avatar_link = Path.join([base_url, "avatars", avatar_link])
 
       if opts !== [] do
         imgix_query = URI.encode_query(opts)
@@ -112,6 +112,14 @@ defmodule Nappy.Accounts do
 
     Repo.one(query)
   end
+
+  def is_admin_or_contributor(_user, roles \\ [:admin, :contributor])
+
+  def is_admin_or_contributor(%User{} = user, roles) do
+    user.account_role_id in Enum.map(roles, &get_user_role_id/1)
+  end
+
+  def is_admin_or_contributor(_user, _roles), do: false
 
   def get_user_status_id(status) do
     # Ecto.Enum.values(User, :status)
@@ -428,6 +436,10 @@ defmodule Nappy.Accounts do
     Ecto.Multi.new()
     |> Ecto.Multi.update(:user, User.confirm_changeset(user))
     |> Ecto.Multi.delete_all(:tokens, UserToken.user_and_contexts_query(user, ["confirm"]))
+    |> Ecto.Multi.run(:notify_user, fn _repo, %{user: user} ->
+      UserNotifier.deliver_welcome_message(user)
+      {:ok, user}
+    end)
   end
 
   ## Reset password

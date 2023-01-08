@@ -2,7 +2,7 @@
   <img
     class="w-32 rounded-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-900 border border-gray-300"
     src={Accounts.avatar_url(@socket, @user.avatar_link)}
-    alt="{@user.username}'s profile"
+    alt={"#{@user.username}'s profile"}
   />
   <h1 class="text-center font-tiempos-bold text-2xl mt-4">
     <%= @user.name %>

@@ -31,7 +31,7 @@ defmodule NappyWeb.SearchLive.FuzzySearch do
   end
 
   @impl true
-  def handle_event("search", %{"search" => %{"search_phrase" => search_phrase}}, socket)
+  def handle_event("search", %{"search_phrase" => search_phrase}, socket)
       when search_phrase == "" do
     socket =
       socket

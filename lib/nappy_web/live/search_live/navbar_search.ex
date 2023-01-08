@@ -7,7 +7,7 @@ defmodule NappyWeb.SearchLive.NavbarSearch do
   @moduledoc false
 
   @impl true
-  def handle_event("search", %{"search" => %{"search_phrase" => query}}, socket) do
+  def handle_event("search", %{"search_phrase" => query}, socket) do
     sponsored_images = SponsoredImages.get_images("search-#{query}", query)
     route = Routes.search_show_path(socket, :show, query)
 
@@ -47,7 +47,7 @@ defmodule NappyWeb.SearchLive.NavbarSearch do
         <%= label f, :phrase, class: "relative" do %>
           <input
             x-ref="button"
-            name="search[search_phrase]"
+            name="search_phrase"
             id="search_phrase"
             type="text"
             placeholder="Search for photos"

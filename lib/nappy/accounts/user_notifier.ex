@@ -26,6 +26,46 @@ defmodule Nappy.Accounts.UserNotifier do
     |> Phoenix.View.render_to_string(template, assigns)
   end
 
+  def notify_uploaded_images_to_users(grouped_images, status) do
+    {title, template} =
+      case status do
+        "approved" ->
+          {"Your photo(s) was approved 🙌🏿.", "approved_images.html"}
+
+        "denied" ->
+          {"Your photo(s) was denied.", "denied_images.html"}
+
+        "featured" ->
+          {"Your photo(s) is featured.", "featured_images.html"}
+      end
+
+    grouped_images
+    |> Enum.each(fn {username, images} ->
+      email = hd(images).user.email
+
+      assigns = [
+        username: username,
+        title: title,
+        images: images
+      ]
+
+      html_body = compose_html_body(template, assigns)
+
+      deliver(email, assigns[:title], html_body)
+    end)
+  end
+
+  def deliver_welcome_message(user) do
+    assigns = [
+      username: user.username,
+      title: "Welcome to Nappy"
+    ]
+
+    html_body = compose_html_body("welcome.html", assigns)
+
+    deliver(user.email, assigns[:title], html_body)
+  end
+
   @doc """
   Deliver instructions to confirm account.
   """

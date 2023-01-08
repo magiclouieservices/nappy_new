@@ -42,13 +42,6 @@ defmodule NappyWeb.HomeLive.Index do
     {:noreply, socket}
   end
 
-  @impl true
-  def handle_event("search", %{"search" => %{"search_phrase" => query}}, socket) do
-    route = Routes.search_show_path(socket, :show, query)
-
-    {:noreply, redirect(socket, to: route)}
-  end
-
   defp prepare_assigns(socket, uri, page_title \\ "Nappy", filter \\ [filter: :featured]) do
     socket
     |> assign(page: 1)

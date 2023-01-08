@@ -20,6 +20,12 @@ if System.get_env("PHX_SERVER") do
   config :nappy, NappyWeb.Endpoint, server: true
 end
 
+config :ex_azure_vision,
+  header_name: System.get_env("AZURE_OCP_APIM_HEADER_NAME"),
+  subscription_key: System.get_env("AZURE_OCP_APIM_SUBSCRIPTION_KEY"),
+  base_url: System.get_env("AZURE_COGNITIVE_VISION_BASE_URI"),
+  scheme: "https"
+
 config :nappy, :runtime,
   app_name: "Nappy",
   getty_api_key: System.get_env("GETTY_API_KEY"),
@@ -27,7 +33,7 @@ config :nappy, :runtime,
   subscription_url: "https://email.boogie.co/subscribe",
   support_email: "support@nappy.co",
   notifications_email: "notifications@nappy.co",
-  embed_url: System.get_env("IMGIX_URL", "https://devnappy.imgix.net/"),
+  embed_url: System.get_env("IMGIX_URL", "https://devnappy.imgix.net"),
   image_path: System.get_env("WASABI_IMAGE_PATH", "nappy-prod/photos/")
 
 config :ex_aws, :s3,

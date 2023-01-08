@@ -4,9 +4,14 @@ defmodule Nappy.Metrics do
   """
 
   import Ecto.Query, warn: false
+  alias Ecto.Multi
+  alias Nappy.Accounts.UserNotifier
+  alias Nappy.Admin
   alias Nappy.Catalog.Images
+  alias Nappy.Metrics.ImageAnalytics
   alias Nappy.Metrics.ImageMetadata
   alias Nappy.Metrics.ImageStatus
+  alias Nappy.Metrics.LikedImage
   alias Nappy.Repo
 
   @doc """
@@ -74,10 +79,114 @@ defmodule Nappy.Metrics do
     |> where([i, _], i.image_status_id in ^[active, featured])
     |> select([i, ia], %{
       image_count: count(i.id),
-      view_count: type(sum(ia.view_count), :integer),
-      download_count: type(sum(ia.download_count), :integer)
+      view_count: type(count(ia.view_count), :integer),
+      download_count: type(count(ia.download_count), :integer)
     })
     |> Repo.one()
+  end
+
+  @spec approve_images(list(String.t())) :: any()
+  def approve_images(slugs) do
+    active = get_image_status_id(:active)
+    featured = get_image_status_id(:featured)
+
+    images =
+      Images
+      |> where([i], i.slug in ^slugs)
+      |> where([i], i.image_status_id not in ^[active, featured])
+
+    images_id =
+      from(i in Images,
+        where: i.slug in ^slugs,
+        select: i.id
+      )
+      |> Repo.all()
+
+    image_analytics =
+      ImageAnalytics
+      |> where([i], i.image_id in ^images_id)
+
+    Multi.new()
+    |> Multi.update_all(:approve_image, images, set: [image_status_id: active])
+    |> Multi.update_all(:approve_dates, image_analytics,
+      set: [approved_date: NaiveDateTime.utc_now()]
+    )
+    |> multi_run_notify_users(slugs, "approved")
+  end
+
+  @spec deny_images(list(String.t())) :: any()
+  def deny_images(slugs) do
+    denied = get_image_status_id(:denied)
+
+    images =
+      Images
+      |> where([i], i.slug in ^slugs)
+      |> where([i], i.image_status_id != ^denied)
+
+    images_id =
+      from(i in Images,
+        where: i.slug in ^slugs,
+        select: i.id
+      )
+      |> Repo.all()
+
+    image_analytics =
+      ImageAnalytics
+      |> where([i], i.image_id in ^images_id)
+
+    Multi.new()
+    |> Multi.update_all(:approve_image, images, set: [image_status_id: denied])
+    |> Multi.update_all(:set_nil_dates, image_analytics,
+      set: [approved_date: nil, featured_date: nil]
+    )
+    |> multi_run_notify_users(slugs, "denied")
+  end
+
+  defp multi_run_notify_users(multi, slugs, status) do
+    images =
+      Images
+      |> where([i], i.slug in ^slugs)
+      |> preload(:user)
+      |> Repo.all()
+
+    transaction =
+      multi
+      |> Multi.run(:images, fn _repo, _changes ->
+        images
+        |> case do
+          [] ->
+            {:error, :not_found}
+
+          value ->
+            value =
+              value
+              |> Enum.group_by(fn image -> image.user.username end)
+
+            {:ok, value}
+        end
+      end)
+      |> Multi.run(:notify_users, fn _repo, %{images: images} ->
+        UserNotifier.notify_uploaded_images_to_users(images, status)
+
+        {:ok, "images #{status}"}
+      end)
+      |> Repo.transaction()
+
+    case transaction do
+      {:ok, _} ->
+        images
+        |> Task.async_stream(
+          fn image ->
+            Admin.generate_tags_and_description(image)
+          end,
+          max_concurrency: 12,
+          timeout: 100_000
+        )
+        |> Stream.run()
+
+      {:error, reason} ->
+        reason
+    end
   end
 
   @doc """
@@ -310,8 +419,6 @@ defmodule Nappy.Metrics do
     ImageMetadata.changeset(image_metadata, attrs)
   end
 
-  alias Nappy.Metrics.ImageAnalytics
-
   @doc """
   Returns the list of image_analytics.
 
@@ -413,8 +520,6 @@ defmodule Nappy.Metrics do
   def change_image_analytics(%ImageAnalytics{} = image_analytics, attrs \\ %{}) do
     ImageAnalytics.changeset(image_analytics, attrs)
   end
-
-  alias Nappy.Metrics.LikedImage
 
   @doc """
   Returns the list of liked_images.

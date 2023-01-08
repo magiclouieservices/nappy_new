@@ -1,0 +1,584 @@
+<section class="container mx-auto mt-8">
+  <div class="mt-4 flex flex-col">
+    <div class="-my-2 -mx-4 overflow-x-auto sm:-mx-6 lg:-mx-8">
+      <div class="inline-block min-w-full py-2 align-middle md:px-6 lg:px-8">
+        <div class="flex relative overflow-hidden shadow ring-1 ring-black ring-opacity-5 md:rounded-lg">
+          <Component.admin_sidebar_nav socket={@socket} path={@path} />
+          <table
+            id="admin-clipboard-hook"
+            phx-hook="AdminClipboard"
+            class="relative table-auto w-full divide-y divide-gray-300"
+          >
+            <thead id="multiselect-hook" phx-hook="Multiselect" class="bg-gray-50">
+              <!-- header for pagination -->
+              <.live_component
+                images={@images}
+                page={@page}
+                sort_by={@sort_by}
+                sort_order={@sort_order}
+                search_phrase={@search_phrase}
+                image_status={@image_status}
+                socket={@socket}
+                module={ImagesPaginationComponent}
+                id="admin-images-pagination"
+              />
+              <!-- end header for pagination -->
+
+              <!-- header for search, approve button, etc. -->
+              <tr>
+                <th></th>
+                <!-- approval button -->
+                <th>
+                  <.live_component
+                    module={ImagesApprovalButtonComponent}
+                    id="admin-approval-button"
+                  />
+                </th>
+                <!-- end approval button -->
+
+                <!-- approval search button -->
+                <th>
+                  <.live_component
+                    page={@page}
+                    sort_by={@sort_by}
+                    sort_order={@sort_order}
+                    search_phrase={@search_phrase}
+                    image_status={@image_status}
+                    module={SearchComponent}
+                    id="admin-search"
+                  />
+                </th>
+                <!-- end approval search button -->
+
+                <!-- filter by image status -->
+                <th colspan="3">
+                  <.live_component
+                    module={ImagesFilterImageStatusComponent}
+                    id="admin-filter-image-status"
+                  />
+                </th>
+                <!-- end filter by image status -->
+                <th></th>
+              </tr>
+              <!-- end header for search, approve button, etc. -->
+
+              <!-- header for status, uploader, date, etc. -->
+              <tr>
+                <!-- checkbox for group actions -->
+                <th scope="col" class="relative w-12 px-6 sm:w-16 sm:px-8">
+                  <input
+                    id="group-select"
+                    type="checkbox"
+                    class="absolute left-4 top-1/2 -mt-2 h-4 w-4 rounded border-gray-300 text-gray-600 focus:ring-gray-500 sm:left-6"
+                  />
+                </th>
+                <!-- end checkbox for group actions -->
+
+                <!-- sort by (title, date, downloads, etc.) -->
+                <th
+                  :for={
+                    {sort_by, header_name} <-
+                      [
+                        {:title, "Title"},
+                        {:image_status_id, "Status"},
+                        {:user_id, "Uploader"},
+                        {:inserted_at, "Date"},
+                        {:downloads, "Downloads"},
+                        {:views, "Views"}
+                      ]
+                  }
+                  scope="col"
+                  class="py-3.5 pr-3 text-left text-sm font-semibold text-gray-900"
+                >
+                  <span class="underline flex items-center gap-1">
+                    <span
+                      phx-click="sort_image"
+                      phx-value-sort_by={sort_by}
+                      phx-value-sort_order={@sort_order}
+                      phx-value-page={@page}
+                      phx-value-search_phrase={@search_phrase}
+                      phx-value-image_status={@image_status}
+                      class="hover:cursor-pointer"
+                    >
+                      <%= header_name %>
+                    </span>
+                    <span :if={@sort_order === :asc && @sort_by === sort_by}>
+                      <!-- Heroicon name: outline/arrow-up -->
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke-width="2"
+                        stroke="currentColor"
+                        class="w-4 h-4"
+                      >
+                        <path
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          d="M4.5 10.5L12 3m0 0l7.5 7.5M12 3v18"
+                        />
+                      </svg>
+                    </span>
+                    <span :if={@sort_order === :desc && @sort_by === sort_by}>
+                      <!-- Heroicon name: outline/arrow-down -->
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke-width="2"
+                        stroke="currentColor"
+                        class="w-4 h-4"
+                      >
+                        <path
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          d="M19.5 13.5L12 21m0 0l-7.5-7.5M12 21V3"
+                        />
+                      </svg>
+                    </span>
+                  </span>
+                </th>
+                <!-- end sort by (title, date, downloads, etc.) -->
+              </tr>
+              <!-- end header for status, uploader, date, etc. -->
+            </thead>
+
+            <tbody
+              id="input-tags-admin-hook"
+              phx-hook="InputTagsAdmin"
+              class="divide-y divide-gray-200 bg-white"
+            >
+              <tr
+                :for={image <- @images}
+                class="select-images hover:bg-gray-300 hover:cursor-pointer"
+              >
+                <!-- Checkbox for multiselect images -->
+                <td class="relative w-12 px-6 sm:w-16 sm:px-8">
+                  <input
+                    :for={action <- ["approve", "deny", "delete"]}
+                    type="checkbox"
+                    form={"form-#{action}"}
+                    name={"select_#{image.slug}"}
+                    value={image.slug}
+                    class="absolute left-4 top-1/2 -mt-2 h-4 w-4 rounded border-gray-300 text-gray-600 focus:ring-gray-500 sm:left-6"
+                  />
+                </td>
+                <!-- End checkbox for multiselect images -->
+
+                <!-- Modal for quick edit -->
+                <td
+                  id={"modal-#{image.slug}"}
+                  x-data="{ open: false }"
+                  class="whitespace-nowrap py-4 text-sm sm:pr-6 flex items-center gap-2"
+                >
+                  <!-- trigger -->
+                  <span
+                    id={"modal-trigger-#{image.slug}"}
+                    class="flex items-center hover:cursor-pointer hover:underline"
+                    x-on:click="open = true"
+                  >
+                    <img
+                      id={"modal-thumbnail-trigger-#{image.slug}"}
+                      class="rounded w-12 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-900 mr-2"
+                      src={Catalog.image_url(image, w: 200)}
+                      alt={image.title}
+                    />
+                    <%= ellipsis(image.title) %>
+                  </span>
+                  <!-- Modal -->
+                  <div
+                    x-show="open"
+                    style="display: none"
+                    x-on:keydown.escape.prevent.stop="open = false"
+                    role="dialog"
+                    aria-modal="true"
+                    x-id="['modal-quick-edit']"
+                    x-bind:aria-labelledby="$id('modal-title-quick-edit')"
+                    class="fixed inset-0 z-10 overflow-y-auto"
+                  >
+                    <!-- Overlay -->
+                    <div
+                      x-show="open"
+                      x-transition.opacity
+                      class="fixed inset-0 bg-black bg-opacity-50"
+                    >
+                    </div>
+                    <!-- Panel -->
+                    <div
+                      x-show="open"
+                      x-transition
+                      x-on:click="open = false"
+                      class="cursor-default relative flex min-h-screen items-center justify-center p-4"
+                    >
+                      <div
+                        x-on:click.stop
+                        x-trap.noscroll.inert="open"
+                        class="relative w-full max-w-[1100px] overflow-y-auto rounded-xl bg-white p-4 shadow-lg grid grid-cols-2"
+                      >
+                        <!-- image preview popup -->
+                        <div class="relative">
+                          <!-- close button -->
+                          <div
+                            x-on:click="open = false"
+                            class="cursor-pointer absolute left-2 top-1 bg-[rgba(0,0,0,0.5)] rounded-full p-1"
+                          >
+                            <span class="sr-only">Close popup</span>
+                            <!-- Heroicon name: outline/x-mark -->
+                            <svg
+                              xmlns="http://www.w3.org/2000/svg"
+                              fill="none"
+                              viewBox="0 0 24 24"
+                              stroke-width="2"
+                              stroke="currentColor"
+                              class="w-5 h-5 text-white"
+                            >
+                              <path
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                d="M6 18L18 6M6 6l12 12"
+                              />
+                            </svg>
+                          </div>
+                          <!-- end close button -->
+
+                          <!-- open in new tab button -->
+                          <a
+                            href={Routes.image_show_path(@socket, :show, image.slug)}
+                            target="_blank"
+                            rel="noopener noreferer nofollow"
+                            class="absolute top-1 right-10 bg-[rgba(0,0,0,0.5)] p-1.5 rounded-full flex rounded-full justify-center items-center"
+                          >
+                            <!-- Heroicon name: outline/arrow-top-right-on-square -->
+                            <svg
+                              xmlns="http://www.w3.org/2000/svg"
+                              fill="none"
+                              viewBox="0 0 24 24"
+                              stroke-width="2"
+                              stroke="currentColor"
+                              class="w-5 h-5 text-white"
+                            >
+                              <path
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                d="M13.5 6H5.25A2.25 2.25 0 003 8.25v10.5A2.25 2.25 0 005.25 21h10.5A2.25 2.25 0 0018 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25"
+                              />
+                            </svg>
+                          </a>
+                          <!-- end open in new tab button -->
+
+                          <!-- image preview popup -->
+                          <img
+                            class="rounded max-w-[500px] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-900 mr-2"
+                            src={Catalog.image_url(image, w: 800)}
+                            alt={image.title}
+                          />
+                        </div>
+                        <!-- end image preview popup -->
+                        <.form
+                          :let={_f}
+                          id={"specific-image-#{image.slug}"}
+                          for={:admin_image}
+                          phx-submit="update_photo"
+                        >
+                          <div class="grid grid-cols-6 gap-4">
+                            <!-- image status badge -->
+                            <div class="col-span-1 flex pt-1 items-center">
+                              <span
+                                :for={
+                                  {image_status, [span_class_name, svg_class_name]} <-
+                                    [
+                                      active: ["bg-green-100 text-green-800", "text-green-400"],
+                                      denied: ["bg-red-100 text-red-800", "text-red-400"],
+                                      featured: [
+                                        "bg-indigo-100 text-indigo-800",
+                                        "text-indigo-400"
+                                      ],
+                                      pending: [
+                                        "bg-yellow-100 text-yellow-800",
+                                        "text-yellow-400"
+                                      ]
+                                    ]
+                                }
+                                :if={
+                                  Metrics.get_image_status_name(image.image_status_id) ===
+                                    image_status
+                                }
+                                class={"#{span_class_name} h-8 inline-flex items-center rounded px-2.5 py-0.5 text-sm font-medium"}
+                              >
+                                <svg
+                                  class="#{svg_class_name} -ml-0.5 mr-1.5 h-2 w-2"
+                                  fill="currentColor"
+                                  viewBox="0 0 8 8"
+                                >
+                                  <circle cx="4" cy="4" r="3" />
+                                </svg>
+                                <%= Metrics.get_image_status_name(image.image_status_id) %>
+                              </span>
+                            </div>
+                            <!-- end image status badge -->
+                            <input type="hidden" name="slug" value={image.slug} />
+                            <!-- category -->
+                            <div class="col-span-2 flex items-center rounded-md shadow-sm">
+                              <select
+                                class="h-8 mt-1 focus:ring-gray-500 text-xs w-full focus:border-gray-500 border-gray-300 rounded-md"
+                                id={"photo-category-#{image.slug}"}
+                                name="category"
+                              >
+                                <option disabled="" value="">Choose category</option>
+                                <option
+                                  :for={category <- Catalog.list_all_category_names()}
+                                  value={category}
+                                  selected={
+                                    if category ==
+                                         Catalog.get_category(id: image.category_id).name,
+                                       do: "true",
+                                       else: nil
+                                  }
+                                >
+                                  <%= category %>
+                                </option>
+                              </select>
+                            </div>
+                            <!-- end category -->
+
+                            <!-- featured -->
+                            <div class="col-span-3 flex gap-2 justify-center items-center">
+                              <label class="text-gray-900">Featured?</label>
+                              <fieldset class="flex items-center">
+                                <div class="flex items-center gap-3">
+                                  <div class="flex items-center">
+                                    <input
+                                      id={"featured-yes-#{image.slug}"}
+                                      name="featured"
+                                      type="radio"
+                                      value="yes"
+                                      checked={
+                                        if :featured ==
+                                             Metrics.get_image_status_name(image.image_status_id),
+                                           do: "true",
+                                           else: nil
+                                      }
+                                      class="h-4 w-4 border-gray-300 text-gray-600 focus:ring-gray-500"
+                                    />
+                                    <label
+                                      for={"featured-yes-#{image.slug}"}
+                                      class="ml-1 block text-sm font-medium text-gray-700"
+                                    >
+                                      Yes
+                                    </label>
+                                  </div>
+
+                                  <div class="flex items-center">
+                                    <input
+                                      id={"featured-no-#{image.slug}"}
+                                      name="featured"
+                                      type="radio"
+                                      value="no"
+                                      checked={
+                                        if :featured !=
+                                             Metrics.get_image_status_name(image.image_status_id),
+                                           do: "true",
+                                           else: nil
+                                      }
+                                      class="h-4 w-4 border-gray-300 text-gray-600 focus:ring-gray-500"
+                                    />
+                                    <label
+                                      for={"featured-no-#{image.slug}"}
+                                      class="ml-1 block text-sm font-medium text-gray-700"
+                                    >
+                                      No
+                                    </label>
+                                  </div>
+                                </div>
+                              </fieldset>
+                            </div>
+                            <!-- end featured -->
+
+                            <!-- uploader -->
+                            <div class="col-span-6 flex items-center gap-2">
+                              Photo taken by:
+                              <a
+                                target="_blank"
+                                rel="noopener noreferer nofollow"
+                                class="underline hover:text-black"
+                                href={
+                                  Routes.user_profile_show_path(
+                                    @socket,
+                                    :show,
+                                    image.user.username
+                                  )
+                                }
+                              >
+                                <%= image.user.username %>
+                              </a>
+                            </div>
+                            <!-- end uploader -->
+
+                            <!-- image title -->
+                            <div class="col-span-6 flex">
+                              <label
+                                for={"photo-title-#{image.slug}"}
+                                class="inline-flex items-center rounded-l-md border border-r-0 border-gray-300 bg-gray-50 px-3 text-gray-500 sm:text-sm"
+                              >
+                                Title
+                              </label>
+                              <input
+                                class="block w-full flex-1 rounded-none rounded-r-md border-gray-300 px-3 focus:border-gray-500 focus:ring-gray-500 sm:text-sm"
+                                id={"photo-title-#{image.slug}"}
+                                name="title"
+                                required=""
+                                type="text"
+                                value={image.title}
+                              />
+                            </div>
+                            <!-- end image title -->
+
+                            <!-- permalink -->
+                            <div class="col-span-6 flex rounded-md shadow-sm">
+                              <div
+                                for={"permalink-#{image.slug}"}
+                                class="copy-button cursor-pointer inline-flex items-center rounded-l-md border border-r-0 border-gray-300 bg-gray-50 px-3 text-gray-500 sm:text-sm"
+                              >
+                                <!-- Heroicon name: outline/document-duplicate -->
+                                <svg
+                                  xmlns="http://www.w3.org/2000/svg"
+                                  fill="none"
+                                  viewBox="0 0 24 24"
+                                  stroke-width="1.5"
+                                  stroke="currentColor"
+                                  class="w-6 h-6 mr-1"
+                                >
+                                  <path
+                                    id={"clipboard-icon-#{image.slug}"}
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    d="M15.75 17.25v3.375c0 .621-.504 1.125-1.125 1.125h-9.75a1.125 1.125 0 01-1.125-1.125V7.875c0-.621.504-1.125 1.125-1.125H6.75a9.06 9.06 0 011.5.124m7.5 10.376h3.375c.621 0 1.125-.504 1.125-1.125V11.25c0-4.46-3.243-8.161-7.5-8.876a9.06 9.06 0 00-1.5-.124H9.375c-.621 0-1.125.504-1.125 1.125v3.5m7.5 10.375H9.375a1.125 1.125 0 01-1.125-1.125v-9.25m12 6.625v-1.875a3.375 3.375 0 00-3.375-3.375h-1.5a1.125 1.125 0 01-1.125-1.125v-1.5a3.375 3.375 0 00-3.375-3.375H9.75"
+                                  />
+                                </svg>
+                                Permalink
+                              </div>
+                              <input
+                                class="block w-full flex-1 rounded-none rounded-r-md border-gray-300 px-3 focus:border-gray-500 focus:ring-gray-500 sm:text-sm"
+                                id={"permalink-#{image.slug}"}
+                                type="text"
+                                value={Path.join(NappyWeb.Endpoint.url(), "photo/#{image.slug}")}
+                              />
+                            </div>
+                            <!-- end permalink -->
+
+                            <!-- tags -->
+                            <div class="col-span-6 flex rounded-md shadow-sm">
+                              <input
+                                id={"input-tags-#{image.slug}"}
+                                name="input-tags"
+                                value={image.tags}
+                                class="mt-1 appearance-none block w-full border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-gray-500 focus:border-gray-500 sm:text-sm"
+                              />
+                            </div>
+                            <!-- end tags -->
+
+                            <!-- auto generated tags -->
+                            <div :if={image.generated_tags} class="col-span-6 flex flex-col gap-2">
+                              <label class="text-left">Auto generated Tags</label>
+                              <div class="flex flex-wrap gap-1">
+                                <span
+                                  :for={gen_tag <- String.split(image.generated_tags, ",")}
+                                  class="border rounded p-0.5"
+                                >
+                                  <%= gen_tag %>
+                                </span>
+                              </div>
+                            </div>
+                            <!-- end auto generated tags -->
+
+                            <!-- submit and reset button -->
+                            <div class="col-span-6 flex gap-2">
+                              <button
+                                type="submit"
+                                phx-submit="update_photo"
+                                class="cursor-pointer inline-flex items-center px-4 py-2 rounded shadow-sm text-white bg-green-600 hover:bg-green-700 text-lg focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
+                              >
+                                Save
+                              </button>
+                              <button
+                                onclick={"document.getElementById(\"specific-image-#{image.slug}\").reset()"}
+                                class="cursor-pointer inline-flex items-center px-4 py-2 rounded shadow-sm text-white bg-gray-600 hover:bg-gray-700 text-lg focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500"
+                              >
+                                Reset
+                              </button>
+                            </div>
+                            <!-- end submit and reset button -->
+                          </div>
+                        </.form>
+                      </div>
+                    </div>
+                  </div>
+                  <!-- End modal -->
+                </td>
+                <!-- End modal for quick edit -->
+
+                <!-- Image status -->
+                <td class="whitespace-nowrap py-4 pl-3 pr-4 text-sm font-medium sm:pr-6">
+                  <span
+                    :for={
+                      {image_status, [span_class_name, svg_class_name]} <-
+                        [
+                          active: ["bg-green-100 text-green-800", "text-green-400"],
+                          denied: ["bg-red-100 text-red-800", "text-red-400"],
+                          featured: ["bg-indigo-100 text-indigo-800", "text-indigo-400"],
+                          pending: ["bg-yellow-100 text-yellow-800", "text-yellow-400"]
+                        ]
+                    }
+                    :if={Metrics.get_image_status_name(image.image_status_id) === image_status}
+                    class={"#{span_class_name} inline-flex items-center rounded-md px-2.5 py-0.5 text-sm font-medium"}
+                  >
+                    <svg
+                      class="#{svg_class_name} -ml-0.5 mr-1.5 h-2 w-2"
+                      fill="currentColor"
+                      viewBox="0 0 8 8"
+                    >
+                      <circle cx="4" cy="4" r="3" />
+                    </svg>
+                    <%= Metrics.get_image_status_name(image.image_status_id) %>
+                  </span>
+                </td>
+                <!-- End image status -->
+
+                <!-- Uploader -->
+                <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                  <a
+                    target="_blank"
+                    rel="noopener noreferer nofollow"
+                    class="items-center hover:underline hover:text-black"
+                    href={Routes.user_profile_show_path(@socket, :show, image.user.username)}
+                  >
+                    <%= image.user.username %>
+                  </a>
+                </td>
+                <!-- End uploader -->
+
+                <!-- Date created -->
+                <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                  <%= image.inserted_at %>
+                </td>
+                <!-- End date created -->
+
+                <!-- Downloads -->
+                <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                  <%= Metrics.translate_units(image.image_analytics.download_count) %>
+                </td>
+                <!-- End downloads -->
+
+                <!-- Views -->
+                <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                  <%= Metrics.translate_units(image.image_analytics.view_count) %>
+                </td>
+                <!-- End views -->
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

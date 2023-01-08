@@ -91,7 +91,10 @@
       </div>
       <div class="my-6">
         <%= label(f, :photo_category, "Category", class: "font-semibold") %>
-        <%= select(f, :photo_category, ["Active", "Others", "People", "Food"],
+        <%= select(
+          f,
+          :photo_category,
+          Nappy.Catalog.list_all_category_names(),
           prompt: [key: "Choose category", disabled: true],
           class:
             "mt-1 focus:ring-gray-500 w-full focus:border-gray-500 border-gray-300 rounded-md"
@@ -117,3 +120,16 @@
     </div>
   </.form>
 </section>
+<script src="https://cdn.jsdelivr.net/npm/@yaireo/tagify">
+</script>
+<script src="https://cdn.jsdelivr.net/npm/@yaireo/tagify/dist/tagify.polyfills.min.js">
+</script>
+<link
+  href="https://cdn.jsdelivr.net/npm/@yaireo/tagify/dist/tagify.css"
+  rel="stylesheet"
+  type="text/css"
+/>
+<script>
+  let inputTag = document.getElementById("input-tags")
+  new Tagify(inputTag)
+</script>

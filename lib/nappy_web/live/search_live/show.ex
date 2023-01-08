@@ -1,6 +1,7 @@
 defmodule NappyWeb.SearchLive.Show do
   use NappyWeb, :live_view
 
+  alias Nappy.Metrics
   alias Nappy.Search
   alias Nappy.SponsoredImages
   alias NappyWeb.Components.GalleryComponent
@@ -30,7 +31,16 @@ defmodule NappyWeb.SearchLive.Show do
   end
 
   @impl true
-  def handle_event("search", %{"search" => %{"search_phrase" => query}}, socket) do
+  def handle_event("increment_view_count", %{"slug" => slug}, socket) do
+    slug
+    |> Metrics.get_image_analytics_by_slug()
+    |> Metrics.increment_view_count()
+
+    {:noreply, socket}
+  end
+
+  @impl true
+  def handle_event("search", %{"search_phrase" => query}, socket) do
     sponsored_images = SponsoredImages.get_images("search-#{query}", query)
     route = Routes.search_show_path(socket, :show, query)
 

@@ -7,6 +7,27 @@ defmodule Nappy.Catalog.Images do
 
   @moduledoc false
 
+  defimpl Jason.Encoder, for: __MODULE__ do
+    def encode(value, opts) do
+      encoded_fields = [
+        :title,
+        :slug,
+        :tags,
+        :description,
+        :generated_description,
+        :generated_tags
+      ]
+
+      value
+      |> Map.take(encoded_fields)
+      |> Enum.map(fn {key, val} ->
+        if is_nil(val), do: {key, ""}, else: {key, val}
+      end)
+      |> Enum.into(%{})
+      |> Jason.Encode.map(opts)
+    end
+  end
+
   schema "images" do
     field :description, :string
     field :generated_description, :string

@@ -129,6 +129,18 @@ defmodule NappyWeb.Router do
     get "/users/settings/confirm_email/:token", UserSettingsController, :confirm_email
   end
 
+  scope "/admin", NappyWeb do
+    pipe_through [:browser, :require_authenticated_user, :admin_only]
+
+    live "/dashboard", AdminLive.Dashboard, :dashboard
+    live "/images", AdminLive.Images, :images
+    live "/settings", AdminLive.Settings, :settings
+    live "/bulk-upload", AdminLive.BulkUpload, :bulk_upload
+    live "/categories", AdminLive.Categories, :categories
+    live "/collections", AdminLive.Collections, :collections
+    live "/pages", AdminLive.Pages, :pages
+  end
+
   scope "/", NappyWeb do
     pipe_through [:browser]
 

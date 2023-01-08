@@ -5,16 +5,20 @@ defmodule Nappy.Catalog do
   """
 
   import Ecto.Query, warn: false
+  alias Ecto.Multi
   alias ExAws.S3
   alias Nappy.Accounts.User
+  alias Nappy.Accounts.UserNotifier
+  alias Nappy.Admin
   alias Nappy.Admin.Slug
   alias Nappy.Catalog.Images
   alias Nappy.Metrics
   alias Nappy.Metrics.ImageAnalytics
   alias Nappy.Metrics.ImageMetadata
+  alias Nappy.Metrics.ImageStatus
   alias Nappy.Repo
 
-  @image_status_names Ecto.Enum.values(Metrics.ImageStatus, :name)
+  @image_status_names Ecto.Enum.values(ImageStatus, :name)
   @full_list_status_names [:all, :popular | @image_status_names]
 
   @doc """
@@ -130,6 +134,48 @@ defmodule Nappy.Catalog do
     |> Repo.paginate(params)
   end
 
+  def paginate_images(:admin, params) do
+    sort_order = params[:sort_order]
+    sort_by = params[:sort_by]
+    status_name = params[:image_status]
+
+    join_query =
+      case status_name do
+        :all ->
+          Images
+
+        _ ->
+          Images
+          |> where(image_status_id: ^Metrics.get_image_status_id(status_name))
+      end
+      |> preload([:user, :image_metadata, :image_analytics])
+      |> join(:inner, [i], u in assoc(i, :user))
+      |> join(:inner, [i, _], im in assoc(i, :image_metadata))
+      |> join(:inner, [i, _, _], ia in assoc(i, :image_analytics))
+
+    query =
+      case sort_by do
+        :user_id ->
+          join_query
+          |> order_by([_, u, _, _], {^sort_order, u.username})
+
+        :downloads ->
+          join_query
+          |> order_by([_, _, _, ia], {^sort_order, ia.download_count})
+
+        :views ->
+          join_query
+          |> order_by([_, _, _, ia], {^sort_order, ia.view_count})
+
+        _ ->
+          join_query
+          |> preload([:user, :image_metadata, :image_analytics])
+          |> order_by({^sort_order, ^sort_by})
+      end
+
+    Repo.paginate(query, params)
+  end
+
   def paginate_user_images(username, params) do
     active = Metrics.get_image_status_id(:active)
     featured = Metrics.get_image_status_id(:featured)
@@ -171,15 +217,16 @@ defmodule Nappy.Catalog do
     # http://localhost:4566/your-funny-bucket-name/you-weird-file-name
     ext = Metrics.get_image_extension(image.id) || "jpg"
     base_url = Nappy.embed_url()
-    path = Nappy.image_paths()
+    image_path = Nappy.image_paths()
     filename = "#{image.slug}.#{ext}"
+    path = Path.join([base_url, image_path, filename])
     default_query = "auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2"
 
     if opts !== [] do
       imgix_query = URI.encode_query(opts)
-      "#{base_url}#{path}#{filename}?#{imgix_query}"
+      "#{path}?#{imgix_query}"
     else
-      "#{base_url}#{path}#{filename}?#{default_query}"
+      "#{path}?#{default_query}"
     end
 
     # <img
@@ -371,6 +418,93 @@ defmodule Nappy.Catalog do
   end
 
   @doc """
+  Updates an image via admin images page.
+
+  ## Examples
+      iex> params = %{
+        "category" => category,
+        "featured" => featured,
+        "input-tags" => tags,
+        "title" => title,
+        "slug" => slug
+      } = params,
+
+      iex> admin_update_image(params)
+      {:ok, %Images{}}
+  """
+  def admin_update_image(params) do
+    category = params["category"]
+    is_featured = params["featured"]
+    slug = params["slug"]
+    tags = params["input-tags"]
+    title = params["title"]
+
+    image = get_image_by_slug(slug)
+
+    category = get_category_by_name(category)
+    featured = Metrics.get_image_status_id(:featured)
+
+    image_status_id =
+      if is_featured === "yes" && image.image_status_id !== featured do
+        featured
+      else
+        Metrics.get_image_status_id(:active)
+      end
+
+    tags =
+      tags
+      |> Jason.decode!()
+      |> Enum.map_join(",", &Map.values/1)
+
+    image_attrs = %{
+      title: title,
+      category_id: category.id,
+      image_status_id: image_status_id,
+      slug: image.slug,
+      tags: tags,
+      user_id: image.user_id
+    }
+
+    image_analytics = Metrics.get_image_analytics_by_slug(slug)
+
+    featured_date =
+      if is_featured === "yes" do
+        NaiveDateTime.utc_now()
+      else
+        image_analytics.featured_date
+      end
+
+    image_analytics_attrs = %{
+      image_id: image_analytics.image_id,
+      featured_date: featured_date
+    }
+
+    Multi.new()
+    |> Multi.update(
+      :image_analytics,
+      ImageAnalytics.changeset(image_analytics, image_analytics_attrs)
+    )
+    |> Multi.update(:image, Images.changeset(image, image_attrs))
+    |> Multi.run(:notify_user, fn repo, %{image: image} ->
+      image =
+        image
+        |> repo.preload(:user)
+
+      if image.image_status_id === featured do
+        %{image.user.username => [image]}
+        |> UserNotifier.notify_uploaded_images_to_users("featured")
+      end
+
+      unless image.generated_tags do
+        {:ok, _} = Admin.generate_tags_and_description(image)
+      end
+
+      {:ok, image}
+    end)
+    |> Repo.transaction()
+  end
+
+  @doc """
   Deletes a image.
 
   ## Examples
@@ -383,20 +517,44 @@ defmodule Nappy.Catalog do
 
   """
   def delete_image(%Images{} = image, bucket_name \\ Nappy.bucket_name()) do
-    # Repo.delete(image)
-    ext = Metrics.get_image_extension(image.id)
-    filename = "photos/#{image.slug}.#{ext}"
+    Repo.transaction(fn ->
+      ext = Metrics.get_image_extension(image.id)
+      filename = "photos/#{image.slug}.#{ext}"
 
-    case Repo.delete(image) do
-      {:ok, image} ->
-        bucket_name
-        |> S3.delete_object(filename)
-        |> ExAws.request()
+      case Repo.delete(image) do
+        {:ok, _image} ->
+          bucket_name
+          |> S3.delete_object(filename)
+          |> ExAws.request()
 
-      {:error, changeset} ->
-        changeset
-        # IO.inspect(changeset, label: "error changeset from deleting image")
-    end
+        {:error, changeset} ->
+          changeset
+          # IO.inspect(changeset, label: "error changeset from deleting image")
+      end
+    end)
+  end
+
+  def delete_multiple_images(slugs, bucket_name \\ Nappy.bucket_name()) do
+    images =
+      Images
+      |> where([i], i.slug in ^slugs)
+
+    objects =
+      images
+      |> Repo.all()
+      |> Enum.map(fn image ->
+        ext = Metrics.get_image_extension(image.id)
+        "photos/#{image.slug}.#{ext}"
+      end)
+
+    Multi.new()
+    |> Multi.delete_all(:remove_images, images)
+    |> Multi.run(:delete_s3_objects, fn _repo, _changes ->
+      bucket_name
+      |> S3.delete_multiple_objects(objects)
+      |> ExAws.request()
+    end)
+    |> Repo.transaction()
   end
 
   @doc """
@@ -507,6 +665,11 @@ defmodule Nappy.Catalog do
   """
   def list_categories do
     Repo.all(Category)
+  end
+
+  def list_all_category_names do
+    from(c in Category, select: c.name)
+    |> Repo.all()
   end
 
   def paginate_category(slug, params \\ [page: 1]) do

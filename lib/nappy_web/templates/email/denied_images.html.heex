@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <meta content="text/html; charset=utf-8" http-equiv="Content-Type" />
+    <%= csrf_meta_tag() %>
+    <title>
+      <%= Nappy.app_name() %>: <%= @title %>
+    </title>
+    <style media="all" rel="stylesheet" type="text/css">
+      /* Media Queries */
+      @media  only screen and (max-width: 500px) {
+        .button {
+          width: 100% !important;
+        }
+      }
+
+      .blackbtn{
+        padding:10px 20px;
+        color: #fff;
+        background-color: #000;
+        border-radius:20px;
+        text-decoration:none;
+        font-weight:bold;
+      }
+    </style>
+  </head>
+
+  <body style="background:#fff; font-size:15px; line-height:25px; font-family:Helvetica Neue, helvetica, arial;">
+    <!--header start-->
+    <div style="background:#fff; padding: 20px 10px; border-bottom: 1px solid #000; text-align:center;">
+      <a href={Routes.home_index_url(NappyWeb.Endpoint, :index)} target="_blank">
+        <img
+          src={Routes.static_url(NappyWeb.Endpoint, "/images/nappy-logo.png")}
+          style="width: 90px;"
+        />
+      </a>
+    </div>
+    <!--header start--><!--body start-->
+    <div style="width:80%; max-width:600px; margin:auto; padding: 20px;">
+      <p>Hey <%= @username %>,</p>
+      <p>Thanks again for uploading your photo to Nappy.</p>
+      <img
+        :for={image <- @images}
+        src={Nappy.Catalog.image_url(image, w: 600)}
+        alt={image.title}
+        style="display:block; max-width: 600px; margin:0 auto;"
+      />
+      <p>
+        Unfortunately, it wasn't approved because it doesn't meet our <a
+          href="/guidelines"
+          target="_blank"
+        >
+          <span style="color:#000000;">
+            submission guidelines
+          </span>
+        </a>.
+      </p>
+
+      <p><em>It could've been any of the following:</em></p>
+      <p>
+        <em>
+          Don’t submit low-quality images under 2000 x 1300 pixels<br />
+          Don’t submit selfies (or cell phone photos)<br />
+          Don’t submit blurry or unclear images<br /> And more.
+        </em>
+      </p>
+
+      <a href="/guidelines" target="_blank">
+        <span style="color:#000000;">Click here</span>
+      </a>
+      to see the full list.
+      <p>Do you have another photo that does meet our guideline?</p>
+
+      <p>
+        <a class="blackbtn" href={Routes.upload_url(NappyWeb.Endpoint, :new)}>
+          Submit it here
+        </a>
+      </p>
+
+      <p>- Nappy Crew</p>
+    </div>
+    <!--body end--><!--footer start-->
+    <div style="background:#fff; color: #333; padding: 20px 10px; text-align:center; font-family:Helvetica Neue, helvetica; font-size:13px; text-decoration:none;">
+      <hr style="width:300px; color:#333;" />
+      <!--<p><a href="https://nappy.co" target="_blank"><img src="https://nappy.co/public/img/Nappy.png" style="width: 90px; height: 30px;" /></a></p>-->
+      <p>
+        <a href={Routes.home_index_url(NappyWeb.Endpoint, :index)} target="_blank">
+          <span style="color:#000000;">Website</span>
+        </a>&nbsp; | &nbsp; <a
+          href="/studio"
+          target="_blank"
+        >
+          <span style="color:#000000;">Studio</span>
+        </a>&nbsp; | &nbsp; <a
+          href="https://www.instagram.com/nappystock"
+          target="_blank"
+        >
+          <span style="color:#000000;">Instagram</span>
+        </a>&nbsp;| &nbsp; <a href="https://www.facebook.com/nappystock">
+          <span style="color:#000000;">Facebook</span>
+        </a>&nbsp;| &nbsp;
+        <a href="https://www.twitter.com/nappystock" target="_blank">
+          <span style="color:#000000;">Twitter</span>
+        </a>
+      </p>
+    </div>
+    <!--footer end-->
+  </body>
+</html>

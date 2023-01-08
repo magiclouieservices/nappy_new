@@ -5,9 +5,13 @@ defmodule Nappy.Admin do
 
   import Ecto.Query, warn: false
 
+  alias Ecto.Multi
+  alias Nappy.Admin.AdminSettings
+  alias Nappy.Admin.Legal
+  alias Nappy.Admin.Seo
+  alias Nappy.Catalog
+  alias Nappy.Catalog.Images
   alias Nappy.Repo
-
-  alias Nappy.Admin.{AdminSettings, Legal, Seo}
 
   @doc """
   Returns the list of settings.
@@ -289,5 +293,52 @@ defmodule Nappy.Admin do
   """
   def change_seo(%Seo{} = seo, attrs \\ %{}) do
     Seo.changeset(seo, attrs)
+  end
+
+  def generate_tags_and_description(%Images{} = image) do
+    image_url = Catalog.image_url(image)
+
+    query_params = %{
+      visualfeatures: "Categories,Adult,Tags,Description,Faces,Objects",
+      details: "Landmarks"
+    }
+
+    case ExAzureVision.analyze(image_url, query_params) do
+      {:ok, result} ->
+        captions = result["description"]["captions"]
+
+        image_attrs =
+          if captions do
+            generated_description =
+              captions
+              |> Enum.max_by(& &1["confidence"])
+              |> Map.get("text")
+
+            Map.put(%{}, :generated_description, generated_description)
+          else
+            %{}
+          end
+
+        generated_tags =
+          result["tags"]
+          |> Enum.filter(fn %{"confidence" => confidence} -> confidence >= 0.5 end)
+          |> Enum.map_join(",", fn %{"name" => name} -> name end)
+
+        generated_tags =
+          if result["adult"]["isAdultContent"],
+            do: generated_tags <> "," <> "nsfw",
+            else: generated_tags
+
+        image_attrs =
+          image_attrs
+          |> Map.put(:generated_tags, generated_tags)
+
+        Multi.new()
+        |> Multi.update(:image, Images.changeset(image, image_attrs))
+        |> Repo.transaction()
+
+      {:error, reason} ->
+        reason
+    end
   end
 end

@@ -104,16 +104,6 @@
         </div>
       </div>
     </li>
-    <%= if function_exported?(Routes, :live_dashboard_path, 2) do %>
-      <li>
-        <a
-          class="p-1 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-900"
-          href={Routes.live_dashboard_path(@conn, :home)}
-        >
-          <i class="text-gray-900 fa-solid fa-gauge fa-lg"></i>
-        </a>
-      </li>
-    <% end %>
     <%= if @current_user do %>
       <li>
         <div x-data="{ open: false }" class="relative text-left">
@@ -188,7 +178,13 @@
             x-transition:leave-end="transform opacity-0 scale-95"
             class="absolute flex w-40 left-[-100%] rounded flex-col py-4 gap-2 items-center justify-center mt-1 bg-black text-white z-50"
           >
-            <a class="hover:text-slate-300" href="#">Dashboard</a>
+            <a
+              :if={Nappy.Accounts.is_admin_or_contributor(@current_user)}
+              class="hover:text-slate-300"
+              href={Routes.admin_dashboard_path(@conn, :dashboard)}
+            >
+              Dashboard
+            </a>
             <a
               class="hover:text-slate-300"
               href={Routes.user_profile_show_path(@conn, :show, @current_user.username)}

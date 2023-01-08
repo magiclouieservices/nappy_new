@@ -24,8 +24,7 @@ import "phoenix_html"
 import {Socket} from "phoenix"
 import {LiveSocket} from "phoenix_live_view"
 import topbar from "../vendor/topbar"
-import InfiniteScroll from "./infinite_scroll"
-import ViewCount from "./view_count"
+import Hooks from "./hooks"
 import Alpine from 'alpinejs'
 import focus from '@alpinejs/focus'
 import collapse from '@alpinejs/collapse'
@@ -35,12 +34,10 @@ Alpine.plugin(focus)
 Alpine.plugin(collapse)
 Alpine.start()
 
+
 let csrfToken = document.querySelector("meta[name='csrf-token']").getAttribute("content")
 let liveSocket = new LiveSocket("/live", Socket, {
-	hooks: {
-    InfiniteScroll,
-    ViewCount,
-  },
+	hooks: Hooks,
   params: {_csrf_token: csrfToken},
   dom: {
     onBeforeElUpdated(from, to) {

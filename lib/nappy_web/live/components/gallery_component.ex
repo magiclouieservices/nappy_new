@@ -50,6 +50,7 @@ defmodule NappyWeb.Components.GalleryComponent do
       <div
         id="infinite-scroll-body"
         phx-update="append"
+        phx-target={@myself}
         class="grid
           lg:grid-cols-3
           sm:grid-cols-2
@@ -63,6 +64,7 @@ defmodule NappyWeb.Components.GalleryComponent do
           <div
             id={"view-count-#{image.slug}"}
             phx-hook="ViewCount"
+            phx-target={@myself}
             data-slug={image.slug}
             x-data="{ hidden: true, open: false, title: document.title }"
             id={"image-#{image.slug}"}
@@ -255,7 +257,13 @@ defmodule NappyWeb.Components.GalleryComponent do
           </div>
         <% end %>
       </div>
-      <div id="infinite-scroll-marker" phx-hook="InfiniteScroll" data-page={@page}></div>
+      <div
+        id="infinite-scroll-marker"
+        phx-hook="InfiniteScroll"
+        phx-target={@myself}
+        data-page={@page}
+      >
+      </div>
       <div class="mt-8 text-center text-sm">
         Looking for something specific?
         <a target="_blank" rel="noreferer noopener" class="underline" href="https://nappy.kampsite.co">

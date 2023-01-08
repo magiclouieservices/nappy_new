@@ -4,6 +4,7 @@ defmodule NappyWeb.UserAuth do
 
   alias Nappy.Accounts
   alias NappyWeb.Router.Helpers, as: Routes
+  alias Plug.Conn.Status
 
   @moduledoc """
   Module for user authentication.
@@ -140,6 +141,24 @@ defmodule NappyWeb.UserAuth do
       |> maybe_store_return_to()
       |> redirect(to: Routes.user_session_path(conn, :new))
       |> halt()
+    end
+  end
+
+  def admin_only(conn, _opts) do
+    current_user = conn.assigns[:current_user].account_role_id
+    admin = Accounts.get_user_role_id(:admin)
+    contributor = Accounts.get_user_role_id(:contributor)
+
+    if current_user in [admin, contributor] do
+      conn
+    else
+      status_name = :not_found
+      status_code = Status.code(status_name)
+
+      conn
+      |> put_status(status_name)
+      |> put_view(NappyWeb.ErrorView)
+      |> render("#{status_code}.html")
     end
   end
 

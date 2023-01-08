@@ -7,7 +7,7 @@ defmodule NappyWeb.SearchLive.MobileNavbarSearch do
   @moduledoc false
 
   @impl true
-  def handle_event("search", %{"search" => %{"mobile_search_phrase" => mobile_query}}, socket) do
+  def handle_event("search", %{"mobile_search_phrase" => mobile_query}, socket) do
     sponsored_images = SponsoredImages.get_images("search-#{mobile_query}", mobile_query)
     route = Routes.search_show_path(socket, :show, mobile_query)
 
