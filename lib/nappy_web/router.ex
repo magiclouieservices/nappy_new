@@ -21,33 +21,33 @@ defmodule NappyWeb.Router do
   scope "/", NappyWeb do
     pipe_through :browser
 
-    # get "/user/:username", UserProfileController, :show
     live "/popular-searches", PopularSearchesLive.Show, :show
 
+    live "/why", CustomPageLive.Why, :why
+    live "/license", CustomPageLive.License, :license
+    live "/terms", CustomPageLive.Terms, :terms
+    live "/faq", CustomPageLive.FAQ, :faq
+    live "/contact", CustomPageLive.Contact, :contact
+    live "/new", CustomPageLive.New, :new
+    live "/studio", CustomPageLive.Studio, :studio
+
+    live "/collections", CollectionsLive.Index, :index
+    live "/categories", CategoryLive.Index, :index
+
+    # for gallery_component checking @current_user assigns
     live_session :check_auth, on_mount: [{NappyWeb.LiveAuth, :check_auth}] do
       live "/", HomeLive.Index, :index
 
       live "/photo/:slug", ImageLive.Show, :show
 
-      live "/collections", CollectionsLive.Index, :index
       live "/collection/:slug", CollectionsLive.Show, :show
 
-      live "/categories", CategoryLive.Index, :index
       live "/category/:slug", CategoryLive.Show, :show
 
       live "/user/:username", UserProfileLive.Show, :show
 
       live "/search", SearchLive.Show, :show
       live "/search/:query", SearchLive.Show, :show
-
-      live "/why", CustomPageLive.Why, :why
-      live "/license", CustomPageLive.License, :license
-      live "/terms", CustomPageLive.Terms, :terms
-      live "/faq", CustomPageLive.FAQ, :faq
-      live "/contact", CustomPageLive.Contact, :contact
-
-      live "/new", CustomPageLive.New, :new
-      live "/studio", CustomPageLive.Studio, :studio
     end
 
     # resources "/legal", LegalController

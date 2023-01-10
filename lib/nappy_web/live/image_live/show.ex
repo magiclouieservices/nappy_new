@@ -32,21 +32,21 @@ defmodule NappyWeb.ImageLive.Show do
 
   @impl true
   def handle_params(%{"slug" => slug_path}, _uri, socket) do
-    current_user = socket.assigns[:current_user] || %{}
-    admin = Nappy.Accounts.is_admin_or_contributor(current_user, [:admin])
-
     active = Metrics.get_image_status_id(:active)
     featured = Metrics.get_image_status_id(:featured)
     list = String.split(slug_path, "-", trim: true)
     slug = List.last(list)
     title = Enum.filter(list, &(&1 !== slug)) |> Enum.join(" ")
     image = Catalog.get_image_by_slug(slug)
-    is_owner_or_admin = Map.get(current_user, :id, false) === image.user_id || admin
 
-    if (image && image.image_status_id in [active, featured]) || is_owner_or_admin do
+    if image do
+      current_user = socket.assigns[:current_user]
+      admin = Nappy.Accounts.is_admin_or_contributor(current_user, [:admin])
+      is_owner_or_admin = current_user === image.user_id || admin
+      approved_image = image.image_status_id in [active, featured] || is_owner_or_admin
       path = Slug.slugify(image.title)
 
-      if title === "" do
+      if title === "" && approved_image do
         image_show_path = Routes.image_show_path(socket, :show, "#{path}-#{slug}")
         {:noreply, push_redirect(socket, to: image_show_path)}
       else
