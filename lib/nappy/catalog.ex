@@ -521,16 +521,11 @@ defmodule Nappy.Catalog do
       ext = Metrics.get_image_extension(image.id)
       filename = "photos/#{image.slug}.#{ext}"
 
-      case Repo.delete(image) do
-        {:ok, _image} ->
-          bucket_name
-          |> S3.delete_object(filename)
-          |> ExAws.request()
+      Repo.delete!(image)
 
-        {:error, changeset} ->
-          changeset
-          # IO.inspect(changeset, label: "error changeset from deleting image")
-      end
+      bucket_name
+      |> S3.delete_object(filename)
+      |> ExAws.request!()
     end)
   end
 
