@@ -4,6 +4,109 @@
       <div class="inline-block min-w-full py-2 align-middle md:px-6 lg:px-8">
         <div class="flex relative overflow-hidden shadow ring-1 ring-black ring-opacity-5 md:rounded-lg">
           <Component.admin_sidebar_nav socket={@socket} path={@path} />
+          <div id="bulk" class="py-4 flex w-full max-w-lg mx-auto">
+            <.form
+              multipart
+              for={:bulk}
+              phx-submit="save"
+              phx-change="validate"
+              class="container mx-auto"
+            >
+              <.live_file_input upload={@uploads.images} />
+              <p>Max simultaneous uploads: <%= @uploads.images.max_entries %></p>
+              <ul class="flex gap-2">
+                <li>Accepted file extensions:</li>
+                <li
+                  :for={ext <- String.split(@uploads.images.accept, ",", trim: true)}
+                  class="inline-flex items-center rounded border bg-gray-100 px-2.5 py-0.5 text-sm text-gray-800"
+                >
+                  <%= ext %>
+                </li>
+              </ul>
+              <div class="flex gap-2 mt-2" phx-drop-target={@uploads.images.ref}>
+                <%= for entry <- @uploads.images.entries do %>
+                  <figure class="relative upload-entry">
+                    <.live_img_preview entry={entry} width="150" class="rounded" />
+                    <progress value={entry.progress} id={"#{entry.ref}-progress"} max="100">
+                      <%= entry.progress %>%
+                    </progress>
+                    <!-- close button -->
+                    <button
+                      class="cursor-pointer absolute left-1 top-1 bg-[rgba(0,0,0,0.5)] rounded-full p-1"
+                      phx-click="cancel-upload"
+                      phx-value-ref={entry.ref}
+                      aria-label="cancel"
+                    >
+                      <span class="sr-only">Close popup</span>
+                      <!-- Heroicon name: outline/x-mark -->
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke-width="2"
+                        stroke="currentColor"
+                        class="w-5 h-5 text-white"
+                      >
+                        <path
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          d="M6 18L18 6M6 6l12 12"
+                        />
+                      </svg>
+                    </button>
+                    <!-- end close button -->
+                    <%= for err <- upload_errors(@uploads.images, entry) do %>
+                      <p class="alert alert-danger"><%= error_to_string(err) %></p>
+                    <% end %>
+                  </figure>
+                <% end %>
+              </div>
+              <div class="container mx-auto mt-2">
+                <div class="my-6">
+                  <label for="bulk_photo_title" class="font-semibold">Title</label>
+                  <input
+                    id="bulk_photo_title"
+                    name="title"
+                    type="text"
+                    placeholder="i.e. Woman eating ice cream or Child with dog"
+                    class="mt-1 appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-gray-500 focus:border-gray-500 sm:text-sm"
+                    required
+                  />
+                </div>
+                <div class="my-6">
+                  <label for="bulk_photo_category" class="font-semibold">Category</label>
+                  <select
+                    id="bulk_photo_category"
+                    name="category"
+                    class="mt-1 focus:ring-gray-500 w-full focus:border-gray-500 border-gray-300 rounded-md"
+                  >
+                    <option :for={category <- Nappy.Catalog.list_all_category_names()}>
+                      <%= category %>
+                    </option>
+                  </select>
+                </div>
+                <label for="multitagselect" class="font-semibold">
+                  Tags <span class="text-sm font-light">(max tag count: 20)</span>
+                </label>
+                <.live_component
+                  id="multitagselect"
+                  module={MultiTagSelect}
+                  form={:form}
+                  field={:field}
+                  tags={@tags}
+                />
+                <div class="flex justify-center">
+                  <button
+                    class="mt-2 inline-flex items-center px-8 py-3 rounded shadow-sm text-white bg-green-600 hover:bg-green-700 text-lg focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
+                    type="submit"
+                    phx-submit="save"
+                  >
+                    <i class="fa-solid fa-cloud-arrow-up mr-2"></i> Upload
+                  </button>
+                </div>
+              </div>
+            </.form>
+          </div>
         </div>
       </div>
     </div>

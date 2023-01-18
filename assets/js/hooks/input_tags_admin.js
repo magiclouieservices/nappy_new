@@ -5,10 +5,6 @@ export default InputTagsAdmin = {
     document.querySelectorAll("span[id*=modal-trigger]").forEach(el => {
       let inputTag = el.nextElementSibling.querySelector("input[name*=input-tags]")
       new Tagify(inputTag)
-      // inputTag.classList.replace()
-      // inputTag.classList.replace()
-      // grow-0
-      // min-w-[unset]
     })
 
     document.querySelectorAll("tags").forEach(el => {

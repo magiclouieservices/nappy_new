@@ -623,8 +623,25 @@ defmodule Nappy.Catalog do
     paths =
       Enum.reduce(input_file, %{}, fn f, acc ->
         slug = Slug.random_alphanumeric()
-        <<".", ext::binary>> = Path.extname(f.filename)
-        src_path = f.path
+
+        <<".", ext::binary>> =
+          case Map.get(f, :filename) do
+            nil ->
+              Path.extname(f.client_name)
+
+            _ ->
+              Path.extname(f.filename)
+          end
+
+        src_path =
+          case Map.get(f, :path) do
+            nil ->
+              params.path
+
+            _ ->
+              f.path
+          end
+
         dest_path = "photos/#{slug}.#{ext}"
 
         params = %{
