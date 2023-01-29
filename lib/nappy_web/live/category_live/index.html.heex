@@ -30,21 +30,29 @@
   </ul>
 </section>
 <section class="container mx-auto py-4">
-  <div class="grid lg:grid-cols-3 xs:grid-cols-1 sm:grid-cols-2 auto-rows-min gap-4">
+  <div class="grid
+    lg:grid-cols-3
+    sm:grid-cols-2
+    xs:grid-cols-1
+    lg:auto-rows-[45vh]
+    md:auto-rows-max
+    xs:auto-rows-min
+    gap-2">
     <%= for category <- @categories do %>
-      <a class="block" href={Routes.category_show_path(@socket, :show, category.slug)}>
-        <div class="relative rounded bg-slate-300">
-          <img
-            loading="lazy"
-            class="object-cover rounded"
-            src={Nappy.Catalog.image_url_by_id(category.thumbnail)}
-            alt={category.name}
-          />
-          <div class="absolute rounded inset-0 z-1 bg-[rgba(0,0,0,.3)]">
-            <span class="absolute bottom-2 left-4 flex gap-2 items-center text-white font-tiempos-bold text-xl">
-              <%= category.name %>
-            </span>
-          </div>
+      <a
+        class={"#{calc_span(category.thumbnail)} relative bg-slate-300 rounded"}
+        href={Routes.category_show_path(@socket, :show, category.slug)}
+      >
+        <img
+          loading="lazy"
+          class="h-full w-full rounded"
+          src={Nappy.Catalog.image_url_by_id(category.thumbnail)}
+          alt={category.name}
+        />
+        <div class="absolute rounded inset-0 z-1 bg-[rgba(0,0,0,.3)]">
+          <span class="absolute bottom-2 left-4 flex gap-2 items-center text-white font-tiempos-bold text-xl">
+            <%= category.name %>
+          </span>
         </div>
       </a>
     <% end %>

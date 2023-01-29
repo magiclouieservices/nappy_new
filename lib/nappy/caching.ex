@@ -37,12 +37,12 @@ defmodule Nappy.Caching do
   end
 
   @spec paginated_images_payload(
-          mfa :: mfa(),
+          mfa :: {module(), atom(), list(any())},
           payload_name :: String.t(),
           ttl :: non_neg_integer()
         ) :: any()
   def paginated_images_payload(mfa, payload_name, ttl) do
-    [mod, fun, args] = mfa
+    {mod, fun, args} = mfa
 
     case Cachex.get(Nappy.cache_name(), payload_name) do
       {:ok, nil} ->

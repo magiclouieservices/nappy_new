@@ -3,6 +3,7 @@ defmodule NappyWeb.CategoryLive.Show do
 
   alias Nappy.Catalog
   alias Nappy.Metrics
+  alias Nappy.SponsoredImages
   alias NappyWeb.Components.GalleryComponent
   alias NappyWeb.Components.RelatedTagsComponent
   alias Plug.Conn.Status
@@ -49,19 +50,9 @@ defmodule NappyWeb.CategoryLive.Show do
   end
 
   defp fetch(%{assigns: %{slug: slug, page: page, page_size: page_size}} = socket) do
-    payload_name = "category_#{slug}"
-    ttl = :timer.hours(1)
-
-    images =
-      if page === 1 do
-        args = [slug, [page: page, page_size: page_size]]
-        mfa = [Catalog, :paginate_category, args]
-
-        Nappy.Caching.paginated_images_payload(mfa, payload_name, ttl)
-      else
-        Catalog.paginate_category(slug, page: page, page_size: page_size)
-      end
-
+    args = [slug, [page: page, page_size: page_size]]
+    mfa = {Catalog, :paginate_category, args}
+    images = Catalog.insert_adverts_in_paginated_images("category", mfa)
     assign(socket, images: images)
   end
 end

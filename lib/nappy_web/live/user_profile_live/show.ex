@@ -4,6 +4,7 @@ defmodule NappyWeb.UserProfileLive.Show do
   alias Nappy.Accounts
   alias Nappy.Catalog
   alias Nappy.Metrics
+  alias Nappy.SponsoredImages
   alias NappyWeb.Components.GalleryComponent
 
   @moduledoc false
@@ -41,7 +42,9 @@ defmodule NappyWeb.UserProfileLive.Show do
   end
 
   defp fetch(%{assigns: %{user: user, page: page, page_size: page_size}} = socket) do
-    images = Catalog.paginate_user_images(user.username, page: page, page_size: page_size)
+    args = [user.username, [page: page, page_size: page_size]]
+    mfa = {Catalog, :paginate_user_images, args}
+    images = Catalog.insert_adverts_in_paginated_images("user_profile", mfa)
     assign(socket, images: images)
   end
 end

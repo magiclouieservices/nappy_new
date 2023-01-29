@@ -11,12 +11,16 @@ defmodule Nappy.Catalog do
   alias Nappy.Accounts.UserNotifier
   alias Nappy.Admin
   alias Nappy.Admin.Slug
+  alias Nappy.Catalog.Category
+  alias Nappy.Catalog.Collection
+  alias Nappy.Catalog.CollectionDescription
   alias Nappy.Catalog.Images
   alias Nappy.Metrics
   alias Nappy.Metrics.ImageAnalytics
   alias Nappy.Metrics.ImageMetadata
   alias Nappy.Metrics.ImageStatus
   alias Nappy.Repo
+  alias Nappy.SponsoredImages
 
   @image_status_names Ecto.Enum.values(ImageStatus, :name)
   @full_list_status_names [:all, :popular | @image_status_names]
@@ -205,6 +209,94 @@ defmodule Nappy.Catalog do
       updated_at: i.updated_at
     })
     |> Repo.paginate(params)
+  end
+
+  def paginate_category(slug, params \\ [page: 1]) do
+    active = Metrics.get_image_status_id(:active)
+    featured = Metrics.get_image_status_id(:featured)
+
+    category_id =
+      Category
+      |> where(slug: ^slug)
+      |> select([c], c.id)
+      |> Repo.one()
+
+    Images
+    |> where([i], i.image_status_id in ^[active, featured])
+    |> where(category_id: ^category_id)
+    |> order_by(fragment("RANDOM()"))
+    |> preload([:user, :image_metadata, :image_analytics])
+    |> Repo.paginate(params)
+  end
+
+  def paginate_collection(slug, params \\ [page: 1]) do
+    active = Metrics.get_image_status_id(:active)
+    featured = Metrics.get_image_status_id(:featured)
+
+    coll_desc_id =
+      from(cd in CollectionDescription,
+        where: cd.slug == ^slug,
+        select: cd.id
+      )
+      |> Repo.one()
+
+    Collection
+    |> join(:inner, [c], i in assoc(c, :image))
+    |> join(:inner, [_, i], u in assoc(i, :user))
+    |> join(:inner, [_, i, _], im in assoc(i, :image_metadata))
+    |> join(:inner, [_, i, _, _], ia in assoc(i, :image_analytics))
+    |> where([_, i, _, _], i.image_status_id in ^[active, featured])
+    |> where(collection_description_id: ^coll_desc_id)
+    |> order_by(fragment("RANDOM()"))
+    |> select([_, i, u, im, ia], %Images{
+      id: i.id,
+      description: i.description,
+      generated_description: i.generated_description,
+      generated_tags: i.generated_tags,
+      slug: i.slug,
+      tags: i.tags,
+      title: i.title,
+      category_id: i.category_id,
+      image_analytics: ia,
+      image_metadata: im,
+      image_status_id: i.image_status_id,
+      user_id: u.id,
+      user: u,
+      inserted_at: i.inserted_at,
+      updated_at: i.updated_at
+    })
+    |> Repo.paginate(params)
+  end
+
+  @spec insert_adverts_in_paginated_images(String.t(), mfa :: {module(), atom(), list(any())}) ::
+          Scrivener.Page.t()
+  def insert_adverts_in_paginated_images(payload_name, mfa) do
+    {mod, func_name, [name, [page: page, page_size: page_size]] = args} = mfa
+    payload_name = "#{payload_name}_#{name}"
+    ttl = :timer.hours(1)
+
+    images =
+      if page === 1 do
+        args = [name, [page: page, page_size: page_size]]
+        mfa = {mod, func_name, args}
+
+        Nappy.Caching.paginated_images_payload(mfa, payload_name, ttl)
+      else
+        apply(mod, func_name, args)
+      end
+
+    sponsored_search_terms = get_popular_keywords(4) |> Enum.join(",")
+    sponsored = SponsoredImages.get_images("image_adverts_#{page}", sponsored_search_terms, 4)
+
+    unless Enum.empty?(sponsored) do
+      index_pos = length(images.entries) - 1
+      # if page === 1,
+      #   do: length(images.entries) - 1,
+      #   else: Enum.random(7..length(images.entries))
+
+      entries = List.insert_at(images.entries, index_pos, %{sponsored: sponsored})
+      Map.put(images, :entries, entries)
+    end
   end
 
   def image_url_by_id(uuid, opts \\ []) do
@@ -664,8 +756,6 @@ defmodule Nappy.Catalog do
     Enum.map(paths, fn {slug, _field} -> slug end)
   end
 
-  alias Nappy.Catalog.Category
-
   @doc """
   Returns the list of categories.
 
@@ -682,24 +772,6 @@ defmodule Nappy.Catalog do
   def list_all_category_names do
     from(c in Category, select: c.name)
     |> Repo.all()
-  end
-
-  def paginate_category(slug, params \\ [page: 1]) do
-    active = Metrics.get_image_status_id(:active)
-    featured = Metrics.get_image_status_id(:featured)
-
-    category_id =
-      Category
-      |> where(slug: ^slug)
-      |> select([c], c.id)
-      |> Repo.one()
-
-    Images
-    |> where([i], i.image_status_id in ^[active, featured])
-    |> where(category_id: ^category_id)
-    |> order_by(fragment("RANDOM()"))
-    |> preload([:user, :image_metadata, :image_analytics])
-    |> Repo.paginate(params)
   end
 
   @doc """
@@ -806,8 +878,6 @@ defmodule Nappy.Catalog do
     Category.changeset(category, attrs)
   end
 
-  alias Nappy.Catalog.Collection
-
   @doc """
   Returns the list of collections.
 
@@ -902,8 +972,6 @@ defmodule Nappy.Catalog do
     Collection.changeset(collection, attrs)
   end
 
-  alias Nappy.Catalog.CollectionDescription
-
   @doc """
   Returns the list of collection_description.
 
@@ -953,45 +1021,6 @@ defmodule Nappy.Catalog do
     |> limit(1)
     |> preload(:user)
     |> Repo.one()
-  end
-
-  def paginate_collection(slug, params \\ [page: 1]) do
-    active = Metrics.get_image_status_id(:active)
-    featured = Metrics.get_image_status_id(:featured)
-
-    coll_desc_id =
-      from(cd in CollectionDescription,
-        where: cd.slug == ^slug,
-        select: cd.id
-      )
-      |> Repo.one()
-
-    Collection
-    |> join(:inner, [c], i in assoc(c, :image))
-    |> join(:inner, [_, i], u in assoc(i, :user))
-    |> join(:inner, [_, i, _], im in assoc(i, :image_metadata))
-    |> join(:inner, [_, i, _, _], ia in assoc(i, :image_analytics))
-    |> where([_, i, _, _], i.image_status_id in ^[active, featured])
-    |> where(collection_description_id: ^coll_desc_id)
-    |> order_by(fragment("RANDOM()"))
-    |> select([_, i, u, im, ia], %Images{
-      id: i.id,
-      description: i.description,
-      generated_description: i.generated_description,
-      generated_tags: i.generated_tags,
-      slug: i.slug,
-      tags: i.tags,
-      title: i.title,
-      category_id: i.category_id,
-      image_analytics: ia,
-      image_metadata: im,
-      image_status_id: i.image_status_id,
-      user_id: u.id,
-      user: u,
-      inserted_at: i.inserted_at,
-      updated_at: i.updated_at
-    })
-    |> Repo.paginate(params)
   end
 
   def consolidate_tags_by_category(category_id, count \\ 24) do

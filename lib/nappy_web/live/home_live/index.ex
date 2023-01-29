@@ -53,19 +53,9 @@ defmodule NappyWeb.HomeLive.Index do
   end
 
   defp fetch(%{assigns: %{filter: filter, page: page, page_size: page_size}} = socket) do
-    payload_name = "homepage_#{filter}"
-    ttl = :timer.hours(1)
-
-    images =
-      if page === 1 do
-        args = [filter, [page: page, page_size: page_size]]
-        mfa = [Catalog, :paginate_images, args]
-
-        Nappy.Caching.paginated_images_payload(mfa, payload_name, ttl)
-      else
-        Catalog.paginate_images(filter, page: page, page_size: page_size)
-      end
-
+    args = [filter, [page: page, page_size: page_size]]
+    mfa = {Catalog, :paginate_images, args}
+    images = Catalog.insert_adverts_in_paginated_images("homepage", mfa)
     assign(socket, images: images)
   end
 end

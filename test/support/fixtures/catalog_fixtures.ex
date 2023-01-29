@@ -40,6 +40,10 @@ defmodule Nappy.CatalogFixtures do
     image
   end
 
+  def paginate_images(filter, params) do
+    Catalog.paginate_images(filter, params)
+  end
+
   def uploaded_image_fixture(bucket_name, image_status \\ :pending)
       when image_status in @image_status_names do
     user = AccountsFixtures.user_fixture()
