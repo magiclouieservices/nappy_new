@@ -622,7 +622,7 @@ defmodule Nappy.Catalog do
 
     paths =
       Enum.reduce(input_file, %{}, fn f, acc ->
-        slug = Slug.random_alphanumeric()
+        slug = Nanoid.generate()
 
         <<".", ext::binary>> =
           case Map.get(f, :filename) do
