@@ -170,7 +170,7 @@ defmodule Nappy.Accounts do
       attrs
       |> Map.put("account_status_id", pending)
       |> Map.put("account_role_id", normal)
-      |> Map.put("slug", Slug.random_alphanumeric())
+      |> Map.put("slug", Nanoid.generate())
 
     with {:ok, user} <-
            %User{}

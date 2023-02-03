@@ -69,7 +69,8 @@ defmodule Nappy.MixProject do
       {:logflare_logger_backend, "~> 0.11.0"},
       {:wallaby, "~> 0.30.1", only: :test, runtime: false},
       {:oban, "~> 2.13"},
-      {:ex_azure_vision, "~> 0.1.2"}
+      {:ex_azure_vision, "~> 0.1.2"},
+      {:nanoid, "~> 2.0.5"}
     ]
   end
 
