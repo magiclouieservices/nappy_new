@@ -11,7 +11,7 @@ defmodule NappyWeb.CustomPageLive.Contact do
       </h1>
       <article class="grid grid-cols-12 place-items-start gap-2 mt-24">
         <div class="cols-span-2 invisible"></div>
-        <CustomPageComponent.sidebar socket={@socket} action={assigns.live_action} />
+        <CustomPageComponent.sidebar side_links="about" socket={@socket} action={assigns.live_action} />
         <div class="col-span-6 justify-self-center leading-loose text-lg font-light">
           <p class="text-center font-bold">Questions? Comments?</p>
           <div>

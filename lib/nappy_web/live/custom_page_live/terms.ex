@@ -11,7 +11,7 @@ defmodule NappyWeb.CustomPageLive.Terms do
       </h1>
       <article class="grid grid-cols-12 place-items-start gap-2 mt-24">
         <div class="cols-span-2 invisible"></div>
-        <CustomPageComponent.sidebar socket={@socket} action={assigns.live_action} />
+        <CustomPageComponent.sidebar side_links="about" socket={@socket} action={assigns.live_action} />
         <div class="col-span-6 leading-loose text-lg font-light">
           <p>
             These Terms of Use hereinafter referred to as “TOU” constitute a legally binding agreement made between you, whether personally or on behalf of an entity (“you or user or visitor”) and (“Nappy, we,” “us” or “our”), concerning your access to and use of
