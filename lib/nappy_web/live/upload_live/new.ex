@@ -52,14 +52,10 @@ defmodule NappyWeb.UploadLive.New do
 
     socket =
       socket
-      |> assign(tags: [])
-      |> update(:uploaded_files, &(&1 ++ uploaded_files))
-
-    socket =
-      socket
+      |> assign(:tags, [])
       |> put_flash(:info, "Photo currently in pending, we'll notify you once approved.")
 
-    {:noreply, push_navigate(socket, to: "/", replace: true)}
+    {:noreply, update(socket, :uploaded_files, &(&1 ++ uploaded_files))}
   end
 
   @impl true
