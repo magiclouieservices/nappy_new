@@ -87,4 +87,7 @@ defmodule NappyWeb.UploadLive.New do
     send(self(), {:remove_tag, tag})
     {:noreply, socket}
   end
+
+  def error_to_string(:too_large), do: "Too large"
+  def error_to_string(:not_accepted), do: "You have selected an unacceptable file type"
 end
