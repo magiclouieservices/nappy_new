@@ -11,7 +11,7 @@ defmodule NappyWeb.CustomPageLive.Why do
       </h1>
       <article class="grid grid-cols-12 place-items-start gap-2 mt-24">
         <div class="cols-span-2 invisible"></div>
-        <CustomPageComponent.sidebar socket={@socket} action={assigns.live_action} />
+        <CustomPageComponent.sidebar side_links="about" socket={@socket} action={assigns.live_action} />
         <div class="col-span-6 leading-loose text-lg font-light">
           <p>
             What’s the first thing that comes to mind when you think of traditional stock photos? Let me guess… white backgrounds, New York City skyline, executives with their arms crossed, etc.
@@ -68,7 +68,7 @@ defmodule NappyWeb.CustomPageLive.Why do
           </p>
           <p class="mt-4">
             If you’re a photographer, <em><a
-                href={Routes.upload_path(@socket, :new)}
+                href={Routes.upload_new_path(@socket, :new)}
                 class="underline"
               >submit your photos here</a></em>.
           </p>

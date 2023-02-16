@@ -70,10 +70,8 @@ defmodule NappyWeb.SearchLive.Show do
     args = [query, [page: page, page_size: page_size]]
     mfa = {__MODULE__, :search_images, args}
     images = Catalog.insert_adverts_in_paginated_images("image_search", mfa)
-
-    contains_sponsored? =
-      (Map.get(images, :entries) || [])
-      |> Enum.any?(&Map.has_key?(&1, :sponsored))
+    entries = Map.get(images, :entries) || []
+    contains_sponsored? = Enum.any?(entries, &Map.has_key?(&1, :sponsored))
 
     images =
       if length(images.entries) === 1 and contains_sponsored? do

@@ -11,7 +11,7 @@ defmodule NappyWeb.CustomPageLive.License do
       </h1>
       <article class="grid grid-cols-12 place-items-start gap-2 mt-24">
         <div class="cols-span-2 invisible"></div>
-        <CustomPageComponent.sidebar socket={@socket} action={assigns.live_action} />
+        <CustomPageComponent.sidebar side_links="about" socket={@socket} action={assigns.live_action} />
         <div class="col-span-6 leading-loose text-lg font-light">
           <p>
             All photos posted on Nappy are licensed under the

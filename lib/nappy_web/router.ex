@@ -24,6 +24,8 @@ defmodule NappyWeb.Router do
     live "/popular-searches", PopularSearchesLive.Show, :show
 
     live "/why", CustomPageLive.Why, :why
+    live "/why-submit", CustomPageLive.WhySubmit, :why_submit
+    live "/guidelines", CustomPageLive.Guidelines, :guidelines
     live "/license", CustomPageLive.License, :license
     live "/terms", CustomPageLive.Terms, :terms
     live "/faq", CustomPageLive.FAQ, :faq
@@ -128,10 +130,7 @@ defmodule NappyWeb.Router do
   scope "/", NappyWeb do
     pipe_through [:browser, :require_authenticated_user]
 
-    get "/upload", UploadController, :new
-    post "/upload", UploadController, :create
-    # get "/bulk-upload", UploadController, :bulk_new
-    # post "/bulk-upload", UploadController, :bulk_create
+    live "/upload", UploadLive.New, :new
 
     get "/users/settings", UserSettingsController, :edit
     put "/users/settings", UserSettingsController, :update
