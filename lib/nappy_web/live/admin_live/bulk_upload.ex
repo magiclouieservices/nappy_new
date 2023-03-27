@@ -103,6 +103,8 @@ defmodule NappyWeb.AdminLive.BulkUpload do
       |> assign(:tags, [])
       |> put_flash(:info, "Photo currently in pending, we'll notify you once approved.")
 
+    Process.send_after(self(), :clear_info, 5_000)
+
     {:noreply, update(socket, :uploaded_files, &(&1 ++ uploaded_files))}
   end
 
@@ -111,6 +113,11 @@ defmodule NappyWeb.AdminLive.BulkUpload do
     tags = Enum.filter(socket.assigns.tags, &(&1 != tag))
     socket = assign(socket, :tags, tags)
     {:noreply, socket}
+  end
+
+  @impl true
+  def handle_info(:clear_info, socket) do
+    {:noreply, clear_flash(socket, :info)}
   end
 
   def error_to_string(:too_large), do: "Too large"

@@ -55,11 +55,18 @@
 }
 
 /* Alerts and form errors used by phx.new */
+.alert-login {
+  padding: 15px;
+  margin-bottom: 20px;
+  border: 1px solid transparent;
+  border-radius: 4px;
+}
 .alert {
   padding: 15px;
   margin-bottom: 20px;
   border: 1px solid transparent;
   border-radius: 4px;
+  @apply fixed bottom-0 right-4 z-50;
 }
 .alert-info {
   color: #31708f;
