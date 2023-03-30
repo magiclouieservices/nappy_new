@@ -52,6 +52,24 @@ config :nappy, :runtime,
   image_path: System.get_env("WASABI_IMAGE_PATH", "/nappy/photos/") # <-- this part
 ```
 
+## Install vips
+
+If you're using via homebrew:
+
+```bash
+brew install vips
+```
+
+Or in *nix distro (e.g. `Ubuntu`)
+
+```bash
+# If build-essential is not installed
+sudo apt install build-essential
+
+# install glib and libvips
+sudo apt install libglib2.0-dev libvips-dev
+```
+
 ## S3 local upload behavior
 
 Currently, all the images are pulled from imgIX. You need to follow this section if you want to try to **upload an image** and view it. We download the whole bucket (15+ Gb as of this commit) in order to test it locally. Don't forget to change line 30 in `runtime.exs` to `http://localhost:9000`.
