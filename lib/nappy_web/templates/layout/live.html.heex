@@ -1,13 +1,13 @@
 <main>
-  <div class="container mx-auto">
+  <div class="container relative mx-auto">
     <p
-      class="alert alert-info"
+      class="alert alert-info hover:cursor-pointer"
       role="alert"
       phx-click="lv:clear-flash"
       phx-value-key="info"><%= live_flash(@flash, :info) %></p>
 
     <p
-      class="alert alert-danger"
+      class="alert alert-danger hover:cursor-pointer"
       role="alert"
       phx-click="lv:clear-flash"
       phx-value-key="error"><%= live_flash(@flash, :error) %></p>
