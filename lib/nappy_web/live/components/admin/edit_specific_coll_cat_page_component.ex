@@ -3,19 +3,15 @@ defmodule NappyWeb.Components.Admin.EditSpecificCollCatPageComponent do
 
   @moduledoc false
 
-  # TODO: edit, delete, change thumbnail, set related tags and description
-
   @impl true
   def handle_event("delete_collection", %{"slug" => slug}, socket) do
-    IO.inspect(socket.assigns, label: "assigns")
-
     socket =
       socket
-      |> put_flash(:info, "deleted collection")
+      |> put_flash(:info, "TODO deleted collection")
 
     path = Routes.collections_show_path(socket, :show, slug)
 
-    {:noreply, push_navigate(socket, to: path, replace: true)}
+    {:noreply, push_navigate(socket, to: path)}
   end
 
   @doc """
@@ -33,8 +29,14 @@ defmodule NappyWeb.Components.Admin.EditSpecificCollCatPageComponent do
   def render(assigns) do
     ~H"""
     <div>
-      
-      <div x-data="{ open: false }" class="text-black inline-flex justify-center">
+      <!-- Start edit button -->
+      <div
+        x-data={"{
+          open: false,
+          value: #{@collection_desc.is_enabled}
+        }"}
+        class="text-black inline-flex justify-center"
+      >
         <!-- Trigger -->
         <span x-on:click="open = true">
           <button
@@ -62,6 +64,163 @@ defmodule NappyWeb.Components.Admin.EditSpecificCollCatPageComponent do
         <div
           x-show="open"
           style="display: none"
+          x-on:keydown.escape.prevent.stop={"open = false; value = #{@collection_desc.is_enabled}; document.getElementById('update-collection').reset()"}
+          role="dialog"
+          aria-modal="true"
+          x-id="['modal-title']"
+          x-bind:aria-labelledby="$id('modal-title')"
+          class="fixed inset-0 z-10 overflow-y-auto"
+        >
+          <!-- Overlay -->
+          <div x-show="open" x-transition.opacity class="fixed inset-0 bg-black bg-opacity-50"></div>
+          <!-- Panel -->
+          <div
+            x-show="open"
+            x-transition
+            x-on:click={"open = false; value = #{@collection_desc.is_enabled}; document.getElementById('update-collection').reset()"}
+            class="relative flex min-h-screen items-center justify-center p-4"
+          >
+            <div
+              x-on:click.stop
+              x-trap.noscroll.inert="open"
+              class="relative overflow-y-auto rounded-xl bg-white p-12 shadow-lg"
+            >
+              <div
+                x-on:click={"open = false; value = #{@collection_desc.is_enabled}; document.getElementById('update-collection').reset()"}
+                class="absolute right-0 top-0 hidden pr-4 pt-4 sm:block"
+              >
+                <button
+                  type="button"
+                  class="rounded-md bg-white text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2"
+                >
+                  <span class="sr-only">Close</span>
+                  <svg
+                    class="h-6 w-6"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke-width="1.5"
+                    stroke="currentColor"
+                    aria-hidden="true"
+                  >
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
+              <!-- Title -->
+              <h2 class="text-xl font-bold" x-bind:id="$id('modal-title')">
+                Edit collection name and visibility
+              </h2>
+              <!-- Content -->
+              <div class="mt-4">
+                <label for="collection-title" class="sr-only">
+                  Collection Title
+                </label>
+                <input
+                  type="text"
+                  name="collection_title"
+                  id="collection-title"
+                  form="update-collection"
+                  value={@collection_desc.title}
+                  required
+                  class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-gray-600 sm:leading-6 font-bold"
+                />
+              </div>
+              <!-- Toggle -->
+              <div class="my-4 flex items-center justify-center" x-id="['toggle-label']">
+                <input type="hidden" name="is_enabled" x-bind:value="value" form="update-collection" />
+                <input
+                  type="hidden"
+                  name="slug"
+                  value={@collection_desc.slug}
+                  form="update-collection"
+                />
+                <!-- Label -->
+                <label
+                  @click="$refs.toggle.click(); $refs.toggle.focus()"
+                  x-bind:id="$id('toggle-label')"
+                  class="text-gray-900 font-medium"
+                >
+                  Is enabled (viewed publicly)?
+                </label>
+                <!-- Button -->
+                <button
+                  x-ref="toggle"
+                  x-on:click="value = ! value"
+                  type="button"
+                  role="switch"
+                  x-bind:aria-checked="value"
+                  x-bind:aria-labelledby="$id('toggle-label')"
+                  x-bind:class="value ? 'bg-green-500' : 'bg-slate-300'"
+                  class="relative ml-2 inline-flex w-14 rounded-full py-1 transition"
+                >
+                  <span
+                    x-bind:class="value ? 'translate-x-7' : 'translate-x-1'"
+                    class="bg-white h-6 w-6 rounded-full transition shadow-md"
+                    aria-hidden="true"
+                  >
+                  </span>
+                </button>
+              </div>
+              <!-- Buttons -->
+              <div class="mt-4 flex space-x-2 justify-center">
+                <.form
+                  :let={_f}
+                  for={:update_collection}
+                  id="update-collection"
+                  phx-submit="update_collection"
+                >
+                  <button
+                    phx-submit="update_collection"
+                    phx-target={@myself}
+                    type="submit"
+                    class="rounded-md border border-gray-200 bg-white hover:bg-gray-100 px-5 py-2.5"
+                  >
+                    Update
+                  </button>
+                </.form>
+                <button
+                  type="button"
+                  x-on:click={"open = false; value = #{@collection_desc.is_enabled}; document.getElementById('update-collection').reset()"}
+                  class="rounded-md text-white bg-black hover:bg-gray-900 px-5 py-2.5"
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- End edit button -->
+
+      <!-- Start delete button -->
+      <div x-data="{ open: false }" class="text-black inline-flex justify-center">
+        <!-- Trigger -->
+        <span x-on:click="open = true">
+          <button
+            type="button"
+            class="inline-flex items-center gap-x-1.5 rounded-md bg-red-700 px-2.5 py-1.5 text-sm font-semibold text-white shadow-sm hover:bg-red-600 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-700"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke-width="1.5"
+              stroke="currentColor"
+              class="w-4 h-4"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0"
+              />
+            </svg>
+            Delete
+          </button>
+        </span>
+        <!-- Modal -->
+        <div
+          x-show="open"
+          style="display: none"
           x-on:keydown.escape.prevent.stop="open = false"
           role="dialog"
           aria-modal="true"
@@ -81,28 +240,60 @@ defmodule NappyWeb.Components.Admin.EditSpecificCollCatPageComponent do
             <div
               x-on:click.stop
               x-trap.noscroll.inert="open"
-              class="relative w-full max-w-2xl overflow-y-auto rounded-xl bg-white p-12 shadow-lg"
+              class="relative overflow-y-auto rounded-xl bg-white p-12 shadow-lg"
             >
+              <div x-on:click="open = false" class="absolute right-0 top-0 hidden pr-4 pt-4 sm:block">
+                <button
+                  type="button"
+                  class="rounded-md bg-white text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2"
+                >
+                  <span class="sr-only">Close</span>
+                  <svg
+                    class="h-6 w-6"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke-width="1.5"
+                    stroke="currentColor"
+                    aria-hidden="true"
+                  >
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
               <!-- Title -->
-              <h2 class="text-3xl font-bold" x-bind:id="$id('modal-title')">Confirm</h2>
+              <h2 class="text-xl font-bold" x-bind:id="$id('modal-title')">
+                Confirm delete
+                <span class="bg-black text-white py-0.5 px-1.5 rounded">
+                  <%= @collection_desc.title %>
+                </span>
+              </h2>
               <!-- Content -->
               <p class="mt-2 text-gray-600">
-                Are you sure you want to learn how to create an awesome modal?
+                Are you sure you want to delete this collection?
               </p>
               <!-- Buttons -->
-              <div class="mt-8 flex space-x-2">
-                <button
-                  type="button"
-                  x-on:click="open = false"
-                  class="rounded-md border border-gray-200 bg-white px-5 py-2.5"
+              <div class="mt-8 flex space-x-2 justify-center">
+                <.form
+                  :let={_f}
+                  id="confirm-delete-collection"
+                  for={:confirm_delete_collection}
+                  phx-submit="delete_collection"
+                  phx-target={@myself}
                 >
-                  Confirm
-                </button>
-
+                  <input type="hidden" name="slug" value={@slug} />
+                  <button
+                    phx-submit="delete_collection"
+                    phx-target={@myself}
+                    type="submit"
+                    class="rounded-md border border-gray-200 bg-white hover:bg-gray-100 px-5 py-2.5"
+                  >
+                    Confirm
+                  </button>
+                </.form>
                 <button
                   type="button"
                   x-on:click="open = false"
-                  class="rounded-md border border-gray-200 bg-white px-5 py-2.5"
+                  class="rounded-md text-white bg-black hover:bg-gray-900 px-5 py-2.5"
                 >
                   Cancel
                 </button>
@@ -111,31 +302,9 @@ defmodule NappyWeb.Components.Admin.EditSpecificCollCatPageComponent do
           </div>
         </div>
       </div>
+      <!-- End delete button -->
 
-      <button
-        phx-click="delete_collection"
-        phx-value-slug={@slug}
-        phx-target={@myself}
-        type="button"
-        class="inline-flex items-center gap-x-1.5 rounded-md bg-red-700 px-2.5 py-1.5 text-sm font-semibold text-white shadow-sm hover:bg-red-600 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-700"
-      >
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke-width="1.5"
-          stroke="currentColor"
-          class="w-4 h-4"
-        >
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0"
-          />
-        </svg>
-        Delete
-      </button>
-
+      <!-- Start change thumbnail button -->
       <div x-data="{ open: false }" class="text-black inline-flex justify-center">
         <!-- Trigger -->
         <span x-on:click="open = true">
@@ -213,7 +382,9 @@ defmodule NappyWeb.Components.Admin.EditSpecificCollCatPageComponent do
           </div>
         </div>
       </div>
+      <!-- End change thumbnail button -->
 
+      <!-- Start set related tags button -->
       <div x-data="{ open: false }" class="text-black inline-flex justify-center">
         <!-- Trigger -->
         <span x-on:click="open = true">
@@ -292,7 +463,9 @@ defmodule NappyWeb.Components.Admin.EditSpecificCollCatPageComponent do
           </div>
         </div>
       </div>
+      <!-- End set related tags button -->
 
+      <!-- Start set description button -->
       <div x-data="{ open: false }" class="text-black inline-flex justify-center">
         <!-- Trigger -->
         <span x-on:click="open = true">
@@ -370,6 +543,7 @@ defmodule NappyWeb.Components.Admin.EditSpecificCollCatPageComponent do
           </div>
         </div>
       </div>
+      <!-- End set description button -->
     </div>
     """
   end

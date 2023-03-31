@@ -46,7 +46,10 @@ services:
     env_file:
       - nappy_dev.env
     volumes:
-      - ./minio-persistence:/data
+      - minio_data:/data
+
+volumes:
+  minio_data:
 
   # This is used when deploying to
   # a vps with caddy as web server
