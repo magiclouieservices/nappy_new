@@ -173,6 +173,34 @@ rename `nappy_dev.env.example` to `nappy_dev.env`, then `docker compose up -d`
 
 For Linux: rename `nappy_dev.env.example` to `nappy_dev.env`, then `docker-compose up -d`
 
+## Running test(s) on Windows (via wsl)
+
+`chromedriver`: Go to https://chromedriver.storage.googleapis.com/index.html, then find the latest version to download
+
+```bash
+# skip these step if unzip is installed
+sudo apt update && sudo apt install -y unzip
+
+cd ~ && curl -O https://chromedriver.storage.googleapis.com/112.0.5615.28/chromedriver_linux64.zip
+unzip chromedriver_linux64.zip && chmod +x chromedriver
+mv chromedriver /usr/local/bin/
+```
+
+install chrome stable
+```bash
+wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
+
+sudo dpkg -i google-chrome-stable_current_amd64.deb
+
+# install missing dependencies if it's asking
+```
+
+then test
+
+```bash
+mix test --trace test/nappy_web/api/upload_images_test.exs
+```
+
 ## Check for leaked secrets (optional)
 
 This repo uses [zricethezav/gitleaks](https://github.com/zricethezav/gitleaks)
