@@ -17,11 +17,15 @@ defmodule NappyWeb.Components.Admin.EditSpecificCollCatPageComponent do
   end
 
   @impl true
-  def handle_event("update_collection", %{"collection_title" => collection_title, "is_enabled" => is_enabled, "slug" => slug}, socket) do
+  def handle_event(
+        "update_collection",
+        %{"collection_title" => collection_title, "is_enabled" => is_enabled, "slug" => slug},
+        socket
+      ) do
     attrs = %{
       is_enabled: is_enabled,
       title: collection_title,
-      slug: slug,
+      slug: slug
     }
 
     collection_description = Catalog.update_collection_description(attrs)
@@ -148,12 +152,7 @@ defmodule NappyWeb.Components.Admin.EditSpecificCollCatPageComponent do
               </div>
               <!-- Toggle -->
               <div class="my-4 flex items-center justify-center" x-id="['toggle-label']">
-                <input
-                  type="hidden"
-                  name="is_enabled"
-                  x-bind:value="value"
-                  form="update-collection"
-                />
+                <input type="hidden" name="is_enabled" x-bind:value="value" form="update-collection" />
                 <input
                   type="hidden"
                   name="slug"
