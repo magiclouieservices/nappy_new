@@ -268,6 +268,26 @@ defmodule Nappy.Catalog do
     |> Repo.paginate(params)
   end
 
+  def list_collection_images(slug) do
+    # coll_desc_id =
+    #   from(cd in CollectionDescription,
+    #     where: cd.slug == ^slug,
+    #     select: cd.id
+    #   )
+    #   |> Repo.one()
+    active = Metrics.get_image_status_id(:active)
+    featured = Metrics.get_image_status_id(:featured)
+
+    Collection
+    |> join(:inner, [coll], coll_desc in assoc(coll, :collection_description))
+    |> join(:inner, [coll, _coll_desc], i in assoc(coll, :image))
+    |> where([_coll, _coll_desc, i], i.image_status_id in ^[active, featured])
+    |> where([_coll, coll_desc, _], coll_desc.slug == ^slug)
+    # |> where(collection_description_id: ^coll_desc_id)
+    |> select([_coll, _coll_desc, i], %Images{id: i.id, slug: i.slug})
+    |> Repo.all()
+  end
+
   @spec insert_adverts_in_paginated_images(String.t(), mfa :: {module(), atom(), list(any())}) ::
           Scrivener.Page.t()
   def insert_adverts_in_paginated_images(payload_name, mfa) do

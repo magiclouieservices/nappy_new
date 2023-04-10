@@ -2,6 +2,7 @@ defmodule NappyWeb.Components.Admin.EditSpecificCollCatPageComponent do
   use NappyWeb, :live_component
 
   alias Nappy.Catalog
+  alias NappyWeb.Components.Admin.ThumbnailPickerComponent
 
   @moduledoc false
 
@@ -35,6 +36,17 @@ defmodule NappyWeb.Components.Admin.EditSpecificCollCatPageComponent do
       |> put_flash(:info, "Succesfully updated the collection")
 
     path = Routes.collections_show_path(socket, :show, collection_description.slug)
+
+    {:noreply, push_navigate(socket, to: path)}
+  end
+
+  @impl true
+  def handle_event("update_collection_thumbnail", %{"slug" => slug}, socket) do
+    socket =
+      socket
+      |> put_flash(:info, "TODO update collection thumbnail")
+
+    path = Routes.collections_show_path(socket, :show, slug)
 
     {:noreply, push_navigate(socket, to: path)}
   end
@@ -378,28 +390,61 @@ defmodule NappyWeb.Components.Admin.EditSpecificCollCatPageComponent do
             <div
               x-on:click.stop
               x-trap.noscroll.inert="open"
-              class="relative w-full max-w-2xl overflow-y-auto rounded-xl bg-white p-12 shadow-lg"
+              class="relative overflow-y-auto rounded-xl bg-white p-12 shadow-lg"
             >
-              <!-- Title -->
-              <h2 class="text-3xl font-bold" x-bind:id="$id('modal-title')">Confirm</h2>
-              <!-- Content -->
-              <p class="mt-2 text-gray-600">
-                Are you sure you want to learn how to create an awesome modal?
-              </p>
-              <!-- Buttons -->
-              <div class="mt-8 flex space-x-2">
+              <div x-on:click="open = false" class="absolute right-0 top-0 hidden pr-4 pt-4 sm:block">
                 <button
                   type="button"
-                  x-on:click="open = false"
-                  class="rounded-md border border-gray-200 bg-white px-5 py-2.5"
+                  class="rounded-md bg-white text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2"
                 >
-                  Confirm
+                  <span class="sr-only">Close</span>
+                  <svg
+                    class="h-6 w-6"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke-width="1.5"
+                    stroke="currentColor"
+                    aria-hidden="true"
+                  >
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                  </svg>
                 </button>
+              </div>
+              <!-- Title -->
+              <h2 class="text-xl font-bold mb-4" x-bind:id="$id('modal-title')">
+                Pick an image for thumbnail
+              </h2>
 
+              <!-- Content -->
+              <.live_component
+                module={ThumbnailPickerComponent}
+                id="thumbnail-picker"
+                slug={@slug}
+              />
+
+              <!-- Buttons -->
+              <div class="mt-8 flex space-x-2 justify-center">
+                <.form
+                  :let={_f}
+                  id="update-collection-thumbnail"
+                  for={:update_collection_thumbnail}
+                  phx-submit="update_collection_thumbnail"
+                  phx-target={@myself}
+                >
+                  <input type="hidden" name="slug" value={@slug} />
+                  <button
+                    phx-submit="update_collection_thumbnail"
+                    phx-target={@myself}
+                    type="submit"
+                    class="rounded-md border border-gray-200 bg-white hover:bg-gray-100 px-5 py-2.5"
+                  >
+                    Set thumbnail
+                  </button>
+                </.form>
                 <button
                   type="button"
                   x-on:click="open = false"
-                  class="rounded-md border border-gray-200 bg-white px-5 py-2.5"
+                  class="rounded-md text-white bg-black hover:bg-gray-900 px-5 py-2.5"
                 >
                   Cancel
                 </button>
