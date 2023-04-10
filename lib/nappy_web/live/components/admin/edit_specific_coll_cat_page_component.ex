@@ -1,6 +1,8 @@
 defmodule NappyWeb.Components.Admin.EditSpecificCollCatPageComponent do
   use NappyWeb, :live_component
 
+  alias Nappy.Catalog
+
   @moduledoc false
 
   @impl true
@@ -10,6 +12,25 @@ defmodule NappyWeb.Components.Admin.EditSpecificCollCatPageComponent do
       |> put_flash(:info, "TODO deleted collection")
 
     path = Routes.collections_show_path(socket, :show, slug)
+
+    {:noreply, push_navigate(socket, to: path)}
+  end
+
+  @impl true
+  def handle_event("update_collection", %{"collection_title" => collection_title, "is_enabled" => is_enabled, "slug" => slug}, socket) do
+    attrs = %{
+      is_enabled: is_enabled,
+      title: collection_title,
+      slug: slug,
+    }
+
+    collection_description = Catalog.update_collection_description(attrs)
+
+    socket =
+      socket
+      |> put_flash(:info, "Succesfully updated the collection")
+
+    path = Routes.collections_show_path(socket, :show, collection_description.slug)
 
     {:noreply, push_navigate(socket, to: path)}
   end
@@ -127,7 +148,12 @@ defmodule NappyWeb.Components.Admin.EditSpecificCollCatPageComponent do
               </div>
               <!-- Toggle -->
               <div class="my-4 flex items-center justify-center" x-id="['toggle-label']">
-                <input type="hidden" name="is_enabled" x-bind:value="value" form="update-collection" />
+                <input
+                  type="hidden"
+                  name="is_enabled"
+                  x-bind:value="value"
+                  form="update-collection"
+                />
                 <input
                   type="hidden"
                   name="slug"
@@ -168,6 +194,7 @@ defmodule NappyWeb.Components.Admin.EditSpecificCollCatPageComponent do
                   for={:update_collection}
                   id="update-collection"
                   phx-submit="update_collection"
+                  phx-target={@myself}
                 >
                   <button
                     phx-submit="update_collection"

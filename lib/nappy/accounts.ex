@@ -121,6 +121,7 @@ defmodule Nappy.Accounts do
 
     Repo.one(query) === :admin
   end
+
   def is_admin(_), do: false
 
   def is_admin_or_contributor(_user, roles \\ [:admin, :contributor])

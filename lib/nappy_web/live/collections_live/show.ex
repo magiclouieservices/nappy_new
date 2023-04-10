@@ -55,21 +55,6 @@ defmodule NappyWeb.CollectionsLive.Show do
   end
 
   @impl true
-  def handle_event(
-        "update_collection",
-        %{"collection_title" => _collection_title, "is_enabled" => _is_enabled, "slug" => slug},
-        socket
-      ) do
-    socket =
-      socket
-      |> put_flash(:info, "TODO updated collection")
-
-    path = Routes.collections_show_path(socket, :show, slug)
-
-    {:noreply, push_navigate(socket, to: path)}
-  end
-
-  @impl true
   def handle_info(:clear_info, socket) do
     {:noreply, clear_flash(socket, :info)}
   end

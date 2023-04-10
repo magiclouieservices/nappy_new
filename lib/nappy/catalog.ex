@@ -1103,10 +1103,21 @@ defmodule Nappy.Catalog do
       {:error, %Ecto.Changeset{}}
 
   """
+  def update_collection_description(attrs) do
+    collection_description =
+      CollectionDescription
+      |> where(slug: ^attrs.slug)
+      |> Repo.one()
+
+    attrs = Map.put(attrs, :slug, Slug.slugify(attrs.title))
+
+    update_collection_description(collection_description, attrs)
+  end
+
   def update_collection_description(%CollectionDescription{} = collection_description, attrs) do
     collection_description
     |> CollectionDescription.changeset(attrs)
-    |> Repo.update()
+    |> Repo.update!()
   end
 
   @doc """
