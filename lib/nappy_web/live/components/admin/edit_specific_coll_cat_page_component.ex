@@ -41,12 +41,25 @@ defmodule NappyWeb.Components.Admin.EditSpecificCollCatPageComponent do
   end
 
   @impl true
-  def handle_event("update_collection_thumbnail", %{"slug" => slug}, socket) do
+  def handle_event(
+        "update_collection_thumbnail",
+        %{"slug" => slug, "thumbnail" => thumbnail},
+        socket
+      ) do
+    image = Catalog.get_image_by_slug(thumbnail)
+
+    attrs = %{
+      thumbnail: image.id,
+      slug: slug
+    }
+
+    collection_description = Catalog.update_collection_description(attrs)
+
     socket =
       socket
-      |> put_flash(:info, "TODO update collection thumbnail")
+      |> put_flash(:info, "Succesfully updated the collection")
 
-    path = Routes.collections_show_path(socket, :show, slug)
+    path = Routes.collections_show_path(socket, :show, collection_description.slug)
 
     {:noreply, push_navigate(socket, to: path)}
   end
@@ -414,14 +427,13 @@ defmodule NappyWeb.Components.Admin.EditSpecificCollCatPageComponent do
               <h2 class="text-xl font-bold mb-4" x-bind:id="$id('modal-title')">
                 Pick an image for thumbnail
               </h2>
-
               <!-- Content -->
               <.live_component
                 module={ThumbnailPickerComponent}
                 id="thumbnail-picker"
                 slug={@slug}
+                collection_desc={@collection_desc}
               />
-
               <!-- Buttons -->
               <div class="mt-8 flex space-x-2 justify-center">
                 <.form
@@ -443,7 +455,7 @@ defmodule NappyWeb.Components.Admin.EditSpecificCollCatPageComponent do
                 </.form>
                 <button
                   type="button"
-                  x-on:click="open = false"
+                  x-on:click="open = false; document.getElementById('update-collection-thumbnail').reset()"
                   class="rounded-md text-white bg-black hover:bg-gray-900 px-5 py-2.5"
                 >
                   Cancel

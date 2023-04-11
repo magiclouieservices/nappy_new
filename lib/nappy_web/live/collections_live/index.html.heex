@@ -30,13 +30,19 @@
   </ul>
 </section>
 <section class="container mx-auto py-4">
-  <div class="grid lg:grid-cols-3 xs:grid-cols-1 sm:grid-cols-2 auto-rows-min gap-4">
+  <div class="grid
+      lg:grid-cols-3
+      sm:grid-cols-2
+      xs:grid-cols-1
+      md:auto-rows-max
+      xs:auto-rows-min
+      gap-4">
     <%= for item <- @collections do %>
       <a class="mb-4 block" href={Routes.collections_show_path(@socket, :show, item.slug)}>
         <div class="relative rounded-t bg-slate-300">
           <img
             loading="lazy"
-            class="object-cover rounded-t"
+            class="w-full h-96 object-cover rounded-t"
             src={Catalog.image_url_by_id(item.thumbnail)}
             alt={item.title}
           />

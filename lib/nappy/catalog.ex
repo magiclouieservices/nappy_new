@@ -269,12 +269,6 @@ defmodule Nappy.Catalog do
   end
 
   def list_collection_images(slug) do
-    # coll_desc_id =
-    #   from(cd in CollectionDescription,
-    #     where: cd.slug == ^slug,
-    #     select: cd.id
-    #   )
-    #   |> Repo.one()
     active = Metrics.get_image_status_id(:active)
     featured = Metrics.get_image_status_id(:featured)
 
@@ -283,7 +277,6 @@ defmodule Nappy.Catalog do
     |> join(:inner, [coll, _coll_desc], i in assoc(coll, :image))
     |> where([_coll, _coll_desc, i], i.image_status_id in ^[active, featured])
     |> where([_coll, coll_desc, _], coll_desc.slug == ^slug)
-    # |> where(collection_description_id: ^coll_desc_id)
     |> select([_coll, _coll_desc, i], %Images{id: i.id, slug: i.slug})
     |> Repo.all()
   end
@@ -1129,7 +1122,10 @@ defmodule Nappy.Catalog do
       |> where(slug: ^attrs.slug)
       |> Repo.one()
 
-    attrs = Map.put(attrs, :slug, Slug.slugify(attrs.title))
+    attrs =
+      if Map.has_key?(attrs, :title),
+        do: Map.put(attrs, :slug, Slug.slugify(attrs.title)),
+        else: attrs
 
     update_collection_description(collection_description, attrs)
   end
