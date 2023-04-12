@@ -27,7 +27,7 @@ jobs:
           POSTGRES_USER: postgres
           POSTGRES_PASSWORD: postgres
           POSTGRES_DB: postgres
-        image: postgres:14
+        image: postgres:14-alpine
         ports: ['5432:5432']
         options: >-
           --health-cmd pg_isready
@@ -36,12 +36,14 @@ jobs:
           --health-retries 5
           
       minio:
-        image: bitnami/minio
+        image: bitnami/minio:2023.3.24
         ports: ['9000:9000', '9001:9001']
         env:
           MINIO_ROOT_USER: minio-root-user
           MINIO_ROOT_PASSWORD: minio-root-password
           MINIO_DEFAULT_BUCKETS: test-bucket
+          MINIO_SERVER_ACCESS_KEY: minio-access-key
+          MINIO_SERVER_SECRET_KEY: minio-secret-key
 
     steps:
       - uses: actions/checkout@v2

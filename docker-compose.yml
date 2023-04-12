@@ -34,7 +34,7 @@ services:
   #     - ./_build/prod/rel/nappy/:/app
 
   minio:
-    image: bitnami/minio
+    image: bitnami/minio:2023.3.24
     container_name: minio
     cpu_count: 1
     cpus: 0.5
@@ -46,7 +46,11 @@ services:
     env_file:
       - nappy_dev.env
     volumes:
-      - ./minio-persistence:/data
+      - minio_data:/data
+
+volumes:
+  minio_data:
+    driver: local
 
   # This is used when deploying to
   # a vps with caddy as web server
