@@ -1,4 +1,4 @@
-defmodule NappyWeb.Components.Admin.EditSpecificCollCatPageComponent do
+defmodule NappyWeb.Components.Admin.EditCollectionPageComponent do
   use NappyWeb, :live_component
 
   alias Nappy.Catalog
@@ -42,7 +42,7 @@ defmodule NappyWeb.Components.Admin.EditSpecificCollCatPageComponent do
 
   @impl true
   def handle_event(
-        "update_collection_thumbnail",
+        "update_thumbnail",
         %{"slug" => slug, "thumbnail" => thumbnail},
         socket
       ) do
@@ -57,7 +57,7 @@ defmodule NappyWeb.Components.Admin.EditSpecificCollCatPageComponent do
 
     socket =
       socket
-      |> put_flash(:info, "Succesfully updated the collection")
+      |> put_flash(:info, "Succesfully updated thumbnail")
 
     path = Routes.collections_show_path(socket, :show, collection_description.slug)
 
@@ -432,20 +432,21 @@ defmodule NappyWeb.Components.Admin.EditSpecificCollCatPageComponent do
                 module={ThumbnailPickerComponent}
                 id="thumbnail-picker"
                 slug={@slug}
-                collection_desc={@collection_desc}
+                page={@collection_desc}
+                page_type="collection"
               />
               <!-- Buttons -->
               <div class="mt-8 flex space-x-2 justify-center">
                 <.form
                   :let={_f}
-                  id="update-collection-thumbnail"
-                  for={:update_collection_thumbnail}
-                  phx-submit="update_collection_thumbnail"
+                  id="update-thumbnail"
+                  for={:update_thumbnail}
+                  phx-submit="update_thumbnail"
                   phx-target={@myself}
                 >
                   <input type="hidden" name="slug" value={@slug} />
                   <button
-                    phx-submit="update_collection_thumbnail"
+                    phx-submit="update_thumbnail"
                     phx-target={@myself}
                     type="submit"
                     class="rounded-md border border-gray-200 bg-white hover:bg-gray-100 px-5 py-2.5"

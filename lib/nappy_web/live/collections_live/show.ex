@@ -4,7 +4,7 @@ defmodule NappyWeb.CollectionsLive.Show do
   alias Nappy.Accounts
   alias Nappy.Catalog
   alias Nappy.Metrics
-  alias NappyWeb.Components.Admin.EditSpecificCollCatPageComponent
+  alias NappyWeb.Components.Admin.EditCollectionPageComponent
   alias NappyWeb.Components.GalleryComponent
   alias NappyWeb.Components.RelatedTagsComponent
   alias Plug.Conn.Status

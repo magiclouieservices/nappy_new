@@ -13,6 +13,9 @@ defmodule NappyWeb.Components.Admin.ThumbnailPickerComponent do
     <.live_component
       module={ThumbnailPickerComponent}
       id="thumbnail-picker"
+      slug={@slug}
+      page={@collection_desc}
+      page_type="collection"
     />
   """
   @impl true
@@ -27,7 +30,7 @@ defmodule NappyWeb.Components.Admin.ThumbnailPickerComponent do
          xs:grid-cols-3
          gap-8"
     >
-      <%= for image <- list_collection_images(@slug) do %>
+      <%= for image <- list_images(@slug, @page_type) do %>
         <button
           x-data="{ hidden: true }"
           class="relative w-full h-full bg-slate-300 rounded flex justify-center items-center"
@@ -37,8 +40,8 @@ defmodule NappyWeb.Components.Admin.ThumbnailPickerComponent do
             type="radio"
             name="thumbnail"
             value={image.slug}
-            form="update-collection-thumbnail"
-            checked={if image.id === @collection_desc.thumbnail, do: "true", else: nil}
+            form="update-thumbnail"
+            checked={if image.id === @page.thumbnail, do: "true", else: nil}
           />
           <div
             x-on:mouseenter="hidden = false"
@@ -66,7 +69,7 @@ defmodule NappyWeb.Components.Admin.ThumbnailPickerComponent do
             </svg>
           </span>
           <span
-            :if={image.id === @collection_desc.thumbnail}
+            :if={image.id === @page.thumbnail}
             class="font-tiempos-bold text-2xl p-4 w-full h-full text-white absolute bottom-0 left-0 flex justify-center items-center bg-[rgba(0,0,0,0.7)] rounded"
             href="#"
           >
@@ -78,7 +81,11 @@ defmodule NappyWeb.Components.Admin.ThumbnailPickerComponent do
     """
   end
 
-  def list_collection_images(slug) do
+  def list_images(slug, "collection") do
     Catalog.list_collection_images(slug)
+  end
+
+  def list_images(slug, "category") do
+    Catalog.list_category_images(slug)
   end
 end

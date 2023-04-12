@@ -1,9 +1,11 @@
 defmodule NappyWeb.CategoryLive.Show do
   use NappyWeb, :live_view
 
+  alias Nappy.Accounts
   alias Nappy.Catalog
   alias Nappy.Metrics
   alias Nappy.SponsoredImages
+  alias NappyWeb.Components.Admin.EditCategoryPageComponent
   alias NappyWeb.Components.GalleryComponent
   alias NappyWeb.Components.RelatedTagsComponent
   alias Plug.Conn.Status
@@ -28,6 +30,7 @@ defmodule NappyWeb.CategoryLive.Show do
           |> assign(slug: slug)
           |> assign(current_url: uri)
           |> assign(related_tags: related_tags)
+          |> assign(category: category)
           |> assign(page_title: category.name)
           |> fetch()
 

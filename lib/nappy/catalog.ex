@@ -281,6 +281,18 @@ defmodule Nappy.Catalog do
     |> Repo.all()
   end
 
+  def list_category_images(slug) do
+    active = Metrics.get_image_status_id(:active)
+    featured = Metrics.get_image_status_id(:featured)
+
+    Category
+    |> join(:inner, [category], i in assoc(category, :images))
+    |> where([_category, i], i.image_status_id in ^[active, featured])
+    |> where([category, _i], category.slug == ^slug)
+    |> select([_category, i], %Images{id: i.id, slug: i.slug})
+    |> Repo.all()
+  end
+
   @spec insert_adverts_in_paginated_images(String.t(), mfa :: {module(), atom(), list(any())}) ::
           Scrivener.Page.t()
   def insert_adverts_in_paginated_images(payload_name, mfa) do
@@ -819,6 +831,12 @@ defmodule Nappy.Catalog do
   """
   def get_category(field), do: Repo.get_by(Category, field)
 
+  def get_category_by_slug(slug) do
+    Category
+    |> where(slug: ^slug)
+    |> Repo.one()
+  end
+
   def get_category_by_name(category_name) do
     Category
     |> where([c], ilike(c.name, ^category_name))
@@ -856,10 +874,23 @@ defmodule Nappy.Catalog do
       {:error, %Ecto.Changeset{}}
 
   """
-  def update_category(%Category{} = category, attrs) do
+  def update_category(attrs) do
+    category = get_category_by_slug(attrs.slug)
+
+    attrs =
+      if Map.has_key?(attrs, :name) do
+        %{attrs | slug: Slug.slugify(attrs.name)}
+      else
+        attrs
+      end
+
+    update_category(category, attrs)
+  end
+
+  def update_category(category, attrs) do
     category
     |> Category.changeset(attrs)
-    |> Repo.update()
+    |> Repo.update!()
   end
 
   @doc """

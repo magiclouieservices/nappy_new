@@ -5,9 +5,17 @@
     src={Routes.static_path(@socket, "/images/header_search.jpg")}
   />
   <div class="absolute inset-0 z-1 flex flex-col gap-1 justify-center items-center text-white bg-[rgba(0,0,0,.5)]">
-    <span class="max-w-[32rem] text-4xl font-tiempos-bold text-center">
-      <%= @slug %>
+    <span class="max-w-[32rem] text-4xl font-tiempos-bold text-center mb-2">
+      <%= @category.name %>
     </span>
+    <.live_component
+      :if={Accounts.is_admin(@current_user)}
+      module={EditCategoryPageComponent}
+      id="edit-category-page-admin"
+      current_user={@current_user}
+      slug={@slug}
+      category={@category}
+    />
   </div>
 </div>
 <section class="container mx-auto">
