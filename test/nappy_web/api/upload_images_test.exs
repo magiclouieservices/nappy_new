@@ -69,8 +69,13 @@ defmodule NappyWeb.Api.UploadImagesTest do
              |> ExAws.request()
   end
 
-  test "error: removing non-existing bucket", context do
+  test "success: deleting non-existent bucket creates one", context do
     assert {:error, {:http_error, 404, %{status_code: 404}}} =
+             context.non_bucket
+             |> S3.delete_bucket()
+             |> ExAws.request()
+
+    assert {:ok, %{status_code: 204}} =
              context.non_bucket
              |> S3.delete_bucket()
              |> ExAws.request()
