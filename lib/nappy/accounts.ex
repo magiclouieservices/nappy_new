@@ -113,6 +113,17 @@ defmodule Nappy.Accounts do
     Repo.one(query)
   end
 
+  def is_admin(%User{} = user) do
+    query =
+      from r in AccountRole,
+        where: r.id == ^user.account_role_id,
+        select: r.name
+
+    Repo.one(query) === :admin
+  end
+
+  def is_admin(_), do: false
+
   def is_admin_or_contributor(_user, roles \\ [:admin, :contributor])
 
   def is_admin_or_contributor(%User{} = user, roles) do

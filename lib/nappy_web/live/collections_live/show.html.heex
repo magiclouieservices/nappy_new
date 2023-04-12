@@ -14,6 +14,14 @@
         <%= @collection.user.username %>
       </a>
     </span>
+    <.live_component
+      :if={Accounts.is_admin(@current_user)}
+      module={EditCollectionPageComponent}
+      id="edit-collection-page-admin"
+      current_user={@current_user}
+      slug={@slug}
+      collection_desc={@collection}
+    />
   </div>
 </div>
 <div class="container mx-auto mb-8" x-data="{ open: false }">

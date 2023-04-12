@@ -1,17 +1,21 @@
 defmodule NappyWeb.CollectionsLive.Show do
   use NappyWeb, :live_view
 
+  alias Nappy.Accounts
   alias Nappy.Catalog
   alias Nappy.Metrics
-  alias Nappy.SponsoredImages
+  alias NappyWeb.Components.Admin.EditCollectionPageComponent
   alias NappyWeb.Components.GalleryComponent
   alias NappyWeb.Components.RelatedTagsComponent
   alias Plug.Conn.Status
-
   @moduledoc false
 
   @impl true
   def handle_params(%{"slug" => slug}, uri, socket) do
+    if Map.get(socket.assigns, :flash) do
+      Process.send_after(self(), :clear_info, 5_000)
+    end
+
     coll_desc = Catalog.get_collection_description_by_slug(slug)
 
     case coll_desc do
@@ -48,6 +52,11 @@ defmodule NappyWeb.CollectionsLive.Show do
     |> Metrics.increment_view_count()
 
     {:noreply, socket}
+  end
+
+  @impl true
+  def handle_info(:clear_info, socket) do
+    {:noreply, clear_flash(socket, :info)}
   end
 
   defp fetch(%{assigns: %{slug: slug, page: page, page_size: page_size}} = socket) do

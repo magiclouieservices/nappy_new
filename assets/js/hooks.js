@@ -6,6 +6,7 @@ import InputTagsAdmin from "./hooks/input_tags_admin"
 import Multiselect from "./hooks/multiselect"
 import MultiSelectTags from "./hooks/multi_select_tags"
 import ViewCount from "./hooks/view_count"
+import ThumbnailPicker from "./hooks/thumbnail_picker"
 
 let Hooks = {
   AdminClipboard: AdminClipboard,
@@ -16,6 +17,7 @@ let Hooks = {
   Multiselect: Multiselect,
   MultiSelectTags: MultiSelectTags,
   ViewCount: ViewCount,
+  ThumbnailPicker: ThumbnailPicker,
 }
 
 export default Hooks;

@@ -1,5 +1,11 @@
 # Nappy
 
+[//]: # "Badges"
+[![Actions Status][actions-badge]](https://github.com/Boogiebrands/nappy_new/actions)
+
+[//]: # "Image sources"
+[actions-badge]: https://github.com/Boogiebrands/nappy_new/actions/workflows/ci.yml/badge.svg
+
 ## Setup
 
 If you have Elixir already in your machine:
@@ -50,6 +56,24 @@ config :nappy, :runtime,
   notifications_email: "notifications@nappy.co",
   embed_url: System.get_env("IMGIX_URL", "http://localhost:9000"), # <-- this part
   image_path: System.get_env("WASABI_IMAGE_PATH", "/nappy/photos/") # <-- this part
+```
+
+## Install vips
+
+If you're using via homebrew:
+
+```bash
+brew install vips
+```
+
+Or in *nix distro (e.g. `Ubuntu`)
+
+```bash
+# If build-essential is not installed
+sudo apt install build-essential
+
+# install glib and libvips
+sudo apt install libglib2.0-dev libvips-dev
 ```
 
 ## S3 local upload behavior
@@ -155,6 +179,34 @@ rename `nappy_dev.env.example` to `nappy_dev.env`, then `docker compose up -d`
 
 For Linux: rename `nappy_dev.env.example` to `nappy_dev.env`, then `docker-compose up -d`
 
+## Running test(s) on Windows (via wsl)
+
+`chromedriver`: Go to https://chromedriver.storage.googleapis.com/index.html, then find the latest version to download
+
+```bash
+# skip these step if unzip is installed
+sudo apt update && sudo apt install -y unzip
+
+cd ~ && curl -O https://chromedriver.storage.googleapis.com/112.0.5615.28/chromedriver_linux64.zip
+unzip chromedriver_linux64.zip && chmod +x chromedriver
+mv chromedriver /usr/local/bin/
+```
+
+install chrome stable
+```bash
+wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
+
+sudo dpkg -i google-chrome-stable_current_amd64.deb
+
+# install missing dependencies if it's asking
+```
+
+then test
+
+```bash
+mix test --trace test/nappy_web/api/upload_images_test.exs
+```
+
 ## Check for leaked secrets (optional)
 
 This repo uses [zricethezav/gitleaks](https://github.com/zricethezav/gitleaks)
@@ -184,4 +236,18 @@ flyctl deploy . \
   --dockerfile ./environment.dockerfile \
   --no-cache \
   --remote-only
+```
+
+## Test Github Actions locally
+
+#### Install [nektos/act](https://github.com/nektos/act#bash-script):
+
+```bash
+# use sudo if needs elevated access
+cd ~ && curl -s https://raw.githubusercontent.com/nektos/act/master/install.sh | sudo bash
+cp ~/bin/act /usr/local/bin
+
+act -l # list workflows
+
+act -s DOCKER_USERNAME=your_docker_username DOCKER_PASSWORD=your_docker_password
 ```
