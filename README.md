@@ -1,5 +1,11 @@
 # Nappy
 
+[//]: # "Badges"
+[![Actions Status][actions-badge]](https://github.com/Boogiebrands/nappy_new/actions)
+
+[//]: # "Image sources"
+[actions-badge]: https://github.com/Boogiebrands/nappy_new/actions/workflows/ci.yml/badge.svg
+
 ## Setup
 
 If you have Elixir already in your machine:
