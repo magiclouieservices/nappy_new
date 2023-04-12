@@ -231,3 +231,17 @@ flyctl deploy . \
   --no-cache \
   --remote-only
 ```
+
+## Test Github Actions locally
+
+#### Install [nektos/act](https://github.com/nektos/act#bash-script):
+
+```bash
+# use sudo if needs elevated access
+cd ~ && curl -s https://raw.githubusercontent.com/nektos/act/master/install.sh | sudo bash
+cp ~/bin/act /usr/local/bin
+
+act -l # list workflows
+
+act -s DOCKER_USERNAME=your_docker_username DOCKER_PASSWORD=your_docker_password
+```
