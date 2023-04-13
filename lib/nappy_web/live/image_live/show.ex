@@ -9,6 +9,7 @@ defmodule NappyWeb.ImageLive.Show do
   alias NappyWeb.Components.GalleryComponent
   alias NappyWeb.Components.MoreInfoComponent
   alias NappyWeb.Components.RelatedImagesComponent
+  alias NappyWeb.Components.ShareLinkComponent
   alias NappyWeb.Components.SponsoredImagesComponent
   alias Plug.Conn.Status
 
