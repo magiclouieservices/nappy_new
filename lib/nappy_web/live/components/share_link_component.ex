@@ -172,11 +172,11 @@ defmodule NappyWeb.Components.ShareLinkComponent do
                   <!-- Panel -->
                   <section
                     :for={
-                      [share_desc, share_url] <-
+                      [share_type, share_desc, share_url] <-
                         [
-                          ["Share this url", @share_url],
-                          ["Tag this photo in your web project", @photo_link],
-                          ["Add this source in your web project", @embed_url]
+                          ["share_url", "Share this url", @share_url],
+                          ["photo_link", "Tag this photo in your web project", @photo_link],
+                          ["embed_url", "Add this source in your web project", @embed_url]
                         ]
                     }
                     x-show="isSelected($id('tab', whichChild($el, $el.parentElement)))"
@@ -185,10 +185,32 @@ defmodule NappyWeb.Components.ShareLinkComponent do
                     class="mb-2"
                   >
                     <h2 class="text-sm"><%= share_desc %></h2>
-                    <div class="mt-2 rounded border border-gray-200 flex justify-between p-2">
+                    <div
+                      id={"hook-clipboard-#{share_type}"}
+                      phx-hook="Clipboard"
+                      class="mt-2 rounded border border-gray-200 flex justify-between p-2"
+                    >
                       <p><%= share_url %></p>
-                      <button class="bg-white px-2 py-.5 text-black font-bold rounded text-xs flex items-center justify-center border border-gray-300 hover:bg-black hover:text-white">
-                        COPY
+                      <button
+                        value={share_url}
+                        class="copy-button bg-white px-2 py-.5 text-black font-bold rounded text-xs flex items-center justify-center border border-gray-300 hover:bg-black hover:text-white"
+                      >
+                        <!-- Heroicon name: outline/document-duplicate -->
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          stroke-width="1.5"
+                          stroke="currentColor"
+                          class="w-3 h-3 mr-1"
+                        >
+                          <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            d="M15.75 17.25v3.375c0 .621-.504 1.125-1.125 1.125h-9.75a1.125 1.125 0 01-1.125-1.125V7.875c0-.621.504-1.125 1.125-1.125H6.75a9.06 9.06 0 011.5.124m7.5 10.376h3.375c.621 0 1.125-.504 1.125-1.125V11.25c0-4.46-3.243-8.161-7.5-8.876a9.06 9.06 0 00-1.5-.124H9.375c-.621 0-1.125.504-1.125 1.125v3.5m7.5 10.375H9.375a1.125 1.125 0 01-1.125-1.125v-9.25m12 6.625v-1.875a3.375 3.375 0 00-3.375-3.375h-1.5a1.125 1.125 0 01-1.125-1.125v-1.5a3.375 3.375 0 00-3.375-3.375H9.75"
+                          />
+                        </svg>
+                        Copy
                       </button>
                     </div>
                   </section>

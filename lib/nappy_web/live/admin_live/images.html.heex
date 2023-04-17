@@ -5,8 +5,8 @@
         <div class="flex relative overflow-hidden shadow ring-1 ring-black ring-opacity-5 md:rounded-lg">
           <Component.admin_sidebar_nav socket={@socket} path={@path} />
           <table
-            id="admin-clipboard-hook"
-            phx-hook="AdminClipboard"
+            id="hook-clipboard"
+            phx-hook="Clipboard"
             class="relative table-auto w-full divide-y divide-gray-300"
           >
             <thead id="multiselect-hook" phx-hook="Multiselect" class="bg-gray-50">
@@ -435,6 +435,7 @@
                             <div class="col-span-6 flex rounded-md shadow-sm">
                               <div
                                 for={"permalink-#{image.slug}"}
+                                value={Path.join(NappyWeb.Endpoint.url(), "photo/#{image.slug}")}
                                 class="copy-button cursor-pointer inline-flex items-center rounded-l-md border border-r-0 border-gray-300 bg-gray-50 px-3 text-gray-500 sm:text-sm"
                               >
                                 <!-- Heroicon name: outline/document-duplicate -->
@@ -457,7 +458,6 @@
                               </div>
                               <input
                                 class="block w-full flex-1 rounded-none rounded-r-md border-gray-300 px-3 focus:border-gray-500 focus:ring-gray-500 sm:text-sm"
-                                id={"permalink-#{image.slug}"}
                                 type="text"
                                 value={Path.join(NappyWeb.Endpoint.url(), "photo/#{image.slug}")}
                               />

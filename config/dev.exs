@@ -7,7 +7,6 @@ config :nappy, Nappy.Repo,
   hostname: "localhost",
   database: "nappy_dev",
   stacktrace: true,
-  log: false,
   show_sensitive_data_on_connection_error: true,
   pool_size: 10
 
