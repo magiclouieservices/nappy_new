@@ -49,7 +49,7 @@ defmodule NappyWeb.Components.ShareLinkComponent do
           <div
             x-on:click.stop
             x-trap.noscroll.inert="open"
-            class="relative max-w-2xl overflow-y-auto rounded-lg bg-white shadow-lg"
+            class="relative max-w-3xl overflow-y-auto rounded-lg bg-white shadow-lg"
           >
             <!-- close button -->
             <button
@@ -76,7 +76,7 @@ defmodule NappyWeb.Components.ShareLinkComponent do
             >
               <img
                 class="rounded-full w-24 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-900"
-                src={Accounts.avatar_url(@socket, @user.avatar_link)}
+                src={Accounts.avatar_url(@user.avatar_link)}
               />
             </a>
             <h2 class="text-3xl text-center px-12" x-bind:id="$id('modal-title')">
@@ -168,7 +168,7 @@ defmodule NappyWeb.Components.ShareLinkComponent do
                   </li>
                 </ul>
                 <!-- Panels -->
-                <div role="tabpanels" class="mt-4">
+                <div role="tabpanels" class="mt-4 px-6">
                   <!-- Panel -->
                   <section
                     :for={
@@ -188,12 +188,12 @@ defmodule NappyWeb.Components.ShareLinkComponent do
                     <div
                       id={"hook-clipboard-#{share_type}"}
                       phx-hook="Clipboard"
-                      class="mt-2 rounded border border-gray-200 flex justify-between p-2"
+                      class="mt-2 rounded border border-gray-200 flex gap-2 justify-between p-2"
                     >
                       <p><%= share_url %></p>
                       <button
                         value={share_url}
-                        class="copy-button bg-white px-2 py-.5 text-black font-bold rounded text-xs flex items-center justify-center border border-gray-300 hover:bg-black hover:text-white"
+                        class="copy-button bg-white px-2 py-.5 text-black font-bold rounded flex items-center justify-center border border-gray-300 hover:bg-black hover:text-white"
                       >
                         <!-- Heroicon name: outline/document-duplicate -->
                         <svg
@@ -202,7 +202,7 @@ defmodule NappyWeb.Components.ShareLinkComponent do
                           viewBox="0 0 24 24"
                           stroke-width="1.5"
                           stroke="currentColor"
-                          class="w-3 h-3 mr-1"
+                          class="w-4 h-4 mr-1"
                         >
                           <path
                             stroke-linecap="round"

@@ -65,6 +65,13 @@ defmodule NappyWeb.ImageLive.Show do
         sponsored_images = SponsoredImages.get_images(image.slug, image.tags)
         related_images = GalleryComponent.related_images(image.slug)
 
+        share_host = Nappy.nappy_host()
+        embed_host = Nappy.embed_host()
+        path = Path.join(["/", "photo", image.slug])
+        share_url = Catalog.image_url(share_host, path)
+        photo_link = Catalog.image_url(embed_host, path)
+        embed_url = Phoenix.HTML.html_escape(~s(<img src="#{photo_link}">))
+
         socket =
           socket
           |> assign(image: image)
@@ -74,6 +81,9 @@ defmodule NappyWeb.ImageLive.Show do
           |> assign(sponsored_images: sponsored_images)
           |> assign(related_images: related_images)
           |> assign(page_title: image.title)
+          |> assign(share_url: share_url)
+          |> assign(photo_link: photo_link)
+          |> assign(embed_url: embed_url)
 
         {:noreply, socket}
       end

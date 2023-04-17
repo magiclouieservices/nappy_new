@@ -124,7 +124,7 @@ defmodule NappyWeb.Components.GalleryComponent do
                   <img
                     loading="lazy"
                     class="object-cover w-full h-full rounded"
-                    src={Catalog.image_url(image)}
+                    src={Catalog.imgix_url(image, "photo")}
                     alt={image.title}
                   />
                 </a>
@@ -137,7 +137,7 @@ defmodule NappyWeb.Components.GalleryComponent do
                 >
                   <img
                     class="rounded-full w-9 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-900"
-                    src={Accounts.avatar_url(@socket, image.user.avatar_link)}
+                    src={Accounts.avatar_url(image.user.avatar_link)}
                   />
                   <span><%= image.user.username %></span>
                 </a>
@@ -195,7 +195,7 @@ defmodule NappyWeb.Components.GalleryComponent do
                         >
                           <img
                             class="rounded-full w-9 border"
-                            src={Accounts.avatar_url(@socket, image.user.avatar_link)}
+                            src={Accounts.avatar_url(image.user.avatar_link)}
                           />
                           <span><%= image.user.username %></span>
                         </a>
@@ -241,7 +241,7 @@ defmodule NappyWeb.Components.GalleryComponent do
                       <div class="my-4 flex justify-center">
                         <img
                           class="object-cover md:h-[75vh] sm:w-auto xs:h-auto xs:w-full"
-                          src={Catalog.image_url(image)}
+                          src={Catalog.imgix_url(image, "photo")}
                           alt={image.title}
                         />
                       </div>

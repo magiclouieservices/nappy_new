@@ -60,7 +60,7 @@
                   <img
                     loading="lazy"
                     class="object-cover w-full h-24"
-                    src={Catalog.image_url(coll.image, w: 280, auto: "format")}
+                    src={Catalog.imgix_url(coll.image, "photo", w: 280, auto: "format")}
                   />
                   <span class="absolute inset-0 flex gap-2 items-center justify-center bg-[rgba(0,0,0,.5)] text-white">
                     <i class="fa-regular fa-images"></i>
@@ -71,7 +71,7 @@
                 <img
                   loading="lazy"
                   class="bg-slate-300 object-cover w-1/3 h-24"
-                  src={Catalog.image_url(coll.image, w: 280, auto: "format")}
+                  src={Catalog.imgix_url(coll.image, "photo", w: 280, auto: "format")}
                 />
               <% end %>
             <% end %>

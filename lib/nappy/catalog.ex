@@ -324,27 +324,43 @@ defmodule Nappy.Catalog do
     end
   end
 
-  def image_url_by_id(uuid, opts \\ []) do
+  def image_url_by_id(uuid) do
     image = get_image!(uuid)
 
-    image_url(image, opts)
+    imgix_url(image, "photo")
   end
 
-  def image_url(%Images{} = image, opts \\ []) do
-    # http://localhost:4566/your-funny-bucket-name/you-weird-file-name
+  def imgix_url(%Images{} = image, type, query \\ nil) do
     ext = Metrics.get_image_extension(image.id) || "jpg"
-    base_url = Nappy.embed_url()
-    image_path = Nappy.image_paths()
     filename = "#{image.slug}.#{ext}"
-    path = Path.join([base_url, image_path, filename])
-    default_query = "auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2"
+    host = Nappy.image_src_host()
+    path = Path.join(["/", type, filename])
 
-    if opts !== [] do
-      imgix_query = URI.encode_query(opts)
-      "#{path}?#{imgix_query}"
-    else
-      "#{path}?#{default_query}"
-    end
+    query =
+      if query do
+        query
+      else
+        %{
+          auto: "compress",
+          cs: "tinysrgb",
+          w: 1260,
+          h: 750
+        }
+      end
+
+    image_url(host, path, URI.encode_query(query))
+  end
+
+  # def get_image_url(host, path \\ nil, query \\ %{}) do
+  def image_url(host, path \\ nil, query \\ nil) do
+    uri = %URI{
+      scheme: "https",
+      host: host,
+      path: path,
+      query: query
+    }
+
+    URI.to_string(uri)
 
     # <img
     #   srcset="https://assets.imgix.net/examples/bluehat.jpg?w=400&dpr=1 1x,

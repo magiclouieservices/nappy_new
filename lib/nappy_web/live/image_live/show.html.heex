@@ -4,10 +4,7 @@
       class="flex gap-2 rounded items-center focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 hover:underline"
       href={Routes.user_profile_show_path(@socket, :show, @image.user.username)}
     >
-      <img
-        class="rounded-full w-9 border"
-        src={Accounts.avatar_url(@socket, @image.user.avatar_link)}
-      />
+      <img class="rounded-full w-9 border" src={Accounts.avatar_url(@image.user.avatar_link)} />
       <span><%= @image.user.username %></span>
     </a>
 
@@ -22,9 +19,9 @@
         <.live_component
           module={ShareLinkComponent}
           user={@image.user}
-          share_url="https://nappy.co/photo/9"
-          photo_link="https://src.nappy.co/9"
-          embed_url={Phoenix.HTML.html_escape(~s(<img src="https://src.nappy.co/9">))}
+          share_url={@share_url}
+          photo_link={@photo_link}
+          embed_url={@embed_url}
           id="share-link"
         />
         <%= if @current_user != nil do %>
@@ -55,7 +52,7 @@
   <div class="my-4 flex justify-center">
     <img
       class="object-cover md:h-[75vh] xs:h-full"
-      src={Catalog.image_url(@image)}
+      src={Catalog.imgix_url(@image, "photo")}
       alt={@image.title}
     />
   </div>
