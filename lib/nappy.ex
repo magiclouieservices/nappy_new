@@ -11,10 +11,11 @@ defmodule Nappy do
 
   def default_title_suffix, do: " | Beautifully Diverse Stock Photos"
   def app_name, do: Application.get_env(:nappy, :runtime)[:app_name]
-  def embed_url, do: Application.get_env(:nappy, :runtime)[:embed_url]
+  def image_src_host, do: Application.get_env(:nappy, :runtime)[:image_src_host]
+  def nappy_host, do: Application.get_env(:nappy, :runtime)[:nappy_host]
+  def embed_host, do: Application.get_env(:nappy, :runtime)[:embed_host]
   def getty_api_key, do: Application.get_env(:nappy, :runtime)[:getty_api_key]
   def getty_api_secret, do: Application.get_env(:nappy, :runtime)[:getty_api_secret]
-  def image_paths, do: Application.get_env(:nappy, :runtime)[:image_path]
   def notifications_email, do: Application.get_env(:nappy, :runtime)[:notifications_email]
   def subscription_url, do: Application.get_env(:nappy, :runtime)[:subscription_url]
   def support_email, do: Application.get_env(:nappy, :runtime)[:support_email]

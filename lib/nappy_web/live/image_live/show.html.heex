@@ -4,10 +4,7 @@
       class="flex gap-2 rounded items-center focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 hover:underline"
       href={Routes.user_profile_show_path(@socket, :show, @image.user.username)}
     >
-      <img
-        class="rounded-full w-9 border"
-        src={Accounts.avatar_url(@socket, @image.user.avatar_link)}
-      />
+      <img class="rounded-full w-9 border" src={Accounts.avatar_url(@image.user.avatar_link)} />
       <span><%= @image.user.username %></span>
     </a>
 
@@ -19,12 +16,14 @@
         >
           <i class="fa-solid fa-circle-dollar-to-slot"></i>
         </button>
-        <button
-          type="button"
-          class="inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2"
-        >
-          <i class="fa-solid fa-reply fa-flip-horizontal"></i>
-        </button>
+        <.live_component
+          module={ShareLinkComponent}
+          user={@image.user}
+          share_url={Catalog.create_shareable_links("share_url", @image.slug)}
+          photo_link={Catalog.create_shareable_links("photo_link", @image.slug)}
+          embed_url={Catalog.create_shareable_links("embed_url", @image.slug)}
+          id="share-component"
+        />
         <%= if @current_user != nil do %>
           <button
             type="button"
@@ -53,7 +52,7 @@
   <div class="my-4 flex justify-center">
     <img
       class="object-cover md:h-[75vh] xs:h-full"
-      src={Catalog.image_url(@image)}
+      src={Catalog.imgix_url(@image, "photo")}
       alt={@image.title}
     />
   </div>

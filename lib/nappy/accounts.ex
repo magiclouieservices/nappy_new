@@ -11,6 +11,7 @@ defmodule Nappy.Accounts do
   alias Nappy.Accounts.UserNotifier
   alias Nappy.Accounts.UserToken
   alias Nappy.Admin.Slug
+  alias Nappy.Catalog
   alias Nappy.Repo
   alias NappyWeb.Router.Helpers, as: Routes
 
@@ -48,19 +49,35 @@ defmodule Nappy.Accounts do
     Repo.one(query)
   end
 
-  def avatar_url(conn_or_socket, avatar_link, opts \\ []) do
+  def avatar_url(avatar_link, query \\ nil) do
     if avatar_link do
-      base_url = Nappy.embed_url()
-      avatar_link = Path.join([base_url, "avatars", avatar_link])
+      host = Nappy.image_src_host()
+      path = Path.join(["/", "avatar", avatar_link])
 
-      if opts !== [] do
-        imgix_query = URI.encode_query(opts)
-        "#{avatar_link}?#{imgix_query}"
-      else
-        avatar_link
-      end
+      query =
+        if query do
+          %{
+            auto: "compress",
+            cs: "tinysrgb",
+            w: 1260,
+            h: 750
+          }
+          |> URI.encode_query()
+        else
+          query
+        end
+
+      Catalog.image_url(host, path, query)
     else
-      Routes.static_path(conn_or_socket, "/images/empty-avatar.jpeg")
+      host = Nappy.nappy_host()
+      path = Path.join(["/", "images", "empty-avatar.jpeg"])
+
+      %URI{
+        scheme: "https",
+        host: host,
+        path: path
+      }
+      |> URI.to_string()
     end
   end
 

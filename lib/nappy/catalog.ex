@@ -324,27 +324,83 @@ defmodule Nappy.Catalog do
     end
   end
 
-  def image_url_by_id(uuid, opts \\ []) do
+  def image_url_by_id(uuid) do
     image = get_image!(uuid)
 
-    image_url(image, opts)
+    imgix_url(image, "photo")
   end
 
-  def image_url(%Images{} = image, opts \\ []) do
-    # http://localhost:4566/your-funny-bucket-name/you-weird-file-name
-    ext = Metrics.get_image_extension(image.id) || "jpg"
-    base_url = Nappy.embed_url()
-    image_path = Nappy.image_paths()
-    filename = "#{image.slug}.#{ext}"
-    path = Path.join([base_url, image_path, filename])
-    default_query = "auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2"
+  def create_shareable_links("share_url", slug) do
+    share_host = Nappy.nappy_host()
+    path = Path.join(["/", "photo", slug])
+    image_url(share_host, path)
+  end
 
-    if opts !== [] do
-      imgix_query = URI.encode_query(opts)
-      "#{path}?#{imgix_query}"
-    else
-      "#{path}?#{default_query}"
-    end
+  def create_shareable_links("photo_link", slug) do
+    embed_host = Nappy.embed_host()
+    path = Path.join(["/", "photo", slug])
+    image_url(embed_host, path)
+  end
+
+  def create_shareable_links("embed_url", slug) do
+    embed_host = Nappy.embed_host()
+    path = Path.join(["/", "photo", slug])
+    photo_link = image_url(embed_host, path)
+    embed_url = Phoenix.HTML.html_escape(~s(<img src="#{photo_link}">))
+  end
+
+  def embed_url(slug, query \\ nil)
+
+  def embed_url("random", query) do
+    Images
+    |> order_by(fragment("RANDOM()"))
+    |> limit(1)
+    |> Repo.one()
+    |> imgix_url("photo", query)
+  end
+
+  def embed_url(slug, query) do
+    active = Metrics.get_image_status_id(:active)
+    featured = Metrics.get_image_status_id(:featured)
+
+    Images
+    |> where(slug: ^slug)
+    |> where([i], i.image_status_id in ^[active, featured])
+    |> limit(1)
+    |> Repo.one()
+    |> imgix_url("photo", query)
+  end
+
+  def imgix_url(%Images{} = image, type, query \\ nil) do
+    ext = Metrics.get_image_extension(image.id) || "jpg"
+    filename = "#{image.slug}.#{ext}"
+    host = Nappy.image_src_host()
+    path = Path.join(["/", type, filename])
+
+    query =
+      if query do
+        query
+      else
+        %{
+          auto: "compress",
+          cs: "tinysrgb",
+          w: 1260,
+          h: 750
+        }
+      end
+
+    image_url(host, path, URI.encode_query(query))
+  end
+
+  def image_url(host, path \\ nil, query \\ nil) do
+    uri = %URI{
+      scheme: "https",
+      host: host,
+      path: path,
+      query: query
+    }
+
+    URI.to_string(uri)
 
     # <img
     #   srcset="https://assets.imgix.net/examples/bluehat.jpg?w=400&dpr=1 1x,

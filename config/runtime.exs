@@ -33,8 +33,9 @@ config :nappy, :runtime,
   subscription_url: "https://email.boogie.co/subscribe",
   support_email: "support@nappy.co",
   notifications_email: "notifications@nappy.co",
-  embed_url: System.get_env("IMGIX_URL", "https://devnappy.imgix.net"),
-  image_path: System.get_env("WASABI_IMAGE_PATH", "nappy-prod/photos/")
+  image_src_host: System.get_env("IMAGE_SRC", "devnappy.imgix.net"),
+  nappy_host: System.get_env("NAPPY_DOMAIN", "dev.nappy.co"),
+  embed_host: System.get_env("NAPPY_EMBED_DOMAIN", "src-staging.nappy.co")
 
 config :ex_aws, :s3,
   access_key_id: System.get_env("WASABI_ACCESS_KEY_ID", "minio-root-user"),

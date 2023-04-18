@@ -32,8 +32,8 @@ defmodule NappyWeb.Components.RelatedImagesComponent do
             >
               <img
                 loading="lazy"
-                class="object-cover w-96 h-full"
-                src={Catalog.image_url(related_img)}
+                class="object-cover w-full h-full"
+                src={Catalog.imgix_url(related_img, "photo")}
                 alt={related_img.title}
               />
             </a>

@@ -65,7 +65,7 @@ defmodule NappyWeb.Components.HeaderSearchComponent do
                 <li class="flex gap-2 items-center border rounded py-1 px-2 text-sm">
                   <img
                     class="object-cover w-8 h-8 rounded-full"
-                    src={Catalog.image_url(image, w: 150, q: 0, cs: "tinysrgb", auto: "compress")}
+                    src={Catalog.imgix_url(image, "photo")}
                   />
                   <%= search_term %>
                 </li>

@@ -9,6 +9,7 @@ defmodule NappyWeb.ImageLive.Show do
   alias NappyWeb.Components.GalleryComponent
   alias NappyWeb.Components.MoreInfoComponent
   alias NappyWeb.Components.RelatedImagesComponent
+  alias NappyWeb.Components.ShareLinkComponent
   alias NappyWeb.Components.SponsoredImagesComponent
   alias Plug.Conn.Status
 
@@ -46,6 +47,12 @@ defmodule NappyWeb.ImageLive.Show do
       approved_image = image.image_status_id in [active, featured] || is_owner_or_admin
       path = Slug.slugify(image.title)
 
+      if connected?(socket) do
+        slug
+        |> Nappy.Metrics.get_image_analytics_by_slug()
+        |> Nappy.Metrics.increment_view_count()
+      end
+
       if title === "" && approved_image do
         image_show_path = Routes.image_show_path(socket, :show, "#{path}-#{slug}")
         {:noreply, push_redirect(socket, to: image_show_path)}
@@ -57,12 +64,6 @@ defmodule NappyWeb.ImageLive.Show do
         tags = Catalog.image_tags_as_list(image.tags, image.generated_tags)
         sponsored_images = SponsoredImages.get_images(image.slug, image.tags)
         related_images = GalleryComponent.related_images(image.slug)
-
-        if connected?(socket) do
-          slug
-          |> Nappy.Metrics.get_image_analytics_by_slug()
-          |> Nappy.Metrics.increment_view_count()
-        end
 
         socket =
           socket
