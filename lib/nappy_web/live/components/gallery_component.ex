@@ -4,6 +4,7 @@ defmodule NappyWeb.Components.GalleryComponent do
   alias Nappy.Catalog
   alias Nappy.Metrics
   alias Nappy.SponsoredImages
+  alias NappyWeb.Components.DownloadComponent
   alias NappyWeb.Components.MoreInfoComponent
   alias NappyWeb.Components.RelatedImagesComponent
   alias NappyWeb.Components.ShareLinkComponent
@@ -231,13 +232,10 @@ defmodule NappyWeb.Components.GalleryComponent do
                               <i class="fa-regular fa-heart"></i>
                             </a>
                           <% end %>
-                          <button
-                            type="button"
-                            class="inline-flex gap-2 justify-center items-center rounded-md bg-green-600 px-4 py-2 text-xs text-white shadow-sm focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2"
-                          >
-                            <span>Download</span>
-                            <i class="fa-solid fa-chevron-down"></i>
-                          </button>
+                          <.live_component
+                            module={DownloadComponent}
+                            id={"download-component-#{image.slug}"}
+                          />
                         </div>
                       </div>
 

@@ -21,6 +21,8 @@ defmodule NappyWeb.Router do
   scope "/", NappyWeb do
     pipe_through :browser
 
+    get "/download/:resolution", DownloadController, :download
+
     live "/popular-searches", PopularSearchesLive.Show, :show
 
     live "/why", CustomPageLive.Why, :why
