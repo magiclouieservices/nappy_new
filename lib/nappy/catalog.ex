@@ -330,6 +330,28 @@ defmodule Nappy.Catalog do
     imgix_url(image, "photo")
   end
 
+  def embed_url(slug, query \\ nil)
+
+  def embed_url("random", query) do
+    Images
+    |> order_by(fragment("RANDOM()"))
+    |> limit(1)
+    |> Repo.one()
+    |> imgix_url("photo", query)
+  end
+
+  def embed_url(slug, query) do
+    active = Metrics.get_image_status_id(:active)
+    featured = Metrics.get_image_status_id(:featured)
+
+    Images
+    |> where(slug: ^slug)
+    |> where([i], i.image_status_id in ^[active, featured])
+    |> limit(1)
+    |> Repo.one()
+    |> imgix_url("photo", query)
+  end
+
   def imgix_url(%Images{} = image, type, query \\ nil) do
     ext = Metrics.get_image_extension(image.id) || "jpg"
     filename = "#{image.slug}.#{ext}"
@@ -351,7 +373,6 @@ defmodule Nappy.Catalog do
     image_url(host, path, URI.encode_query(query))
   end
 
-  # def get_image_url(host, path \\ nil, query \\ %{}) do
   def image_url(host, path \\ nil, query \\ nil) do
     uri = %URI{
       scheme: "https",
