@@ -330,6 +330,25 @@ defmodule Nappy.Catalog do
     imgix_url(image, "photo")
   end
 
+  def create_shareable_links("share_url", slug) do
+    share_host = Nappy.nappy_host()
+    path = Path.join(["/", "photo", slug])
+    image_url(share_host, path)
+  end
+
+  def create_shareable_links("photo_link", slug) do
+    embed_host = Nappy.embed_host()
+    path = Path.join(["/", "photo", slug])
+    image_url(embed_host, path)
+  end
+
+  def create_shareable_links("embed_url", slug) do
+    embed_host = Nappy.embed_host()
+    path = Path.join(["/", "photo", slug])
+    photo_link = image_url(embed_host, path)
+    embed_url = Phoenix.HTML.html_escape(~s(<img src="#{photo_link}">))
+  end
+
   def embed_url(slug, query \\ nil)
 
   def embed_url("random", query) do

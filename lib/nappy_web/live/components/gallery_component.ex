@@ -7,6 +7,7 @@ defmodule NappyWeb.Components.GalleryComponent do
   alias NappyWeb.Components.MoreInfoComponent
   alias NappyWeb.Components.RelatedImagesComponent
   alias NappyWeb.Components.SponsoredImagesComponent
+  alias NappyWeb.Components.ShareLinkComponent
 
   @moduledoc false
 
@@ -207,12 +208,14 @@ defmodule NappyWeb.Components.GalleryComponent do
                           >
                             <i class="fa-solid fa-circle-dollar-to-slot"></i>
                           </button>
-                          <button
-                            type="button"
-                            class="inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2"
-                          >
-                            <i class="fa-solid fa-reply fa-flip-horizontal"></i>
-                          </button>
+                          <.live_component
+                            module={ShareLinkComponent}
+                            user={image.user}
+                            share_url={Catalog.create_shareable_links("share_url", image.slug)}
+                            photo_link={Catalog.create_shareable_links("photo_link", image.slug)}
+                            embed_url={Catalog.create_shareable_links("embed_url", image.slug)}
+                            id={"share-component-#{image.slug}"}
+                          />
                           <%= if @current_user != nil do %>
                             <button
                               type="button"

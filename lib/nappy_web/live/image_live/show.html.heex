@@ -19,10 +19,10 @@
         <.live_component
           module={ShareLinkComponent}
           user={@image.user}
-          share_url={@share_url}
-          photo_link={@photo_link}
-          embed_url={@embed_url}
-          id="share-link"
+          share_url={Catalog.create_shareable_links("share_url", @image.slug)}
+          photo_link={Catalog.create_shareable_links("photo_link", @image.slug)}
+          embed_url={Catalog.create_shareable_links("embed_url", @image.slug)}
+          id="share-component"
         />
         <%= if @current_user != nil do %>
           <button
