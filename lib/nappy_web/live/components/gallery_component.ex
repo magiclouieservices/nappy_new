@@ -6,8 +6,8 @@ defmodule NappyWeb.Components.GalleryComponent do
   alias Nappy.SponsoredImages
   alias NappyWeb.Components.MoreInfoComponent
   alias NappyWeb.Components.RelatedImagesComponent
-  alias NappyWeb.Components.SponsoredImagesComponent
   alias NappyWeb.Components.ShareLinkComponent
+  alias NappyWeb.Components.SponsoredImagesComponent
 
   @moduledoc false
 
