@@ -42,7 +42,7 @@
       <p>Thanks again for uploading your photo to Nappy.</p>
       <img
         :for={image <- @images}
-        src={Nappy.Catalog.image_url(image, w: 600)}
+        src={Nappy.Catalog.imgix_url(image, "photo", w: 600)}
         alt={image.title}
         style="display:block; max-width: 600px; margin:0 auto;"
       />

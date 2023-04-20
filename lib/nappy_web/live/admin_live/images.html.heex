@@ -180,7 +180,7 @@
                     <img
                       id={"modal-thumbnail-trigger-#{image.slug}"}
                       class="rounded w-12 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-900 mr-2"
-                      src={Catalog.image_url(image, w: 200)}
+                      src={Catalog.imgix_url(image, "photo", w: 200)}
                       alt={image.title}
                     />
                     <%= ellipsis(image.title) %>
@@ -267,7 +267,7 @@
                           <!-- end open in new tab button -->
                           <img
                             class="rounded max-w-[500px] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-900 mr-2"
-                            src={Catalog.image_url(image, w: 800)}
+                            src={Catalog.imgix_url(image, "photo", w: 800)}
                             alt={image.title}
                           />
                         </div>

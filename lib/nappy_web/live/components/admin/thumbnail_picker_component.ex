@@ -53,7 +53,7 @@ defmodule NappyWeb.Components.Admin.ThumbnailPickerComponent do
           <img
             loading="lazy"
             class="object-cover w-full h-full rounded"
-            src={Catalog.image_url(image, w: 650)}
+            src={Catalog.imgix_url(image, "photo", w: 650)}
             alt={image.title}
           />
           <span class="hidden rounded-full bg-green-700 absolute flex justify-center items-center w-12 h-12 p-1.5">

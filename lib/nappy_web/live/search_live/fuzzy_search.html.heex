@@ -13,7 +13,7 @@
 
   <div :for={image <- @images}>
     <span class="inline border rounded">
-      <img class="object-cover w-24" src={Catalog.image_url(image)} alt={image.title} />
+      <img class="object-cover w-24" src={Catalog.imgix_url(image, "photo")} alt={image.title} />
       <%= image.title %>
     </span>
   </div>

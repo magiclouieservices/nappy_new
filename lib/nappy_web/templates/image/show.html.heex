@@ -1,6 +1,6 @@
 <div class="container mx-auto">
   <%= if @status === "approved" do %>
-    <img class="w-48" src={Catalog.image_url(@image, w: 350, q: 0)} alt={@image.title} />
+    <img class="w-48" src={Catalog.imgix_url(@image, "photo", w: 350, q: 0)} alt={@image.title} />
 
     <h1>
       Title: <%= @image.title %>
