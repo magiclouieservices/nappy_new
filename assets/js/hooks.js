@@ -7,6 +7,7 @@ import Multiselect from "./hooks/multiselect"
 import MultiSelectTags from "./hooks/multi_select_tags"
 import ViewCount from "./hooks/view_count"
 import ThumbnailPicker from "./hooks/thumbnail_picker"
+import DownloadFile from './hooks/download_file'
 
 let Hooks = {
   Clipboard: Clipboard,
@@ -18,6 +19,7 @@ let Hooks = {
   MultiSelectTags: MultiSelectTags,
   ViewCount: ViewCount,
   ThumbnailPicker: ThumbnailPicker,
+  DownloadFile: DownloadFile,
 }
 
 export default Hooks;

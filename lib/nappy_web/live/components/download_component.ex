@@ -1,6 +1,9 @@
 defmodule NappyWeb.Components.DownloadComponent do
   use NappyWeb, :live_component
 
+  alias Nappy.Catalog
+  alias Nappy.Catalog.Images
+
   @moduledoc false
 
   @doc """
@@ -75,27 +78,45 @@ defmodule NappyWeb.Components.DownloadComponent do
           x-bind:id="$id('dropdown-button')"
           style="display: none;"
           class="mt-2 rounded-md bg-white shadow-md"
+          id="download-file-hook"
+          phx-hook="DownloadFile"
         >
-          <a
-            href={Routes.download_path(@socket, :download, "w=640&h=320")}
+          <button
+            id="download-small"
+            value={Catalog.imgix_url(@image, "photo", %{w: 320})}
             class="flex items-center gap-2 w-full first-of-type:rounded-t-md last-of-type:rounded-b-md px-4 py-2.5 text-left text-sm hover:bg-gray-50 disabled:text-gray-500"
           >
             Small
-          </a>
+          </button>
 
-          <a
-            href={Routes.download_path(@socket, :download, "w=1280h=720")}
+          <button
+            id="download-medium"
+            value={Catalog.imgix_url(@image, "photo", w: 600)}
             class="flex items-center gap-2 w-full first-of-type:rounded-t-md last-of-type:rounded-b-md px-4 py-2.5 text-left text-sm hover:bg-gray-50 disabled:text-gray-500"
           >
             Medium
-          </a>
+          </button>
 
-          <a
-            href={Routes.download_path(@socket, :download, "w=1920h=1080")}
+          <button
+            id="download-large"
+            value={Catalog.imgix_url(@image, "photo", w: 920)}
             class="flex items-center gap-2 w-full first-of-type:rounded-t-md last-of-type:rounded-b-md px-4 py-2.5 text-left text-sm hover:bg-gray-50 disabled:text-gray-500"
           >
             Large
-          </a>
+          </button>
+
+          <button
+            id="download-original"
+            value={
+              Catalog.imgix_url(@image, "photo",
+                w: @image.image_metadata.width,
+                h: @image.image_metadata.height
+              )
+            }
+            class="flex items-center gap-2 w-full first-of-type:rounded-t-md last-of-type:rounded-b-md px-4 py-2.5 text-left text-sm hover:bg-gray-50 disabled:text-gray-500"
+          >
+            Original
+          </button>
         </div>
       </div>
     </div>
