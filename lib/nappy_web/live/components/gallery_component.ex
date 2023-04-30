@@ -235,6 +235,7 @@ defmodule NappyWeb.Components.GalleryComponent do
                           <.live_component
                             module={DownloadComponent}
                             id={"download-component-#{image.slug}"}
+                            image={image}
                           />
                         </div>
                       </div>

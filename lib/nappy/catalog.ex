@@ -572,6 +572,28 @@ defmodule Nappy.Catalog do
     end)
   end
 
+  def list_scaled_images(width, height) do
+    resolution = fn scale ->
+      %{
+        "width" => round(width * scale),
+        "height" => round(height * scale)
+      }
+    end
+
+    if width < 1600 do
+      [
+        original: resolution.(1)
+      ]
+    else
+      [
+        small: resolution.(0.5),
+        medium: resolution.(0.65),
+        large: resolution.(0.8),
+        original: resolution.(1)
+      ]
+    end
+  end
+
   @doc """
   Updates a image.
 
@@ -815,7 +837,7 @@ defmodule Nappy.Catalog do
               f.path
           end
 
-        dest_path = "photos/#{slug}.#{ext}"
+        dest_path = "photo/#{slug}.#{ext}"
 
         params = %{
           category: params.category,

@@ -2,7 +2,6 @@ defmodule NappyWeb.Components.DownloadComponent do
   use NappyWeb, :live_component
 
   alias Nappy.Catalog
-  alias Nappy.Catalog.Images
 
   @moduledoc false
 
@@ -77,45 +76,27 @@ defmodule NappyWeb.Components.DownloadComponent do
           x-on:click.outside="close($refs.button)"
           x-bind:id="$id('dropdown-button')"
           style="display: none;"
-          class="mt-2 rounded-md bg-white shadow-md"
+          class="mt-2 rounded-md bg-white shadow-md absolute right-0 w-[150%]"
           id="download-file-hook"
           phx-hook="DownloadFile"
         >
           <button
-            id="download-small"
-            value={Catalog.imgix_url(@image, "photo", %{w: 320})}
-            class="flex items-center gap-2 w-full first-of-type:rounded-t-md last-of-type:rounded-b-md px-4 py-2.5 text-left text-sm hover:bg-gray-50 disabled:text-gray-500"
-          >
-            Small
-          </button>
-
-          <button
-            id="download-medium"
-            value={Catalog.imgix_url(@image, "photo", w: 600)}
-            class="flex items-center gap-2 w-full first-of-type:rounded-t-md last-of-type:rounded-b-md px-4 py-2.5 text-left text-sm hover:bg-gray-50 disabled:text-gray-500"
-          >
-            Medium
-          </button>
-
-          <button
-            id="download-large"
-            value={Catalog.imgix_url(@image, "photo", w: 920)}
-            class="flex items-center gap-2 w-full first-of-type:rounded-t-md last-of-type:rounded-b-md px-4 py-2.5 text-left text-sm hover:bg-gray-50 disabled:text-gray-500"
-          >
-            Large
-          </button>
-
-          <button
-            id="download-original"
-            value={
-              Catalog.imgix_url(@image, "photo",
-                w: @image.image_metadata.width,
-                h: @image.image_metadata.height
-              )
+            :for={
+              {scale, resolution} <-
+                Catalog.list_scaled_images(@image.image_metadata.width, @image.image_metadata.height)
             }
-            class="flex items-center gap-2 w-full first-of-type:rounded-t-md last-of-type:rounded-b-md px-4 py-2.5 text-left text-sm hover:bg-gray-50 disabled:text-gray-500"
+            id={"download-#{scale}"}
+            value={
+              Catalog.imgix_url(@image, "photo", %{w: resolution["width"], h: resolution["height"]})
+            }
+            class="flex items-center gap-2 first-of-type:rounded-t-md last-of-type:rounded-b-md px-4 py-2.5 text-left text-sm hover:bg-gray-50 disabled:text-gray-500 w-full"
           >
-            Original
+            <span>
+              <%= "#{scale}" %>
+            </span>
+            <span class="text-gray-400 text-xs">
+              <%= "#{resolution["width"]} x #{resolution["height"]}" %>
+            </span>
           </button>
         </div>
       </div>
