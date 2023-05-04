@@ -212,6 +212,7 @@ defmodule NappyWeb.Components.GalleryComponent do
                           <.live_component
                             module={ShareLinkComponent}
                             user={image.user}
+                            image_slug={image.slug}
                             share_url={Catalog.create_shareable_links("share_url", image.slug)}
                             photo_link={Catalog.create_shareable_links("photo_link", image.slug)}
                             embed_url={Catalog.create_shareable_links("embed_url", image.slug)}

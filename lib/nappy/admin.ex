@@ -26,6 +26,8 @@ defmodule Nappy.Admin do
     Repo.all(AdminSettings)
   end
 
+  def max_tag_count, do: hd(list_settings()).max_tag_count
+
   @doc """
   Gets a single settings.
 
