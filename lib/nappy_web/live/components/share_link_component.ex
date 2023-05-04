@@ -12,7 +12,7 @@ defmodule NappyWeb.Components.ShareLinkComponent do
 
     <.live_component
     module={ShareLinkComponent}
-    id="share-link"
+    id="share-component"
     />
   """
   def render(assigns) do

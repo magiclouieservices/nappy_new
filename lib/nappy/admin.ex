@@ -296,7 +296,7 @@ defmodule Nappy.Admin do
   end
 
   def generate_tags_and_description(%Images{} = image) do
-    image_url = Catalog.image_url(image)
+    image_url = Catalog.imgix_url(image, "photo")
 
     query_params = %{
       visualfeatures: "Categories,Adult,Tags,Description,Faces,Objects",

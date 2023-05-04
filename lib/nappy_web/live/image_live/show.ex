@@ -6,6 +6,7 @@ defmodule NappyWeb.ImageLive.Show do
   alias Nappy.Catalog
   alias Nappy.Metrics
   alias Nappy.SponsoredImages
+  alias NappyWeb.Components.DownloadComponent
   alias NappyWeb.Components.GalleryComponent
   alias NappyWeb.Components.MoreInfoComponent
   alias NappyWeb.Components.RelatedImagesComponent
