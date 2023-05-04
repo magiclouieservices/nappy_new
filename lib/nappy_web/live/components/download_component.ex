@@ -2,6 +2,7 @@ defmodule NappyWeb.Components.DownloadComponent do
   use NappyWeb, :live_component
 
   alias Nappy.Catalog
+  alias Nappy.Catalog.Images
 
   @moduledoc false
 
@@ -86,6 +87,7 @@ defmodule NappyWeb.Components.DownloadComponent do
                 Catalog.list_scaled_images(@image.image_metadata.width, @image.image_metadata.height)
             }
             id={"download-#{scale}"}
+            name={set_filename(@image, resolution["width"], resolution["height"])}
             value={
               Catalog.imgix_url(@image, "photo", %{w: resolution["width"], h: resolution["height"]})
             }
@@ -102,5 +104,12 @@ defmodule NappyWeb.Components.DownloadComponent do
       </div>
     </div>
     """
+  end
+
+  def set_filename(%Images{} = image, width, height) do
+    slug = image.slug
+    ext = image.image_metadata.extension_type
+
+    "#{slug}-#{width}x#{height}.#{ext}"
   end
 end
