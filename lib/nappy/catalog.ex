@@ -352,8 +352,12 @@ defmodule Nappy.Catalog do
   def embed_url(slug, query \\ nil)
 
   def embed_url("random", query) do
+    active = Metrics.get_image_status_id(:active)
+    featured = Metrics.get_image_status_id(:featured)
+
     Images
     |> order_by(fragment("RANDOM()"))
+    |> where([i], i.image_status_id in ^[active, featured])
     |> limit(1)
     |> Repo.one()
     |> imgix_url("photo", query)
