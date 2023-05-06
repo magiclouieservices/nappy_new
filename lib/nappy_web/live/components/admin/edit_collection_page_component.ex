@@ -508,7 +508,7 @@ defmodule NappyWeb.Components.Admin.EditCollectionPageComponent do
         <div
           x-show="open"
           style="display: none"
-          x-on:keydown.escape.prevent.stop="open = false"
+          x-on:keydown.escape={"open = false; window.resetTags('#{@collection_desc.related_tags}')"}
           role="dialog"
           aria-modal="true"
           x-id="['modal-title']"
@@ -521,8 +521,8 @@ defmodule NappyWeb.Components.Admin.EditCollectionPageComponent do
           <div
             x-show="open"
             x-transition
-            x-on:click="open = false"
-            class="close-modal relative flex min-h-screen items-center justify-center p-4"
+            x-on:click={"open = false; window.resetTags('#{@collection_desc.related_tags}')"}
+            class="relative flex min-h-screen items-center justify-center p-4"
           >
             <div
               x-on:click.stop
@@ -540,7 +540,6 @@ defmodule NappyWeb.Components.Admin.EditCollectionPageComponent do
                 value={@collection_desc.related_tags}
                 class="mt-1 appearance-none block w-full border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-gray-500 focus:border-gray-500 sm:text-sm"
               />
-              <input type="text" id="test" tabindex="0" />
               <!-- Buttons -->
               <div class="mt-8 flex space-x-2 justify-center">
                 <.form
@@ -563,9 +562,9 @@ defmodule NappyWeb.Components.Admin.EditCollectionPageComponent do
 
                 <button
                   type="button"
-                  x-on:click="open = false"
+                  x-on:click={"open = false; window.resetTags('#{@collection_desc.related_tags}')"}
                   value={@collection_desc.related_tags}
-                  class="close-modal rounded-md text-white bg-black hover:bg-gray-900 px-5 py-2.5"
+                  class="rounded-md text-white bg-black hover:bg-gray-900 px-5 py-2.5"
                 >
                   Cancel
                 </button>
