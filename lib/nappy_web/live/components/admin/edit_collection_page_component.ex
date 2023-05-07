@@ -87,6 +87,21 @@ defmodule NappyWeb.Components.Admin.EditCollectionPageComponent do
     {:noreply, push_navigate(socket, to: path)}
   end
 
+  @impl true
+  def handle_event(
+        "update_collection_description",
+        %{"slug" => slug, "description" => description},
+        socket
+      ) do
+    socket =
+      socket
+      |> put_flash(:info, "TODO update #{description} description")
+
+    path = Routes.collections_show_path(socket, :show, slug)
+
+    {:noreply, push_navigate(socket, to: path)}
+  end
+
   @doc """
   Add/update/delete button for a specific collection
   or categories page.
@@ -541,6 +556,27 @@ defmodule NappyWeb.Components.Admin.EditCollectionPageComponent do
               x-trap.noscroll.inert="open"
               class="relative w-full max-w-2xl overflow-y-auto rounded-xl bg-white p-12 shadow-lg"
             >
+              <div
+                x-on:click={"open = false; window.resetTags('#{@collection_desc.related_tags}')"}
+                class="absolute right-0 top-0 hidden pr-4 pt-4 sm:block"
+              >
+                <button
+                  type="button"
+                  class="rounded-md bg-white text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2"
+                >
+                  <span class="sr-only">Close</span>
+                  <svg
+                    class="h-6 w-6"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke-width="1.5"
+                    stroke="currentColor"
+                    aria-hidden="true"
+                  >
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
               <!-- Title -->
               <h2 class="text-xl font-tiempos-bold" x-bind:id="$id('modal-title')">
                 Set tags for "<%= @collection_desc.title %>"
@@ -616,7 +652,7 @@ defmodule NappyWeb.Components.Admin.EditCollectionPageComponent do
         <div
           x-show="open"
           style="display: none"
-          x-on:keydown.escape.prevent.stop="open = false"
+          x-on:keydown.escape.prevent.stop="open = false; document.getElementById('update-collection-description').reset()"
           role="dialog"
           aria-modal="true"
           x-id="['modal-title']"
@@ -629,7 +665,7 @@ defmodule NappyWeb.Components.Admin.EditCollectionPageComponent do
           <div
             x-show="open"
             x-transition
-            x-on:click="open = false"
+            x-on:click="open = false; document.getElementById('update-collection-description').reset()"
             class="relative flex min-h-screen items-center justify-center p-4"
           >
             <div
@@ -637,25 +673,64 @@ defmodule NappyWeb.Components.Admin.EditCollectionPageComponent do
               x-trap.noscroll.inert="open"
               class="relative w-full max-w-2xl overflow-y-auto rounded-xl bg-white p-12 shadow-lg"
             >
-              <!-- Title -->
-              <h2 class="text-3xl font-bold" x-bind:id="$id('modal-title')">Confirm</h2>
-              <!-- Content -->
-              <p class="mt-2 text-gray-600">
-                Are you sure you want to learn how to create an awesome modal?
-              </p>
-              <!-- Buttons -->
-              <div class="mt-8 flex space-x-2 justify-center">
+              <div
+                x-on:click="open = false; document.getElementById('update-collection-description').reset()"
+                class="absolute right-0 top-0 hidden pr-4 pt-4 sm:block"
+              >
                 <button
                   type="button"
-                  x-on:click="open = false"
-                  class="rounded-md border border-gray-200 bg-white px-5 py-2.5"
+                  class="rounded-md bg-white text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2"
                 >
-                  Confirm
+                  <span class="sr-only">Close</span>
+                  <svg
+                    class="h-6 w-6"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke-width="1.5"
+                    stroke="currentColor"
+                    aria-hidden="true"
+                  >
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                  </svg>
                 </button>
+              </div>
+              <!-- Title -->
+              <h2 class="text-xl font-bold" x-bind:id="$id('modal-title')">
+                Edit description
+              </h2>
+              <!-- Content -->
+              <textarea
+                rows="20"
+                cols="50"
+                form="update-collection-description"
+                name="description"
+                class="mt-1 appearance-none block w-full border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-gray-500 focus:border-gray-500 sm:text-sm"
+              >
+                <%= @collection_desc.description %>
+              </textarea>
+              <!-- Buttons -->
+              <div class="mt-8 flex space-x-2 justify-center">
+                <.form
+                  :let={_f}
+                  id="update-collection-description"
+                  phx-submit="update_collection_description"
+                  for={:update_collection_description}
+                  phx-target={@myself}
+                >
+                  <input type="hidden" name="slug" value={@slug} />
+                  <button
+                    phx-submit="update_collection_description"
+                    phx-target={@myself}
+                    type="submit"
+                    class="rounded-md border border-gray-200 bg-white hover:bg-gray-100 px-5 py-2.5"
+                  >
+                    Update
+                  </button>
+                </.form>
 
                 <button
                   type="button"
-                  x-on:click="open = false"
+                  x-on:click="open = false; document.getElementById('update-collection-description').reset()"
                   class="rounded-md text-white bg-black hover:bg-gray-900 px-5 py-2.5"
                 >
                   Cancel
