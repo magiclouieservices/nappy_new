@@ -8,6 +8,9 @@
     <span class="max-w-[32rem] text-4xl font-tiempos-bold text-center mb-2">
       <%= @category.name %>
     </span>
+    <span class="font-bold text-center mb-2">
+      Photos available in this category
+    </span>
     <.live_component
       :if={Accounts.is_admin(@current_user)}
       module={EditCategoryPageComponent}
@@ -18,6 +21,23 @@
     />
   </div>
 </div>
+<section class="container mx-auto pt-8 pb-4 flex xs:flex-col lg:flex-row justify-start items-center gap-4">
+  <span class="font-tiempos-bold text-lg">
+    Related tags
+  </span>
+  <ul class="flex gap-2 xs:flex-wrap justify-center">
+    <%= for related_tag <- @related_tags do %>
+      <a
+        target="_blank"
+        rel="nofollow noreferer noopener"
+        href={Routes.search_show_path(@socket, :show, related_tag)}
+        class="inline-flex items-center px-2 py-1 border border-gray-300 rounded-md text-gray-500 font-light text-sm bg-white hover:bg-black hover:underline hover:text-white focus:outline-none"
+      >
+        <li><%= Catalog.truncate_related_tags(related_tag) %></li>
+      </a>
+    <% end %>
+  </ul>
+</section>
 <section class="container mx-auto">
   <.live_component
     module={GalleryComponent}
@@ -27,6 +47,4 @@
     current_user={@current_user}
     current_url={@current_url}
   />
-
-  <.live_component module={RelatedTagsComponent} id="related-tags" related_tags={@related_tags} />
 </section>

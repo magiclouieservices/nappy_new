@@ -9,6 +9,7 @@ defmodule Nappy.Catalog.Category do
     field :is_enabled, :boolean, default: false
     field :name, :string
     field :slug, :string
+    field :related_tags, :string
     field :thumbnail, :binary_id
     has_many :images, Images
   end
@@ -19,6 +20,7 @@ defmodule Nappy.Catalog.Category do
     |> cast(attrs, [
       :name,
       :slug,
+      :related_tags,
       :thumbnail,
       :is_enabled
     ])

@@ -1280,4 +1280,12 @@ defmodule Nappy.Catalog do
       ) do
     CollectionDescription.changeset(collection_description, attrs)
   end
+
+  def truncate_related_tags(related_tag) do
+    if String.length(related_tag) > 13 do
+      String.slice(related_tag, 0..12) <> "..."
+    else
+      related_tag
+    end
+  end
 end

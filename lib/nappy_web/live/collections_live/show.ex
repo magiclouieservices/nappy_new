@@ -23,7 +23,9 @@ defmodule NappyWeb.CollectionsLive.Show do
         raise NappyWeb.FallbackController, Status.code(:not_found)
 
       _ ->
-        related_tags = Catalog.consolidate_tags_by_collection(slug)
+        related_tags =
+          coll_desc.related_tags
+          |> String.split(",", trim: true)
 
         socket =
           socket
