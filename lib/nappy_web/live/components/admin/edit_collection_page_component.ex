@@ -65,12 +65,24 @@ defmodule NappyWeb.Components.Admin.EditCollectionPageComponent do
   end
 
   @impl true
-  def handle_event("update_related_tags", %{"slug" => slug}, socket) do
+  def handle_event("update_related_tags", %{"slug" => slug, "input-tags" => related_tags}, socket) do
+    related_tags =
+      related_tags
+      |> Jason.decode!()
+      |> Enum.map_join(",", fn %{"value" => value} -> value end)
+
+    attrs = %{
+      slug: slug,
+      related_tags: related_tags
+    }
+
+    collection_description = Catalog.update_collection_description(attrs)
+
     socket =
       socket
-      |> put_flash(:info, "TODO update related tags")
+      |> put_flash(:info, "Succesfully updated the related tags")
 
-    path = Routes.collections_show_path(socket, :show, slug)
+    path = Routes.collections_show_path(socket, :show, collection_description.slug)
 
     {:noreply, push_navigate(socket, to: path)}
   end
@@ -538,6 +550,7 @@ defmodule NappyWeb.Components.Admin.EditCollectionPageComponent do
                 id={"input-tags-#{@collection_desc.slug}"}
                 name="input-tags"
                 value={@collection_desc.related_tags}
+                form="confirm-update-related_tags"
                 class="mt-1 appearance-none block w-full border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-gray-500 focus:border-gray-500 sm:text-sm"
               />
               <!-- Buttons -->
@@ -546,17 +559,16 @@ defmodule NappyWeb.Components.Admin.EditCollectionPageComponent do
                   :let={_f}
                   id="confirm-update-related_tags"
                   for={:confirm_update_related_tags}
-                  phx-submit="update_related_tags"
                   phx-target={@myself}
                 >
                   <input type="hidden" name="slug" value={@slug} />
                   <button
-                    phx-submit="update_related_tags"
+                    id="confirm-update-related_tags-button"
                     phx-target={@myself}
                     type="submit"
                     class="rounded-md border border-gray-200 bg-white hover:bg-gray-100 px-5 py-2.5"
                   >
-                    Confirm
+                    Update
                   </button>
                 </.form>
 
