@@ -53,6 +53,29 @@ defmodule NappyWeb.Components.Admin.EditCategoryPageComponent do
     {:noreply, push_navigate(socket, to: path)}
   end
 
+  @impl true
+  def handle_event("update_related_tags", %{"slug" => slug, "input-tags" => related_tags}, socket) do
+    related_tags =
+      related_tags
+      |> Jason.decode!()
+      |> Enum.map_join(",", fn %{"value" => value} -> value end)
+
+    attrs = %{
+      slug: slug,
+      related_tags: related_tags
+    }
+
+    category = Catalog.update_category(attrs)
+
+    socket =
+      socket
+      |> put_flash(:info, "Succesfully updated the related tags")
+
+    path = Routes.category_show_path(socket, :show, category.slug)
+
+    {:noreply, push_navigate(socket, to: path)}
+  end
+
   @doc """
   Add/update/delete button for a specific collection
   or categories page.
@@ -67,7 +90,7 @@ defmodule NappyWeb.Components.Admin.EditCategoryPageComponent do
   @impl true
   def render(assigns) do
     ~H"""
-    <div>
+    <div id="input-tags-hook" phx-hook="InputTags">
       <!-- Start edit button -->
       <div
         x-data={"{
@@ -344,6 +367,102 @@ defmodule NappyWeb.Components.Admin.EditCategoryPageComponent do
         </div>
       </div>
       <!-- End change thumbnail button -->
+
+      <!-- Start set related tags button -->
+      <div x-data="{ open: false }" class="text-black inline-flex justify-center">
+        <!-- Trigger -->
+        <button
+          x-on:click="open = true"
+          type="button"
+          class="inline-flex items-center gap-x-1.5 rounded-md bg-white px-2.5 py-1.5 text-sm font-semibold text-black shadow-sm hover:bg-gray-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-600"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke-width="1.5"
+            stroke="currentColor"
+            class="w-4 h-4"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              d="M9.568 3H5.25A2.25 2.25 0 003 5.25v4.318c0 .597.237 1.17.659 1.591l9.581 9.581c.699.699 1.78.872 2.607.33a18.095 18.095 0 005.223-5.223c.542-.827.369-1.908-.33-2.607L11.16 3.66A2.25 2.25 0 009.568 3z"
+            />
+            <path stroke-linecap="round" stroke-linejoin="round" d="M6 6h.008v.008H6V6z" />
+          </svg>
+          Set related tags
+        </button>
+        <!-- Modal -->
+        <div
+          x-show="open"
+          style="display: none"
+          x-on:keydown.escape={"open = false; window.resetTags('#{@category.related_tags}')"}
+          role="dialog"
+          aria-modal="true"
+          x-id="['modal-title']"
+          x-bind:aria-labelledby="$id('modal-title')"
+          class="fixed inset-0 z-10 overflow-y-auto"
+        >
+          <!-- Overlay -->
+          <div x-show="open" x-transition.opacity class="fixed inset-0 bg-black bg-opacity-50"></div>
+          <!-- Panel -->
+          <div
+            x-show="open"
+            x-transition
+            x-on:click={"open = false; window.resetTags('#{@category.related_tags}')"}
+            class="relative flex min-h-screen items-center justify-center p-4"
+          >
+            <div
+              x-on:click.stop
+              x-trap.noscroll.inert="open"
+              class="relative w-full max-w-2xl overflow-y-auto rounded-xl bg-white p-12 shadow-lg"
+            >
+              <!-- Title -->
+              <h2 class="text-xl font-tiempos-bold" x-bind:id="$id('modal-title')">
+                Set tags for "<%= @category.name %>"
+              </h2>
+              <!-- Content -->
+              <input
+                id={"input-tags-#{@category.slug}"}
+                name="input-tags"
+                value={@category.related_tags}
+                form="confirm-update-related_tags"
+                class="mt-1 appearance-none block w-full border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-gray-500 focus:border-gray-500 sm:text-sm"
+              />
+              <!-- Buttons -->
+              <div class="mt-8 flex space-x-2 justify-center">
+                <.form
+                  :let={_f}
+                  id="confirm-update-related_tags"
+                  for={:confirm_update_related_tags}
+                  phx-target={@myself}
+                >
+                  <input type="hidden" name="slug" value={@slug} />
+                  <button
+                    id="confirm-update-related_tags-button"
+                    phx-target={@myself}
+                    type="submit"
+                    class="rounded-md border border-gray-200 bg-white hover:bg-gray-100 px-5 py-2.5"
+                  >
+                    Update
+                  </button>
+                </.form>
+
+                <button
+                  type="button"
+                  x-on:click={"open = false; window.resetTags('#{@category.related_tags}')"}
+                  value={@category.related_tags}
+                  class="rounded-md text-white bg-black hover:bg-gray-900 px-5 py-2.5"
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- End set related tags button -->
     </div>
     """
   end

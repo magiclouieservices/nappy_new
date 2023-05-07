@@ -24,7 +24,7 @@
         href={Routes.search_show_path(@socket, :show, related_tag)}
         class="inline-flex items-center px-2 py-1 border border-gray-300 rounded-md text-gray-500 font-light text-sm bg-white hover:bg-black hover:underline hover:text-white focus:outline-none"
       >
-        <li><%= truncate_related_tags(related_tag) %></li>
+        <li><%= Catalog.truncate_related_tags(related_tag) %></li>
       </a>
     <% end %>
   </ul>

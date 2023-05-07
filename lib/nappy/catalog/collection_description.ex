@@ -11,6 +11,7 @@ defmodule Nappy.Catalog.CollectionDescription do
     field :is_enabled, :boolean, default: false
     field :title, :string
     field :slug, :string
+    field :related_tags, :string
     field :thumbnail, :binary_id
     belongs_to :user, User
 
@@ -37,6 +38,7 @@ defmodule Nappy.Catalog.CollectionDescription do
       :description,
       :is_enabled,
       :user_id,
+      :related_tags,
       :thumbnail
     ])
     |> validate_required([

@@ -7,7 +7,6 @@ defmodule NappyWeb.CategoryLive.Show do
   alias Nappy.SponsoredImages
   alias NappyWeb.Components.Admin.EditCategoryPageComponent
   alias NappyWeb.Components.GalleryComponent
-  alias NappyWeb.Components.RelatedTagsComponent
   alias Plug.Conn.Status
 
   @moduledoc false
@@ -21,7 +20,9 @@ defmodule NappyWeb.CategoryLive.Show do
         raise NappyWeb.FallbackController, Status.code(:not_found)
 
       _ ->
-        related_tags = Catalog.consolidate_tags_by_category(category.id)
+        related_tags =
+          category.related_tags
+          |> String.split(",", trim: true)
 
         socket =
           socket

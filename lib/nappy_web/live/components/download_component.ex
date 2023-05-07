@@ -78,7 +78,7 @@ defmodule NappyWeb.Components.DownloadComponent do
           x-bind:id="$id('dropdown-button')"
           style="display: none;"
           class="mt-2 rounded-md bg-white shadow-md absolute right-0 w-[150%]"
-          id="download-file-hook"
+          id={"download-file-hook-#{@image.slug}"}
           phx-hook="DownloadFile"
         >
           <button
@@ -86,7 +86,7 @@ defmodule NappyWeb.Components.DownloadComponent do
               {scale, resolution} <-
                 Catalog.list_scaled_images(@image.image_metadata.width, @image.image_metadata.height)
             }
-            id={"download-#{scale}"}
+            id={"download-#{scale}-#{@image.slug}"}
             name={set_filename(@image, resolution["width"], resolution["height"])}
             value={
               Catalog.imgix_url(@image, "photo", %{w: resolution["width"], h: resolution["height"]})

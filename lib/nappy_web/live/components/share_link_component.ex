@@ -186,7 +186,7 @@ defmodule NappyWeb.Components.ShareLinkComponent do
                   >
                     <h2 class="text-sm"><%= share_desc %></h2>
                     <div
-                      id={"hook-clipboard-#{share_type}"}
+                      id={"hook-clipboard-#{share_type}-#{@image_slug}"}
                       phx-hook="Clipboard"
                       class="mt-2 rounded border border-gray-200 flex gap-2 justify-between p-2"
                     >

@@ -2,12 +2,12 @@ defmodule NappyWeb.AdminLive.BulkUpload do
   use NappyWeb, :live_view
 
   alias Nappy.Accounts
+  alias Nappy.Admin
   alias Nappy.Catalog
   alias NappyWeb.Components.Admin.Component
   alias NappyWeb.Components.Admin.MultiTagSelect
 
   @admin_path "/admin"
-  @max_tag_count 19
 
   @impl true
   def mount(_params, session, socket) do
@@ -79,7 +79,7 @@ defmodule NappyWeb.AdminLive.BulkUpload do
   def handle_event("save", %{"category" => category, "title" => title}, socket) do
     tags =
       socket.assigns[:tags]
-      |> Enum.slice(0..@max_tag_count)
+      |> Enum.slice(0..Admin.max_tag_count())
       |> Enum.join(",")
 
     uploaded_files =
