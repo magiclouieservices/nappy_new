@@ -93,13 +93,28 @@ defmodule NappyWeb.Components.Admin.EditCollectionPageComponent do
         %{"slug" => slug, "description" => description},
         socket
       ) do
+    attrs = %{
+      slug: slug,
+      description: String.trim(description)
+    }
+
+    collection_description = Catalog.update_collection_description(attrs)
+
     socket =
       socket
-      |> put_flash(:info, "TODO update #{description} description")
+      |> put_flash(:info, "Succesfully updated description")
 
-    path = Routes.collections_show_path(socket, :show, slug)
+    path = Routes.collections_show_path(socket, :show, collection_description.slug)
 
     {:noreply, push_navigate(socket, to: path)}
+
+    # socket =
+    #   socket
+    #   |> put_flash(:info, "TODO update #{description} description")
+
+    # path = Routes.collections_show_path(socket, :show, slug)
+
+    # {:noreply, push_navigate(socket, to: path)}
   end
 
   @doc """
