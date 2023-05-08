@@ -37,6 +37,9 @@ defmodule Nappy.Accounts.UserNotifier do
 
         "featured" ->
           {"Your photo(s) is featured.", "featured_images.html"}
+
+        "pending" ->
+          {"Your photo is being reviewed by our curators 🙌🏾.", "pending_images.html"}
       end
 
     grouped_images

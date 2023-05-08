@@ -386,7 +386,6 @@ defmodule Nappy.Catalog do
         query
       else
         %{
-          auto: "compress",
           cs: "tinysrgb",
           w: 1260,
           h: 750
@@ -571,6 +570,13 @@ defmodule Nappy.Catalog do
       |> Ecto.build_assoc(:image_analytics, %{})
       |> ImageAnalytics.changeset(%{})
       |> Repo.insert()
+
+      created_image =
+        created_image
+        |> Repo.preload(:user)
+
+      %{created_image.user.username => [created_image]}
+      |> UserNotifier.notify_uploaded_images_to_users("pending")
 
       created_image
     end)

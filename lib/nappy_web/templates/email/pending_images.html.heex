@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <meta content="text/html; charset=utf-8" http-equiv="Content-Type" />
+    <%= csrf_meta_tag() %>
+    <title>
+      <%= Nappy.app_name() %>: <%= @title %>
+    </title>
+    <style media="all" rel="stylesheet" type="text/css">
+      /* Media Queries */
+      @media  only screen and (max-width: 500px) {
+          .button {
+              width: 100% !important;
+          }
+      }
+
+      .blackbtn{
+          padding:10px 20px;
+          color: #fff;
+          background-color: #000;
+          border-radius:20px;
+          text-decoration:none;
+          font-weight:bold;
+      }
+    </style>
+  </head>
+
+  <body style="background:#fff; font-size:15px; line-height:25px; font-family:Helvetica Neue, helvetica, arial;">
+    <!--header start-->
+    <div style="background:#fff; padding: 20px 10px; border-bottom: 1px solid #000; text-align:center;">
+      <a href={Routes.home_index_url(NappyWeb.Endpoint, :index)} target="_blank">
+        <img
+          src={Routes.static_url(NappyWeb.Endpoint, "/images/nappy-logo.png")}
+          style="width: 90px;"
+        />
+      </a>
+    </div>
+    <!--header start--><!--body start-->
+    <div style="width:80%; max-width:600px; margin:auto; padding: 20px;">
+      <p>Hey @<%= @username %>,</p>
+
+      <p>
+        Thanks for uploading your photo to Nappy 🙌🏾. It's now been sent to our curators for review.
+      </p>
+
+      <p>
+        As long as it meets our submission <a
+          href={Routes.custom_page_guidelines_path(NappyWeb.Endpoint, :guidelines)}
+          target="_blank"
+        >guidelines</a>, we'll approve it and publish it on the site.
+      </p>
+
+      <p>Hang tight, we'll let you know when it's approved</p>
+
+      <a
+        :for={image <- @images}
+        href={Routes.image_show_url(NappyWeb.Endpoint, :show, image.slug)}
+        style="display: flex;"
+      >
+        <img
+          src={Nappy.Catalog.imgix_url(image, "photo", w: 600)}
+          alt={image.title}
+          style="display:block; max-width: 600px; margin:0 auto;"
+        />
+      </a>
+
+      <p>- Nappy Crew</p>
+
+      <p style="font-size:13px; line-height: 20px; color:#333;">
+        <em>
+          Due to the amount of photo submissions we receive, we may not always be able to give an update on photos that were
+          <strong>not</strong>
+          approved.
+        </em>
+      </p>
+    </div>
+    <!--body end--><!--footer start-->
+    <div style="background:#fff; color: #333; padding: 20px 10px; text-align:center; font-family:Helvetica Neue, helvetica; font-size:13px; text-decoration:none;">
+      <hr style="width:300px; color:#333;" />
+      <!--<p><a href="https://nappy.co" target="_blank"><img src="https://nappy.co/public/img/Nappy.png" style="width: 90px; height: 30px;" /></a></p>-->
+      <p>
+        <a href={Routes.home_index_url(NappyWeb.Endpoint, :index)} target="_blank"><span style="color:#000000;">Website</span></a>&nbsp; | &nbsp;<a
+          href="/studio"
+          target="_blank"
+        ><span style="color:#000000;">Studio</span></a>&nbsp; | &nbsp;<a
+          href="https://www.instagram.com/nappystock"
+          target="_blank"
+        ><span style="color:#000000;">Instagram</span></a> &nbsp;| &nbsp;<a href="https://www.facebook.com/nappystock"><span style="color:#000000;">Facebook</span></a> &nbsp;| &nbsp;<a
+          href="https://www.twitter.com/nappystock"
+          target="_blank"
+        ><span style="color:#000000;">Twitter</span></a>
+      </p>
+    </div>
+    <!--footer end-->
+  </body>
+</html>
