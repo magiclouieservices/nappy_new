@@ -30,12 +30,15 @@ config :nappy, :runtime,
   app_name: "Nappy",
   getty_api_key: System.get_env("GETTY_API_KEY"),
   getty_api_secret: System.get_env("GETTY_API_SECRET"),
-  subscription_url: "https://email.boogie.co/subscribe",
   support_email: "support@nappy.co",
   notifications_email: "notifications@nappy.co",
   image_src_host: System.get_env("IMAGE_SRC", "devnappy.imgix.net"),
   nappy_host: System.get_env("NAPPY_DOMAIN", "dev.nappy.co"),
-  embed_host: System.get_env("NAPPY_EMBED_DOMAIN", "src-staging.nappy.co")
+  embed_host: System.get_env("NAPPY_EMBED_DOMAIN", "src-staging.nappy.co"),
+  subscription_host: System.get_env("SUBSCRIPTION_HOST"),
+  sendy_api_key: System.get_env("SENDY_API_KEY"),
+  sendy_members_list: System.get_env("SENDY_MEMBERS_LIST"),
+  sendy_photographers_list: System.get_env("SENDY_PHOTOGRAPHERS_LIST")
 
 config :ex_aws, :s3,
   access_key_id: System.get_env("WASABI_ACCESS_KEY_ID", "minio-root-user"),

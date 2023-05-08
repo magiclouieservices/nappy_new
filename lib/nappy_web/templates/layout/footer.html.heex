@@ -43,7 +43,7 @@
   </div>
   <div class="xs:col-span-3 md:col-span-1">
     <p class="xs:text-center md:text-left text-lg font-semibold">Stay in the know</p>
-    <.form for={:newsletter} action={Nappy.subscription_url()} class="space-y-6">
+    <.form for={:newsletter} action={Nappy.subscription_url("subscribe")} class="space-y-6">
       <div class="mt-1">
         <%= text_input(:newsletter, :username,
           required: true,

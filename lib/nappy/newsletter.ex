@@ -6,7 +6,9 @@ defmodule Nappy.Newsletter do
   import Ecto.Query, warn: false
   alias Nappy.Repo
 
-  alias Nappy.Newsletter.{Referrer, Subscriber}
+  alias Nappy.Accounts.User
+  alias Nappy.Newsletter.Referrer
+  alias Nappy.Newsletter.Subscriber
 
   @doc """
   Returns the list of subscribers.
@@ -46,6 +48,14 @@ defmodule Nappy.Newsletter do
   """
   def get_subscriber!(id), do: Repo.get!(Subscriber, id)
 
+  def get_subscriber_by_username(username) do
+    User
+    |> where(username: ^username)
+    |> preload(:subscriber)
+    |> Repo.one()
+    |> Map.get(:subscriber)
+  end
+
   @doc """
   Creates a subscriber.
 
@@ -62,6 +72,66 @@ defmodule Nappy.Newsletter do
     %Subscriber{}
     |> Subscriber.changeset(attrs)
     |> Repo.insert()
+  end
+
+  def get_active_subscriber_count(list_id) do
+    options = [
+      form: [
+        api_key: Nappy.sendy_api_key(),
+        list_id: list_id
+      ]
+    ]
+
+    url = Nappy.subscription_url("api/subscribers/active-subscriber-count.php")
+    %Req.Response{status: 200, body: body} = Req.post!(url, options)
+
+    case Integer.parse(body) do
+      {count, _} -> count
+      :error -> 0
+    end
+  end
+
+  def subscribe_newsletter(username, email, list_id) do
+    options = [
+      form: [
+        api_key: Nappy.sendy_api_key(),
+        list: list_id,
+        name: username,
+        email: email,
+        boolean: true
+      ]
+    ]
+
+    url = Nappy.subscription_url("subscribe")
+    Req.post!(url, options)
+  end
+
+  def unsubscribe_newsletter(email, list_id) do
+    options = [
+      form: [
+        api_key: Nappy.sendy_api_key(),
+        list: list_id,
+        email: email,
+        boolean: true
+      ]
+    ]
+
+    url = Nappy.subscription_url("unsubscribe")
+    Req.post!(url, options)
+  end
+
+  def delete_subscriber(email, list_id) do
+    options = [
+      form: [
+        api_key: Nappy.sendy_api_key(),
+        list_id: list_id,
+        email: email,
+        boolean: true
+      ]
+    ]
+
+    url = Nappy.subscription_url("api/subscribers/delete.php")
+    Req.post!(url, options)
   end
 
   @doc """

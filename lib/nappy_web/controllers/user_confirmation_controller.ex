@@ -2,6 +2,7 @@ defmodule NappyWeb.UserConfirmationController do
   use NappyWeb, :controller
 
   alias Nappy.Accounts
+  alias Nappy.Newsletter
 
   def new(conn, _params) do
     render(conn, "new.html")
@@ -32,7 +33,17 @@ defmodule NappyWeb.UserConfirmationController do
   # leaked token giving the user access to the account.
   def update(conn, %{"token" => token}) do
     case Accounts.confirm_user(token) do
-      {:ok, _} ->
+      {:ok, user} ->
+        referrer_id = Newsletter.get_referrer_id("nappy website")
+
+        attrs = %{
+          referrer_id: referrer_id,
+          user_id: user.id
+        }
+
+        Newsletter.create_subscriber(attrs)
+        Newsletter.subscribe_newsletter(user.username, user.email, Nappy.sendy_members_list())
+
         conn
         |> put_flash(:info, "User confirmed successfully.")
         |> redirect(to: "/")
