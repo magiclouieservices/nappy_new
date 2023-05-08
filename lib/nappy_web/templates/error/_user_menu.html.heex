@@ -240,7 +240,7 @@
     <li>
       <%= if @current_user != nil do %>
         <%= link("Submit",
-          to: Routes.upload_path(@conn, :new),
+          to: Routes.upload_new_path(@conn, :new),
           class:
             "inline-flex items-center px-6 py-2 border border-gray-900 rounded-md text-gray-900 bg-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-900"
         ) %>

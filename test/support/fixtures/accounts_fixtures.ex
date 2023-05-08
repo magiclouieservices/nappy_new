@@ -1,6 +1,4 @@
 defmodule Nappy.AccountsFixtures do
-  alias Nappy.Repo
-
   @moduledoc """
   This module defines test helpers for creating
   entities via the `Nappy.Accounts` context.
