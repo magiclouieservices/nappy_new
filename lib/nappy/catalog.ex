@@ -386,7 +386,6 @@ defmodule Nappy.Catalog do
         query
       else
         %{
-          auto: "compress",
           cs: "tinysrgb",
           w: 1260,
           h: 750
