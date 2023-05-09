@@ -11,7 +11,8 @@ defmodule NappyWeb.Endpoint do
   @session_options [
     store: :cookie,
     key: "_nappy_key",
-    signing_salt: "oeGN24SC"
+    signing_salt: "oeGN24SC",
+    same_site: "Secure"
   ]
 
   socket "/live",

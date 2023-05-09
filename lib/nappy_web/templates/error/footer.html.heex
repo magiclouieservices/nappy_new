@@ -38,7 +38,7 @@
   </div>
   <div class="">
     <p class="text-lg font-semibold">Stay in the know</p>
-    <.form for={:newsletter} action={Nappy.subscription_url()} class="space-y-6">
+    <.form for={:newsletter} action={Nappy.subscription_url("subscribe")} class="space-y-6">
       <div>
         <div class="mt-1">
           <%= text_input(:newsletter, :username,

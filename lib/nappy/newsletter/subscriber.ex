@@ -23,7 +23,6 @@ defmodule Nappy.Newsletter.Subscriber do
       :user_id
     ])
     |> validate_required([
-      :is_photographer,
       :referrer_id,
       :user_id
     ])

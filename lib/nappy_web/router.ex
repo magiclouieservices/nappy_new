@@ -21,6 +21,10 @@ defmodule NappyWeb.Router do
   scope "/", NappyWeb do
     pipe_through :browser
 
+    # usage: Sendy "Webform" placed at footer
+    get "/confirm-newsletter", SubscriberController, :confirm
+    get "/thankyou", SubscriberController, :confirmed
+
     live "/popular-searches", PopularSearchesLive.Show, :show
 
     live "/why", CustomPageLive.Why, :why

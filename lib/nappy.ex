@@ -17,9 +17,26 @@ defmodule Nappy do
   def getty_api_key, do: Application.get_env(:nappy, :runtime)[:getty_api_key]
   def getty_api_secret, do: Application.get_env(:nappy, :runtime)[:getty_api_secret]
   def notifications_email, do: Application.get_env(:nappy, :runtime)[:notifications_email]
-  def subscription_url, do: Application.get_env(:nappy, :runtime)[:subscription_url]
   def support_email, do: Application.get_env(:nappy, :runtime)[:support_email]
+  def sendy_api_key, do: Application.get_env(:nappy, :runtime)[:sendy_api_key]
+  def sendy_members_list, do: Application.get_env(:nappy, :runtime)[:sendy_members_list]
+  def sendy_webform_list, do: Application.get_env(:nappy, :runtime)[:sendy_webform_list]
+
+  def sendy_photographers_list,
+    do: Application.get_env(:nappy, :runtime)[:sendy_photographers_list]
+
   def bucket_name, do: Application.get_env(:ex_aws, :s3)[:bucket_name]
+
+  def subscription_url(path) do
+    host = Application.get_env(:nappy, :runtime)[:subscription_host]
+
+    %URI{
+      host: host,
+      path: Path.join(["/", path]),
+      scheme: "https"
+    }
+    |> URI.to_string()
+  end
 
   def cache_name, do: :nappy_cache
 

@@ -2,6 +2,7 @@ defmodule Nappy.Accounts.UserNotifier do
   import Swoosh.Email
 
   alias Nappy.Mailer
+  alias Nappy.Newsletter
 
   @moduledoc """
   Mail notification for users.
@@ -45,6 +46,7 @@ defmodule Nappy.Accounts.UserNotifier do
     grouped_images
     |> Enum.each(fn {username, images} ->
       email = hd(images).user.email
+      name = hd(images).user.name
 
       assigns = [
         username: username,
@@ -53,6 +55,13 @@ defmodule Nappy.Accounts.UserNotifier do
       ]
 
       html_body = compose_html_body(template, assigns)
+
+      subscriber = Newsletter.get_subscriber_by_username(username)
+
+      if status === "approved" && not subscriber.is_photographer do
+        Newsletter.update_subscriber(subscriber, %{is_photographer: true})
+        Newsletter.subscribe_newsletter(name, email, Nappy.sendy_photographers_list())
+      end
 
       deliver(email, assigns[:title], html_body)
     end)
