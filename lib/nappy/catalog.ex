@@ -346,7 +346,7 @@ defmodule Nappy.Catalog do
     embed_host = Nappy.embed_host()
     path = Path.join(["/", "photo", slug])
     photo_link = image_url(embed_host, path)
-    embed_url = Phoenix.HTML.html_escape(~s(<img src="#{photo_link}">))
+    Phoenix.HTML.html_escape(~s(<img src="#{photo_link}">))
   end
 
   def embed_url(slug, query \\ nil)
@@ -387,6 +387,7 @@ defmodule Nappy.Catalog do
       else
         %{
           cs: "tinysrgb",
+          fm: "avif",
           w: 1260,
           h: 750
         }
@@ -580,6 +581,16 @@ defmodule Nappy.Catalog do
 
       created_image
     end)
+  end
+
+  def zoomed_image(%Images{} = image, "w") do
+    width = image.image_metadata.width
+    round(width * 0.45)
+  end
+
+  def zoomed_image(%Images{} = image, "h") do
+    height = image.image_metadata.height
+    round(height * 0.45)
   end
 
   def list_scaled_images(width, height) do

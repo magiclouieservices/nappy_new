@@ -22,7 +22,7 @@ defmodule NappyWeb.Components.RelatedImagesComponent do
       <div class="flex gap-2 my-2">
         <div
           :for={{related_img, index_pos} <- Enum.with_index(@related_images)}
-          class={"#{hide_extra_on_mobile(index_pos)} bg-slate-300 h-48 md:w-96 xs:w-auto"}
+          class={"#{hide_extra_on_mobile(index_pos)} bg-slate-300 h-48 md:w-96 xs:w-auto rounded"}
         >
           <%= unless related_img === "#" do %>
             <a
@@ -32,7 +32,7 @@ defmodule NappyWeb.Components.RelatedImagesComponent do
             >
               <img
                 loading="lazy"
-                class="object-cover w-full h-full"
+                class="object-cover w-full h-full rounded"
                 src={Catalog.imgix_url(related_img, "photo")}
                 alt={related_img.title}
               />

@@ -48,6 +48,31 @@ let liveSocket = new LiveSocket("/live", Socket, {
   }
 })
 
+window.zoom = function (e) {
+  var zoomer = e.currentTarget;
+  e.offsetX ? offsetX = e.offsetX : offsetX = e.pageX
+  e.offsetY ? offsetY = e.offsetY : offsetX = e.pageX
+  x = offsetX/zoomer.offsetWidth*100
+  y = offsetY/zoomer.offsetHeight*100
+  zoomer.style.backgroundPosition = x + '% ' + y + '%';
+}
+
+window.toggleFullscreen = function (selector) {
+  const elem = document.querySelector(selector)
+  let parentElement = elem.parentElement
+
+  if (parentElement.classList.contains("hover:cursor-zoom-in")) {
+    parentElement.classList.replace("hover:cursor-zoom-in", "hover:cursor-zoom-out")
+    parentElement.removeAttribute("onmousemove")
+  } else {
+    parentElement.classList.replace("hover:cursor-zoom-out", "hover:cursor-zoom-in")
+    parentElement.setAttribute("onmousemove", "window.zoom(event)")
+  }
+
+  elem.nextElementSibling.classList.toggle("hidden")
+  elem.classList.toggle("hidden")
+}
+
 window.reset_tags = function (tagify, tags) {
   tagify.loadOriginalValues(tags)
 }

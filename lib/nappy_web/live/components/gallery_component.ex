@@ -242,11 +242,31 @@ defmodule NappyWeb.Components.GalleryComponent do
                       </div>
 
                       <div class="my-4 flex justify-center">
-                        <img
-                          class="object-cover md:h-[75vh] sm:w-auto xs:h-auto xs:w-full"
-                          src={Catalog.imgix_url(image, "photo")}
-                          alt={image.title}
-                        />
+                        <figure
+                          class="zoom relative overflow-hidden hover:cursor-zoom-in rounded"
+                          onclick="window.toggleFullscreen('#fullscreen-img')"
+                          onmousemove="window.zoom(event)"
+                          style={"background-image: url(#{Catalog.imgix_url(image, "photo", w: Catalog.zoomed_image(image, "w"), h: Catalog.zoomed_image(image, "h"), cs: "tinysrgb", fm: "avif")})"}
+                        >
+                          <img
+                            alt={image.title}
+                            id="fullscreen-img"
+                            class="hover:opacity-0 block transition-opacity duration-300 md:h-[75vh] xs:h-full"
+                            src={Catalog.imgix_url(image, "photo")}
+                          />
+                          <img
+                            class="hidden block w-full"
+                            src={
+                              Catalog.imgix_url(image, "photo",
+                                w: Catalog.zoomed_image(image, "w"),
+                                h: Catalog.zoomed_image(image, "h"),
+                                auto: "compress",
+                                cs: "strip",
+                                fm: "avif"
+                              )
+                            }
+                          />
+                        </figure>
                       </div>
 
                       <div class="flex md:gap-8 sm:gap-4 xs:gap-2 sm:justify-center xs:justify-between">
