@@ -48,6 +48,31 @@ let liveSocket = new LiveSocket("/live", Socket, {
   }
 })
 
+window.zoom = function (e) {
+    var zoomer = e.currentTarget;
+    e.offsetX ? offsetX = e.offsetX : offsetX = e.touches[0].pageX
+    e.offsetY ? offsetY = e.offsetY : offsetX = e.touches[0].pageX
+    x = offsetX/zoomer.offsetWidth*100
+    y = offsetY/zoomer.offsetHeight*100
+    zoomer.style.backgroundPosition = x + '% ' + y + '%';
+}
+
+window.toggleFullscreen = function (elem) {
+  document.querySelector(elem).addEventListener('click', (e) =>{
+      e.preventDefault();
+      [
+          "toggle-height",
+          "toggle-fullscreen",
+          "zoom-in",
+          "zoom-out"
+      ].forEach(x => document.querySelector(elem).classList.toggle(x))
+
+      ["fa-expand-alt", "fa-compress-alt"].forEach(x => {
+          document.querySelector("#toggle-icon").classList.toggle(x)
+      })
+  })
+}
+
 window.reset_tags = function (tagify, tags) {
   tagify.loadOriginalValues(tags)
 }

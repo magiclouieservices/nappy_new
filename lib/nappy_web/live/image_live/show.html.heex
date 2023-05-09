@@ -45,11 +45,19 @@
     </div>
   </div>
   <div class="my-4 flex justify-center">
-    <img
-      class="object-cover md:h-[75vh] xs:h-full"
-      src={Catalog.imgix_url(@image, "photo")}
-      alt={@image.title}
-    />
+    <figure
+      class="zoom relative md:h-[75vh] xs:h-full overflow-hidden hover:cursor-zoom-in"
+      onclick="window.toggleFullscreen('#fullscreen-img')"
+      onmousemove="window.zoom(event)"
+      style={"background-image: url(#{Catalog.imgix_url(@image, "photo", w: Catalog.zoomed_image(@image, "w"), h: Catalog.zoomed_image(@image, "h"))})"}
+    >
+      <img
+        alt={@image.title}
+        id="fullscreen-img"
+        class="hover:opacity-0 block w-full transition-opacity duration-300"
+        src={Catalog.imgix_url(@image, "photo")}
+      />
+    </figure>
   </div>
 
   <div class="my-8 flex gap-8 justify-center">

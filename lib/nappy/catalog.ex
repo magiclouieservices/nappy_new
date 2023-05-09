@@ -582,6 +582,16 @@ defmodule Nappy.Catalog do
     end)
   end
 
+  def zoomed_image(%Images{} = image, "w") do
+    width = image.image_metadata.width
+    round(width * 0.8)
+  end
+
+  def zoomed_image(%Images{} = image, "h") do
+    height = image.image_metadata.height
+    round(height * 0.8)
+  end
+
   def list_scaled_images(width, height) do
     resolution = fn scale ->
       %{
