@@ -97,8 +97,7 @@ defmodule Nappy.Newsletter do
         api_key: Nappy.sendy_api_key(),
         list: list_id,
         name: username,
-        email: email,
-        boolean: true
+        email: email
       ]
     ]
 

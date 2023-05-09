@@ -38,7 +38,8 @@ config :nappy, :runtime,
   subscription_host: System.get_env("SUBSCRIPTION_HOST"),
   sendy_api_key: System.get_env("SENDY_API_KEY"),
   sendy_members_list: System.get_env("SENDY_MEMBERS_LIST"),
-  sendy_photographers_list: System.get_env("SENDY_PHOTOGRAPHERS_LIST")
+  sendy_photographers_list: System.get_env("SENDY_PHOTOGRAPHERS_LIST"),
+  sendy_webform_list: System.get_env("SENDY_WEBFORM_LIST")
 
 config :ex_aws, :s3,
   access_key_id: System.get_env("WASABI_ACCESS_KEY_ID", "minio-root-user"),

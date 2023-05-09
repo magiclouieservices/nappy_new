@@ -20,6 +20,7 @@ defmodule Nappy do
   def support_email, do: Application.get_env(:nappy, :runtime)[:support_email]
   def sendy_api_key, do: Application.get_env(:nappy, :runtime)[:sendy_api_key]
   def sendy_members_list, do: Application.get_env(:nappy, :runtime)[:sendy_members_list]
+  def sendy_webform_list, do: Application.get_env(:nappy, :runtime)[:sendy_webform_list]
 
   def sendy_photographers_list,
     do: Application.get_env(:nappy, :runtime)[:sendy_photographers_list]
