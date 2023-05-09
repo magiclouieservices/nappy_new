@@ -89,7 +89,11 @@ defmodule NappyWeb.Components.DownloadComponent do
             id={"download-#{scale}-#{@image.slug}"}
             name={set_filename(@image, resolution["width"], resolution["height"])}
             value={
-              Catalog.imgix_url(@image, "photo", %{w: resolution["width"], h: resolution["height"]})
+              Catalog.imgix_url(@image, "photo",
+                w: resolution["width"],
+                h: resolution["height"],
+                fm: "avif"
+              )
             }
             class="flex items-center gap-2 first-of-type:rounded-t-md last-of-type:rounded-b-md px-4 py-2.5 text-left text-sm hover:bg-gray-50 disabled:text-gray-500 w-full"
           >

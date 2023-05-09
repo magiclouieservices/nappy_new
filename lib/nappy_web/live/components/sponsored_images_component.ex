@@ -22,7 +22,7 @@ defmodule NappyWeb.Components.SponsoredImagesComponent do
       <div class="flex gap-2 xs:my-6 md:my-2">
         <div
           :for={{sponsored_img, index_pos} <- Enum.with_index(@sponsored_images)}
-          class={"#{hide_extra_on_mobile(index_pos)} bg-slate-300 h-48 md:w-96 xs:w-auto"}
+          class={"#{hide_extra_on_mobile(index_pos)} bg-slate-300 h-48 md:w-96 xs:w-auto rounded"}
         >
           <%= unless sponsored_img === "#" do %>
             <a
@@ -43,7 +43,7 @@ defmodule NappyWeb.Components.SponsoredImagesComponent do
               <% else %>
                 <img
                   loading="lazy"
-                  class="object-cover w-full h-full"
+                  class="object-cover w-full h-full rounded"
                   src={sponsored_img["image_src"]}
                   alt={sponsored_img["image_alt"]}
                 />
