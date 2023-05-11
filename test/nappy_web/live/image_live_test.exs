@@ -27,15 +27,15 @@ defmodule NappyWeb.ImageLiveTest do
       {:ok, _count} = Cachex.clear(Nappy.cache_name())
     end)
 
-    CatalogFixtures.image_fixture(%{}, :featured)
+    image = CatalogFixtures.image_fixture(%{}, :featured)
 
-    :ok
+    %{image: image}
   end
 
   describe "live(/photo/:slug, ImageLive.Show, :show)" do
-    test "success: visits an existing image page", %{conn: conn} do
+    test "success: visits an existing image page", %{conn: conn, image: image} do
       assert {:ok, index_live, _html} =
-               live(conn, Routes.image_show_path(conn, :show, "some-title-test_slug"))
+               live(conn, Routes.image_show_path(conn, :show, Nappy.slug_link(image)))
 
       # only 1 span[x-id] is using in a specific image page:
       # and it's "more-info" button
@@ -46,7 +46,7 @@ defmodule NappyWeb.ImageLiveTest do
       assert {:error, {:live_redirect, %{flash: %{}, to: path}}} =
                live(conn, Routes.image_show_path(conn, :show, "test_slug"))
 
-      assert {:ok, _, _} = live(conn, Routes.image_show_path(conn, :show, path))
+      assert {:ok, _, _} = live(conn, Routes.image_show_path(conn, :show, URI.decode(path)))
     end
 
     test "error: visits a non-existing image page", %{conn: conn} do

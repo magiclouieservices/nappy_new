@@ -45,7 +45,7 @@ defmodule Nappy do
   end
 
   def slug_link(image) do
-    "#{Slug.slugify(image.title)}-#{image.slug}"
+    "#{Slug.slugify(image.title)}+#{image.slug}"
   end
 
   def path(path) do

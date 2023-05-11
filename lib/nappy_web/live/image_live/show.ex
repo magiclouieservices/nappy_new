@@ -36,7 +36,7 @@ defmodule NappyWeb.ImageLive.Show do
   def handle_params(%{"slug" => slug_path}, _uri, socket) do
     active = Metrics.get_image_status_id(:active)
     featured = Metrics.get_image_status_id(:featured)
-    list = String.split(slug_path, "-", trim: true)
+    list = String.split(slug_path, "+", trim: true)
     slug = List.last(list)
     title = Enum.filter(list, &(&1 !== slug)) |> Enum.join(" ")
     image = Catalog.get_image_by_slug(slug)
@@ -55,7 +55,7 @@ defmodule NappyWeb.ImageLive.Show do
       end
 
       if title === "" && approved_image do
-        image_show_path = Routes.image_show_path(socket, :show, "#{path}-#{slug}")
+        image_show_path = Routes.image_show_path(socket, :show, "#{path}+#{slug}")
         {:noreply, push_redirect(socket, to: image_show_path)}
       else
         preload = [:user, :image_metadata, :image_analytics]
