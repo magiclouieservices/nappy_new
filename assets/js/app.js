@@ -58,19 +58,21 @@ window.zoom = function (e) {
 }
 
 window.toggleFullscreen = function (selector) {
-  const elem = document.querySelector(selector)
-  let parentElement = elem.parentElement
+  const elems = document.querySelectorAll(selector)
+  elems.forEach(elem => {
+    let parentElement = elem.parentElement
 
-  if (parentElement.classList.contains("hover:cursor-zoom-in")) {
-    parentElement.classList.replace("hover:cursor-zoom-in", "hover:cursor-zoom-out")
-    parentElement.removeAttribute("onmousemove")
-  } else {
-    parentElement.classList.replace("hover:cursor-zoom-out", "hover:cursor-zoom-in")
-    parentElement.setAttribute("onmousemove", "window.zoom(event)")
-  }
+    if (parentElement.classList.contains("hover:cursor-zoom-in")) {
+      parentElement.classList.replace("hover:cursor-zoom-in", "hover:cursor-zoom-out")
+      parentElement.removeAttribute("onmousemove")
+    } else {
+      parentElement.classList.replace("hover:cursor-zoom-out", "hover:cursor-zoom-in")
+      parentElement.setAttribute("onmousemove", "window.zoom(event)")
+    }
 
-  elem.nextElementSibling.classList.toggle("hidden")
-  elem.classList.toggle("hidden")
+    elem.nextElementSibling.classList.toggle("hidden")
+    elem.classList.toggle("hidden")
+  })
 }
 
 window.reset_tags = function (tagify, tags) {
