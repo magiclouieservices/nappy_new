@@ -83,7 +83,7 @@ defmodule NappyWeb.IncrementViewCountTest do
 
     test "success: visits specific image and increments once", %{conn: conn, image: image} do
       assert {:ok, _view, _html} =
-               live(conn, Routes.image_show_path(conn, :show, "some-title-slug_1"))
+               live(conn, Routes.image_show_path(conn, :show, "some-title+slug_1"))
 
       image_analytics = Nappy.Metrics.get_image_analytics_by_slug(image.slug)
       assert 1 === image_analytics.view_count
@@ -93,7 +93,7 @@ defmodule NappyWeb.IncrementViewCountTest do
       assert {:error, {:live_redirect, %{flash: %{}, to: path}}} =
                live(conn, Routes.image_show_path(conn, :show, "slug_1"))
 
-      assert {:ok, _, _} = live(conn, Routes.image_show_path(conn, :show, path))
+      assert {:ok, _, _} = live(conn, Routes.image_show_path(conn, :show, URI.decode(path)))
 
       image_analytics = Nappy.Metrics.get_image_analytics_by_slug(image.slug)
       assert 1 === image_analytics.view_count
