@@ -69,14 +69,14 @@ defmodule NappyWeb.Components.GalleryComponent do
               class="row-span-1 relative rounded"
               id={"advert#{System.unique_integer()}"}
             >
-              <p class="bg-black text-white text-xs text-center py-2 rounded">
-                Sponsored Photos from <strong>iStock</strong>. Use code <strong>NAPPY15</strong>
-                for 15% off.
-              </p>
-              <div class="grid grid-cols-2 gap-1 pt-1">
+              <div class="grid grid-cols-2 gap-1 pt-1 items-start h-full">
+                <p class="bg-black text-white text-center py-2 rounded col-span-2 self-center">
+                  Sponsored Photos from <strong>iStock</strong>. Use code <strong>NAPPY15</strong>
+                  for 15% off.
+                </p>
                 <a
                   :for={spon <- image.sponsored}
-                  class="rounded bg-slate-300"
+                  class="rounded h-full w-full bg-slate-300"
                   href={spon["referral_link"]}
                   target="_blank"
                   rel="noopener noreferer nofollow"
