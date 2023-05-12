@@ -15,6 +15,16 @@ defmodule Nappy.Accounts do
   alias Nappy.Repo
   alias NappyWeb.Router.Helpers, as: Routes
 
+  @topic inspect(__MODULE__)
+
+  def subscribe do
+    Phoenix.PubSub.subscribe(Nappy.PubSub, @topic)
+  end
+
+  def subscribe(user_slug) do
+    Phoenix.PubSub.subscribe(Nappy.PubSub, @topic <> "#{user_slug}")
+  end
+
   ## Database getters
 
   @doc """
@@ -209,7 +219,6 @@ defmodule Nappy.Accounts do
            |> Ecto.build_assoc(:social_media, %{})
            |> SocialMedia.changeset(%{})
            |> Repo.insert() do
-      {:ok, user}
     else
       {:error, reason} ->
         {:error, reason}

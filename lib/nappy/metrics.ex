@@ -14,6 +14,22 @@ defmodule Nappy.Metrics do
   alias Nappy.Metrics.LikedImage
   alias Nappy.Repo
 
+  @topic inspect(__MODULE__)
+
+  def notify_subscribers({:ok, image}, event) do
+    Phoenix.PubSub.broadcast(Nappy.PubSub, @topic, {__MODULE__, event, image})
+
+    Phoenix.PubSub.broadcast(
+      Nappy.PubSub,
+      @topic <> "#{image.slug}",
+      {__MODULE__, event, image}
+    )
+
+    {:ok, result}
+  end
+
+  def notify_subscribers({:error, reason}, _event), do: {:error, reason}
+
   @doc """
   Returns the list of image_status.
 
