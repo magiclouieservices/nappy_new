@@ -8,9 +8,7 @@
   <ul class="hidden md:flex md:items-center md:gap-6">
     <%= unless Nappy.get_root_path(@conn) === "/" or String.match?(Nappy.get_root_path(@conn), ~r/\/search/u) do %>
       <li>
-        <!--
-        <i class="text-gray-900 fa-solid fa-magnifying-glass"></i>
-        -->
+        <!-- <i class="text-gray-900 fa-solid fa-magnifying-glass"></i> -->
         <%= live_render(
           @conn,
           NappyWeb.SearchLive.NavbarSearch,
@@ -183,7 +181,7 @@
               />
             </svg>
             <span class="absolute right-0.5 top-0.5 inline-flex items-center rounded-full bg-pink-100 px-1.5 py-0.5 text-xs font-medium text-pink-700 border border-pink-300">
-              <%= 2 %>
+              <%= inspect(Process.info(self(), :messages)) %>
             </span>
           </button>
           <ul

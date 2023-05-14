@@ -14,18 +14,18 @@ defmodule Nappy.Metrics do
   alias Nappy.Metrics.LikedImage
   alias Nappy.Repo
 
-  @topic inspect(__MODULE__)
+  @auth_topic inspect(Nappy.Accounts)
 
   def notify_subscribers({:ok, image}, event) do
-    Phoenix.PubSub.broadcast(Nappy.PubSub, @topic, {__MODULE__, event, image})
+    # Phoenix.PubSub.broadcast(Nappy.PubSub, @auth_topic, {__MODULE__, event, image})
 
     Phoenix.PubSub.broadcast(
       Nappy.PubSub,
-      @topic <> "#{image.slug}",
+      @auth_topic <> "#{image.user_id}",
       {__MODULE__, event, image}
     )
 
-    {:ok, result}
+    {:ok, image}
   end
 
   def notify_subscribers({:error, reason}, _event), do: {:error, reason}

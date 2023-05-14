@@ -21,8 +21,8 @@ defmodule Nappy.Accounts do
     Phoenix.PubSub.subscribe(Nappy.PubSub, @topic)
   end
 
-  def subscribe(user_slug) do
-    Phoenix.PubSub.subscribe(Nappy.PubSub, @topic <> "#{user_slug}")
+  def subscribe(user_id) do
+    Phoenix.PubSub.subscribe(Nappy.PubSub, @topic <> "#{user_id}")
   end
 
   ## Database getters
@@ -41,6 +41,10 @@ defmodule Nappy.Accounts do
   """
   def get_user_by_email(email) when is_binary(email) do
     Repo.get_by(User, email: email)
+  end
+
+  def get_user_by_slug(slug) when is_binary(slug) do
+    Repo.get_by(User, slug: slug)
   end
 
   def get_user_by_username(username) when is_binary(username) do

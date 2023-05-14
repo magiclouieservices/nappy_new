@@ -10,9 +10,11 @@ defmodule NappyWeb.LiveAuth do
     socket =
       case session do
         %{"user_token" => user_token} ->
-          assign_new(socket, :current_user, fn ->
+          socket
+          |> assign_new(:notif_count, fn -> 0 end)
+          |> assign_new(:current_user, fn ->
             user = Accounts.get_user_by_session_token(user_token)
-            Accounts.subscribe(user.slug)
+            Accounts.subscribe(user.id)
             user
           end)
 
