@@ -223,6 +223,7 @@ defmodule Nappy.Accounts do
            |> Ecto.build_assoc(:social_media, %{})
            |> SocialMedia.changeset(%{})
            |> Repo.insert() do
+      {:ok, user}
     else
       {:error, reason} ->
         {:error, reason}

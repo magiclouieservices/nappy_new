@@ -193,6 +193,7 @@ defmodule Nappy.Metrics do
         images
         |> Task.async_stream(
           fn image ->
+            if status === "approved", do: notify_subscribers({:ok, image}, "approved")
             Admin.generate_tags_and_description(image)
           end,
           max_concurrency: 12,
