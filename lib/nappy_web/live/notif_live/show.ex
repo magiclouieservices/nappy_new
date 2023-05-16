@@ -1,7 +1,37 @@
 defmodule NappyWeb.NotifLive.Show do
   use NappyWeb, :inline_live_view
 
+  alias Nappy.Accounts
+
+  @topic inspect(Nappy.Accounts)
+
   @moduledoc false
+
+  @impl true
+  def mount(_params, session, socket) do
+    socket =
+      case session do
+        %{"user_token" => user_token} ->
+          socket
+          |> assign_new(:notif_count, fn -> 0 end)
+          |> assign_new(:current_user, fn ->
+            Accounts.get_user_by_session_token(user_token)
+          end)
+
+        %{} ->
+          socket
+          |> assign_new(:notif_count, fn -> 0 end)
+          |> assign_new(:current_user, fn -> nil end)
+      end
+
+    {:ok, socket}
+  end
+
+  @impl true
+  def handle_info(%{topic: @topic, payload: state}, socket) do
+    IO.inspect("triggered")
+    {:noreply, assign(socket, state)}
+  end
 
   @impl true
   def render(assigns) do
@@ -28,7 +58,7 @@ defmodule NappyWeb.NotifLive.Show do
           />
         </svg>
         <span class="absolute right-0.5 top-0.5 inline-flex items-center rounded-full bg-pink-100 px-1.5 py-0.5 text-xs font-medium text-pink-700 border border-pink-300">
-          <%= 2 %>
+          <%= @notif_count %>
         </span>
       </button>
       <ul

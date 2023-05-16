@@ -10,10 +10,8 @@ defmodule Nappy.Accounts do
   alias Nappy.Accounts.User
   alias Nappy.Accounts.UserNotifier
   alias Nappy.Accounts.UserToken
-  alias Nappy.Admin.Slug
   alias Nappy.Catalog
   alias Nappy.Repo
-  alias NappyWeb.Router.Helpers, as: Routes
 
   @topic inspect(__MODULE__)
 

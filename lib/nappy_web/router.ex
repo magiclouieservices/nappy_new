@@ -21,6 +21,8 @@ defmodule NappyWeb.Router do
   scope "/", NappyWeb do
     pipe_through :browser
 
+    live "/deploy", NotifLive.GithubDeploy, :github_deploy
+
     # usage: Sendy "Webform" placed at footer
     get "/confirm-newsletter", SubscriberController, :confirm
     get "/thankyou", SubscriberController, :confirmed

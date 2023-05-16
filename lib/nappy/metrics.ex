@@ -14,14 +14,13 @@ defmodule Nappy.Metrics do
   alias Nappy.Metrics.LikedImage
   alias Nappy.Repo
 
-  @auth_topic inspect(Nappy.Accounts)
+  @topic inspect(Nappy.Accounts)
 
   def notify_subscribers({:ok, image}, event) do
-    # Phoenix.PubSub.broadcast(Nappy.PubSub, @auth_topic, {__MODULE__, event, image})
-
-    Phoenix.PubSub.broadcast(
+    Phoenix.PubSub.broadcast_from(
       Nappy.PubSub,
-      @auth_topic <> "#{image.user_id}",
+      self(),
+      @topic <> "#{image.user_id}",
       {__MODULE__, event, image}
     )
 
@@ -188,12 +187,12 @@ defmodule Nappy.Metrics do
       end)
       |> Repo.transaction()
 
-    case transaction do
-      {:ok, _} ->
+    case [transaction, status] do
+      [{:ok, _}, "approved"] ->
         images
         |> Task.async_stream(
           fn image ->
-            if status === "approved", do: notify_subscribers({:ok, image}, "approved")
+            notify_subscribers({:ok, image}, "approved")
             Admin.generate_tags_and_description(image)
           end,
           max_concurrency: 12,
@@ -201,7 +200,7 @@ defmodule Nappy.Metrics do
         )
         |> Stream.run()
 
-      {:error, reason} ->
+      [{:error, reason}, _] ->
         reason
     end
   end
