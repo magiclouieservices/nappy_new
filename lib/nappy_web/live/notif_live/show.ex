@@ -29,7 +29,6 @@ defmodule NappyWeb.NotifLive.Show do
 
   @impl true
   def handle_info(%{topic: @topic, payload: state}, socket) do
-    IO.inspect("triggered")
     {:noreply, assign(socket, state)}
   end
 

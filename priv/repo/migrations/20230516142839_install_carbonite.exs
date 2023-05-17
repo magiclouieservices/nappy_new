@@ -19,6 +19,7 @@ defmodule Nappy.Repo.Migrations.InstallCarbonite do
     #    Carbonite.Migrations.create_trigger("rabbits")
     #    Carbonite.Migrations.create_trigger("rabbits", table_prefix: "animals")
     #    Carbonite.Migrations.create_trigger("rabbits", carbonite_prefix: "carbonite_other")
+    Carbonite.Migrations.create_trigger("images")
 
     # Configure trigger options:
     #
@@ -26,6 +27,14 @@ defmodule Nappy.Repo.Migrations.InstallCarbonite do
     #    Carbonite.Migrations.put_trigger_option("rabbits", :excluded_columns, ["private"])
     #    Carbonite.Migrations.put_trigger_option("rabbits", :filtered_columns, ["private"])
     #    Carbonite.Migrations.put_trigger_option("rabbits", :mode, :ignore)
+    Carbonite.Migrations.put_trigger_config("images", :excluded_columns, [
+      "title",
+      "slug",
+      "description",
+      "generated_description",
+      "tags",
+      "generated_tags"
+    ])
 
     # If you wish to insert an initial outbox:
     #
@@ -39,6 +48,7 @@ defmodule Nappy.Repo.Migrations.InstallCarbonite do
     #    Carbonite.Migrations.drop_trigger("rabbits")
     #    Carbonite.Migrations.drop_trigger("rabbits", table_prefix: "animals")
     #    Carbonite.Migrations.drop_trigger("rabbits", carbonite_prefix: "carbonite_other")
+    Carbonite.Migrations.drop_trigger("images")
 
     # Make sure to apply the same carbonite_prefix option here.
     Carbonite.Migrations.down(6)

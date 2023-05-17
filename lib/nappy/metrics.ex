@@ -122,6 +122,7 @@ defmodule Nappy.Metrics do
       |> where([i], i.image_id in ^images_id)
 
     Multi.new()
+    |> Carbonite.Multi.insert_transaction(%{meta: %{type: "image_approved"}})
     |> Multi.update_all(:approve_image, images, set: [image_status_id: active])
     |> Multi.update_all(:approve_dates, image_analytics,
       set: [approved_date: NaiveDateTime.utc_now()]
