@@ -8,6 +8,7 @@ defmodule Nappy.Metrics.Notifications do
   schema "notifications" do
     belongs_to :user, User
     field :description, :string
+    field :slug, :string
     field :additional_foreign_key, :binary_id
 
     timestamps()
@@ -19,11 +20,13 @@ defmodule Nappy.Metrics.Notifications do
     |> cast(attrs, [
       :user_id,
       :description,
+      :slug,
       :additional_foreign_key
     ])
     |> foreign_key_constraint(:user_id)
     |> validate_required([
-      :description
+      :description,
+      :slug
     ])
   end
 end

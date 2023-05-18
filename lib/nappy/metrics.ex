@@ -214,12 +214,23 @@ defmodule Nappy.Metrics do
     attrs = %{
       user_id: user_id,
       description: description,
+      slug: Nanoid.generate(),
       additional_foreign_key: additional_foreign_key
     }
 
     %Notifications{}
     |> Notifications.changeset(attrs)
     |> Repo.insert()
+  end
+
+  def get_notification_by_slug(slug) do
+    Notifications
+    |> where(slug: ^slug)
+    |> Repo.one()
+  end
+
+  def delete_notification(%Notifications{} = notification) do
+    Repo.delete!(notification)
   end
 
   def list_notifications_from_user(user_id) do

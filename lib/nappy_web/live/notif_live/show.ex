@@ -18,14 +18,33 @@ defmodule NappyWeb.NotifLive.Show do
           pubsub_notif = Metrics.list_notifications_from_user(user.id)
 
           socket
-          |> assign_new(:pubsub_notif, fn -> pubsub_notif end)
+          |> assign(pubsub_notif: pubsub_notif)
+          |> assign(current_user: user)
 
         %{} ->
           socket
-          |> assign_new(:pubsub_notif, fn -> [] end)
+          |> assign(pubsub_notif: [])
+          |> assign(current_user: nil)
       end
 
     {:ok, socket}
+  end
+
+  @impl true
+  def handle_event("remove_notif", %{"slug" => slug}, socket) do
+    user_id = socket.assigns.current_user.id
+    notification = Metrics.get_notification_by_slug(slug)
+
+    socket =
+      if notification.user_id === user_id do
+        Metrics.delete_notification(notification)
+        pubsub_notif = Metrics.list_notifications_from_user(user_id)
+
+        socket
+        |> assign(pubsub_notif: pubsub_notif)
+      end
+
+    {:noreply, socket}
   end
 
   @impl true
@@ -102,7 +121,7 @@ defmodule NappyWeb.NotifLive.Show do
                 <%= notif.description %>
               </span>
             </a>
-            <button phx-click="remove_notif">
+            <button phx-click="remove_notif" phx-value-slug={notif.slug}>
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 fill="none"

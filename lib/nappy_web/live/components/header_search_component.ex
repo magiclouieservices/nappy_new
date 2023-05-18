@@ -32,7 +32,8 @@ defmodule NappyWeb.Components.HeaderSearchComponent do
     <div x-data="{ open: false }">
       <.form
         :let={f}
-        for={:search}
+        for={%{}}
+        as={:search}
         phx-submit="search"
         phx-target={@myself}
         class="flex justify-center relative"
