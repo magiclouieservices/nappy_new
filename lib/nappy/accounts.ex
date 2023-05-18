@@ -13,14 +13,8 @@ defmodule Nappy.Accounts do
   alias Nappy.Catalog
   alias Nappy.Repo
 
-  @topic inspect(__MODULE__)
-
-  def subscribe do
-    Phoenix.PubSub.subscribe(Nappy.PubSub, @topic)
-  end
-
   def subscribe(user_id) do
-    Phoenix.PubSub.subscribe(Nappy.PubSub, @topic <> "#{user_id}")
+    Phoenix.PubSub.subscribe(Nappy.PubSub, "#{user_id}")
   end
 
   ## Database getters

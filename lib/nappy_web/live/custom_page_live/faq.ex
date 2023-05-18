@@ -15,8 +15,7 @@ defmodule NappyWeb.CustomPageLive.FAQ do
         <div class="col-span-6 leading-loose text-lg font-light">
           <p class="font-bold mt-4">How can I use the photos I download from this website?</p>
           <p>
-            Our photos are available for both personal and commercial use. Feel free to use them for your blog posts, websites, presentations, ebooks, social media, display ads, and more. To learn more about our usage, check out our
-            <.link
+            Our photos are available for both personal and commercial use. Feel free to use them for your blog posts, websites, presentations, ebooks, social media, display ads, and more. To learn more about our usage, check out our <.link
               navigate={Routes.custom_page_license_path(@socket, :license)}
               target="_blank"
               rel="noopener noreferer nofollow"

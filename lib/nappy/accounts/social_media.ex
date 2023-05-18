@@ -27,6 +27,6 @@ defmodule Nappy.Accounts.SocialMedia do
       :contact_email,
       :bio
     ])
-    |> validate_required([:user_id])
+    |> foreign_key_constraint(:user_id)
   end
 end

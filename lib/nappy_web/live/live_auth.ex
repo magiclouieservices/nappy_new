@@ -3,6 +3,7 @@ defmodule NappyWeb.LiveAuth do
   import Phoenix.Component
 
   alias Nappy.Accounts
+  alias Nappy.Metrics
 
   @moduledoc false
 
@@ -10,16 +11,18 @@ defmodule NappyWeb.LiveAuth do
     socket =
       case session do
         %{"user_token" => user_token} ->
+          user = Accounts.get_user_by_session_token(user_token)
+          Accounts.subscribe(user.id)
+          pubsub_notif = Metrics.list_notifications_from_user(user.id)
+
           socket
-          |> assign_new(:notif_count, fn -> 0 end)
-          |> assign_new(:current_user, fn ->
-            user = Accounts.get_user_by_session_token(user_token)
-            Accounts.subscribe(user.id)
-            user
-          end)
+          |> assign_new(:pubsub_notif, fn -> pubsub_notif end)
+          |> assign_new(:current_user, fn -> user end)
 
         %{} ->
-          assign_new(socket, :current_user, fn -> nil end)
+          socket
+          |> assign_new(:pubsub_notif, fn -> [] end)
+          |> assign_new(:current_user, fn -> nil end)
       end
 
     {:cont, socket}

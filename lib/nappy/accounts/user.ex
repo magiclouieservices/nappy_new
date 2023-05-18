@@ -56,10 +56,10 @@ defmodule Nappy.Accounts.User do
       :account_status_id,
       :account_role_id
     ])
+    |> foreign_key_constraint(:account_role_id)
+    |> foreign_key_constraint(:account_status_id)
     |> validate_required([
       :slug,
-      :account_role_id,
-      :account_status_id,
       :username
     ])
     |> unique_constraint(:slug)

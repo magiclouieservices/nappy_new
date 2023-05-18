@@ -12,19 +12,21 @@ defmodule Nappy.Metrics do
   alias Nappy.Metrics.ImageMetadata
   alias Nappy.Metrics.ImageStatus
   alias Nappy.Metrics.LikedImage
+  alias Nappy.Metrics.Notifications
   alias Nappy.Repo
 
-  @topic inspect(Nappy.Accounts)
+  @notif_event ["approved", "featured"]
 
-  def notify_subscribers({:ok, image}, event) do
+  def notify_subscribers({:ok, image}, event)
+      when event in @notif_event do
     Phoenix.PubSub.broadcast_from(
       Nappy.PubSub,
       self(),
-      @topic <> "#{image.user_id}",
-      {__MODULE__, event, image}
+      image.user_id,
+      image
     )
 
-    {:ok, image}
+    :ok
   end
 
   def notify_subscribers({:error, reason}, _event), do: {:error, reason}
@@ -193,6 +195,8 @@ defmodule Nappy.Metrics do
         images
         |> Task.async_stream(
           fn image ->
+            description = "Your image was approved."
+            {:ok, _} = create_notification_for_user(image.user_id, description, image.id)
             notify_subscribers({:ok, image}, "approved")
             Admin.generate_tags_and_description(image)
           end,
@@ -204,6 +208,24 @@ defmodule Nappy.Metrics do
       [{:error, reason}, _] ->
         reason
     end
+  end
+
+  def create_notification_for_user(user_id, description, additional_foreign_key) do
+    attrs = %{
+      user_id: user_id,
+      description: description,
+      additional_foreign_key: additional_foreign_key
+    }
+
+    %Notifications{}
+    |> Notifications.changeset(attrs)
+    |> Repo.insert()
+  end
+
+  def list_notifications_from_user(user_id) do
+    Notifications
+    |> where(user_id: ^user_id)
+    |> Repo.all()
   end
 
   @doc """

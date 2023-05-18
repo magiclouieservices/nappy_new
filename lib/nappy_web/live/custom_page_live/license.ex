@@ -54,8 +54,10 @@ defmodule NappyWeb.CustomPageLive.License do
             </li>
           </ul>
           <p class="mt-4">
-            If you have any questions,
-            <.link navigate={Routes.custom_page_faq_path(@socket, :faq)} class="underline">
+            If you have any questions, <.link
+              navigate={Routes.custom_page_faq_path(@socket, :faq)}
+              class="underline"
+            >
               check out our FAQs
             </.link>.
           </p>

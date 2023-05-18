@@ -22,9 +22,7 @@ defmodule Nappy.Newsletter.Subscriber do
       :referrer_id,
       :user_id
     ])
-    |> validate_required([
-      :referrer_id,
-      :user_id
-    ])
+    |> foreign_key_constraint(:referrer_id)
+    |> foreign_key_constraint(:user_id)
   end
 end

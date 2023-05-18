@@ -25,13 +25,42 @@ defmodule NappyWeb.NotifLive.GithubDeploy do
           Status: <span class={@status}><%= @text %></span>
         </div>
       </div>
+      <button class="border" phx-click="increment" phx-value-inc={@inc}>increment</button>
+      <button class="border" phx-click="decrement" phx-value-inc={@inc}>decrement</button>
+      <%= @inc %>
     </div>
     """
   end
 
   def mount(_params, _session, socket) do
     PubSub.subscribe(Nappy.PubSub, @topic)
-    {:ok, assign(socket, text: "Ready!", status: "ready")}
+
+    socket =
+      socket
+      |> assign(text: "Ready!", status: "ready")
+      |> assign(inc: 0)
+
+    {:ok, socket}
+  end
+
+  def handle_event("increment", %{"inc" => inc}, socket) do
+    inc = String.to_integer(inc)
+
+    socket =
+      socket
+      |> assign(inc: inc + 1)
+
+    {:noreply, socket}
+  end
+
+  def handle_event("decrement", %{"inc" => inc}, socket) do
+    inc = String.to_integer(inc)
+
+    socket =
+      socket
+      |> assign(inc: inc - 1)
+
+    {:noreply, socket}
   end
 
   def handle_event(step, _value, socket) do

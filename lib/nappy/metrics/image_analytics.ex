@@ -25,8 +25,6 @@ defmodule Nappy.Metrics.ImageAnalytics do
       :approved_date,
       :featured_date
     ])
-    |> validate_required([
-      :image_id
-    ])
+    |> foreign_key_constraint(:image_id)
   end
 end

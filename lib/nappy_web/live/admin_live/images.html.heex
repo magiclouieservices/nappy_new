@@ -275,7 +275,8 @@
                         <.form
                           :let={_f}
                           id={"specific-image-#{image.slug}"}
-                          for={:admin_image}
+                          for={%{}}
+                          as={:admin_image}
                           phx-submit="update_photo"
                         >
                           <div class="grid grid-cols-6 gap-4">

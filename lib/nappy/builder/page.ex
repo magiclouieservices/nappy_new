@@ -18,11 +18,12 @@ defmodule Nappy.Builder.Page do
   @doc false
   def changeset(page, attrs) do
     page
-    |> cast(attrs, [:title, :content, :slug, :thumbnail, :is_enabled])
+    |> cast(attrs, [:title, :content, :slug, :is_enabled])
     |> validate_required([:title, :content, :slug, :is_enabled])
     |> validate_format(:slug, ~r/^[a-zA-Z]+$/, message: "only letters with no spaces")
     |> validate_length(:slug, min: 3, max: 50)
     |> validate_length(:title, min: 3, max: 50)
+    |> foreign_key_constraint(:thumbnail)
     |> unique_constraint(:slug)
   end
 end

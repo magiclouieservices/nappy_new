@@ -162,7 +162,7 @@
         <%= live_render(
           @conn,
           NappyWeb.NotifLive.Show,
-          session: %{"notif_count" => @notif_count}
+          session: %{"pubsub_notif" => @pubsub_notif}
         ) %>
       </li>
     <% end %>

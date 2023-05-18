@@ -98,7 +98,7 @@ defmodule NappyWeb.UserAuth do
     user = user_token && Accounts.get_user_by_session_token(user_token)
 
     conn
-    |> assign(:notif_count, 0)
+    |> assign(:pubsub_notif, [])
     |> assign(:current_user, user)
   end
 
