@@ -8,9 +8,7 @@
   <ul class="hidden md:flex md:items-center md:gap-6">
     <%= unless Nappy.get_root_path(@conn) === "/" or String.match?(Nappy.get_root_path(@conn), ~r/\/search/u) do %>
       <li>
-        <!--
-        <i class="text-gray-900 fa-solid fa-magnifying-glass"></i>
-        -->
+        <!-- <i class="text-gray-900 fa-solid fa-magnifying-glass"></i> -->
         <%= live_render(
           @conn,
           NappyWeb.SearchLive.NavbarSearch,
@@ -158,41 +156,17 @@
         Submit
       </.link>
     </li>
+    <!-- start bell icon -->
     <%= if @current_user do %>
       <li>
-        <div x-data="{ open: false }" class="relative text-left">
-          <button
-            @click="open = !open"
-            @keydown.escape.window="open = false"
-            @click.outside="open = false"
-            class="flex p-2 items-center focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-900"
-          >
-            <i class="fa-regular fa-bell"></i>
-            <span class="ml-1 inline-flex items-center rounded-full bg-pink-100 px-1.5 py-0.5 text-xs font-medium text-pink-800">
-              2
-            </span>
-          </button>
-          <ul
-            x-cloak
-            x-show="open"
-            x-transition:enter="transition ease-out duration-100"
-            x-transition:enter-start="transform opacity-0 scale-95"
-            x-transition:enter-end="transform opacity-100 scale-100"
-            x-transition:leave="transition ease-in duration-75"
-            x-transition:leave-start="transform opacity-100 scale-100"
-            x-transition:leave-end="transform opacity-0 scale-95"
-            class="absolute flex w-64 left-[-200%] rounded flex-col px-4 py-6 gap-2 items-start justify-center mt-1 bg-black text-white z-50"
-          >
-            <li>
-              <i class="fa-solid fa-heart"></i> User1234 liked your photo
-            </li>
-            <li>
-              <i class="fa-solid fa-heart"></i> John liked your photo
-            </li>
-          </ul>
-        </div>
+        <%= live_render(
+          @conn,
+          NappyWeb.NotifLive.Show,
+          session: %{"pubsub_notif" => @pubsub_notif}
+        ) %>
       </li>
     <% end %>
+    <!-- end bell icon -->
     <li>
       <%= if @current_user != nil do %>
         <div x-data="{ open: false }" class="relative text-left">

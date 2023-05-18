@@ -19,9 +19,7 @@ defmodule Nappy.Catalog.Collection do
       :image_id,
       :collection_description_id
     ])
-    |> validate_required([
-      :image_id,
-      :collection_description_id
-    ])
+    |> foreign_key_constraint(:image_id)
+    |> foreign_key_constraint(:collection_description_id)
   end
 end

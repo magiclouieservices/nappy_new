@@ -21,6 +21,8 @@ defmodule NappyWeb.Router do
   scope "/", NappyWeb do
     pipe_through :browser
 
+    live "/deploy", NotifLive.GithubDeploy, :github_deploy
+
     # usage: Sendy "Webform" placed at footer
     get "/confirm-newsletter", SubscriberController, :confirm
     get "/thankyou", SubscriberController, :confirmed
@@ -134,7 +136,9 @@ defmodule NappyWeb.Router do
   scope "/", NappyWeb do
     pipe_through [:browser, :require_authenticated_user]
 
-    live "/upload", UploadLive.New, :new
+    live_session :upload, on_mount: [{NappyWeb.LiveAuth, :check_auth}] do
+      live "/upload", UploadLive.New, :new
+    end
 
     get "/users/settings", UserSettingsController, :edit
     put "/users/settings", UserSettingsController, :update
@@ -144,13 +148,15 @@ defmodule NappyWeb.Router do
   scope "/admin", NappyWeb do
     pipe_through [:browser, :require_authenticated_user, :admin_only]
 
-    live "/dashboard", AdminLive.Dashboard, :dashboard
-    live "/images", AdminLive.Images, :images
-    live "/settings", AdminLive.Settings, :settings
-    live "/bulk-upload", AdminLive.BulkUpload, :bulk_upload
-    live "/categories", AdminLive.Categories, :categories
-    live "/collections", AdminLive.Collections, :collections
-    live "/pages", AdminLive.Pages, :pages
+    live_session :admin_check_auth, on_mount: [{NappyWeb.LiveAuth, :check_auth}] do
+      live "/dashboard", AdminLive.Dashboard, :dashboard
+      live "/images", AdminLive.Images, :images
+      live "/settings", AdminLive.Settings, :settings
+      live "/bulk-upload", AdminLive.BulkUpload, :bulk_upload
+      live "/categories", AdminLive.Categories, :categories
+      live "/collections", AdminLive.Collections, :collections
+      live "/pages", AdminLive.Pages, :pages
+    end
   end
 
   scope "/", NappyWeb do

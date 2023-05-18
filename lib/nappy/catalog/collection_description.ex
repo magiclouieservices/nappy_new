@@ -41,13 +41,13 @@ defmodule Nappy.Catalog.CollectionDescription do
       :related_tags,
       :thumbnail
     ])
+    |> foreign_key_constraint(:user_id)
+    |> foreign_key_constraint(:thumbnail)
     |> validate_required([
       :title,
       :slug,
       :description,
-      :is_enabled,
-      :user_id,
-      :thumbnail
+      :is_enabled
     ])
     |> unique_constraint(:slug)
   end

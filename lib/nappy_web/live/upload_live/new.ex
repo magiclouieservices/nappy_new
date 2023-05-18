@@ -4,6 +4,7 @@ defmodule NappyWeb.UploadLive.New do
   alias Nappy.Accounts
   alias Nappy.Admin
   alias Nappy.Catalog
+  alias Nappy.Metrics
   alias NappyWeb.Components.Admin.MultiTagSelect
 
   @impl true
@@ -92,6 +93,17 @@ defmodule NappyWeb.UploadLive.New do
   @impl true
   def handle_info(:clear_info, socket) do
     {:noreply, clear_flash(socket, :info)}
+  end
+
+  @impl true
+  def handle_info(image, socket) do
+    pubsub_notif = Metrics.list_notifications_from_user(image.user_id)
+
+    socket =
+      socket
+      |> assign_new(:pubsub_notif, fn -> pubsub_notif end)
+
+    {:noreply, socket}
   end
 
   def error_to_string(:too_large), do: "Too large"

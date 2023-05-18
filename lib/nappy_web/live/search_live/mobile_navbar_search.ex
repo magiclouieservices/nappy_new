@@ -36,7 +36,8 @@ defmodule NappyWeb.SearchLive.MobileNavbarSearch do
     >
       <.form
         :let={f}
-        for={:search}
+        for={%{}}
+        as={:search}
         method="get"
         class="flex grow justify-center relative"
         phx-submit="search"

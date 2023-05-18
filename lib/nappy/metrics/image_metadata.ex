@@ -41,8 +41,8 @@ defmodule Nappy.Metrics.ImageMetadata do
       :camera_software,
       :color_palette
     ])
+    |> foreign_key_constraint(:image_id)
     |> validate_required([
-      :image_id,
       :extension_type,
       :height,
       :width,

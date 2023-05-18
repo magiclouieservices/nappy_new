@@ -10,10 +10,12 @@ defmodule Nappy.Accounts do
   alias Nappy.Accounts.User
   alias Nappy.Accounts.UserNotifier
   alias Nappy.Accounts.UserToken
-  alias Nappy.Admin.Slug
   alias Nappy.Catalog
   alias Nappy.Repo
-  alias NappyWeb.Router.Helpers, as: Routes
+
+  def subscribe(user_id) do
+    Phoenix.PubSub.subscribe(Nappy.PubSub, "#{user_id}")
+  end
 
   ## Database getters
 
@@ -31,6 +33,10 @@ defmodule Nappy.Accounts do
   """
   def get_user_by_email(email) when is_binary(email) do
     Repo.get_by(User, email: email)
+  end
+
+  def get_user_by_slug(slug) when is_binary(slug) do
+    Repo.get_by(User, slug: slug)
   end
 
   def get_user_by_username(username) when is_binary(username) do

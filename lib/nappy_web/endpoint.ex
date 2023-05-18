@@ -20,6 +20,7 @@ defmodule NappyWeb.Endpoint do
          websocket: [
            connect_info: [
              :user_agent,
+             :uri,
              session: @session_options
            ]
          ]

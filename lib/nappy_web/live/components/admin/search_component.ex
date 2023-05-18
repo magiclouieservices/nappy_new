@@ -68,7 +68,8 @@ defmodule NappyWeb.Components.Admin.SearchComponent do
       <.form
         id="admin-search-hook"
         phx-hook="AdminSearch"
-        for={:admin_search}
+        for={%{}}
+        as={:admin_search}
         phx-submit="admin_search"
         phx-target={@myself}
         class="flex justify-center items-center gap-2 relative"

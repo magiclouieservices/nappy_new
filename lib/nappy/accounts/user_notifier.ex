@@ -46,7 +46,6 @@ defmodule Nappy.Accounts.UserNotifier do
     grouped_images
     |> Enum.each(fn {username, images} ->
       email = hd(images).user.email
-      name = hd(images).user.name
 
       assigns = [
         username: username,
@@ -60,7 +59,7 @@ defmodule Nappy.Accounts.UserNotifier do
 
       if status === "approved" && not subscriber.is_photographer do
         Newsletter.update_subscriber(subscriber, %{is_photographer: true})
-        Newsletter.subscribe_newsletter(name, email, Nappy.sendy_photographers_list())
+        Newsletter.subscribe_newsletter(username, email, Nappy.sendy_photographers_list())
       end
 
       deliver(email, assigns[:title], html_body)

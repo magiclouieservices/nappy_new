@@ -12,7 +12,24 @@ defmodule Nappy.Metrics do
   alias Nappy.Metrics.ImageMetadata
   alias Nappy.Metrics.ImageStatus
   alias Nappy.Metrics.LikedImage
+  alias Nappy.Metrics.Notifications
   alias Nappy.Repo
+
+  @notif_event ["approved", "featured"]
+
+  def notify_subscribers({:ok, image}, event)
+      when event in @notif_event do
+    Phoenix.PubSub.broadcast_from(
+      Nappy.PubSub,
+      self(),
+      image.user_id,
+      image
+    )
+
+    :ok
+  end
+
+  def notify_subscribers({:error, reason}, _event), do: {:error, reason}
 
   @doc """
   Returns the list of image_status.
@@ -107,6 +124,7 @@ defmodule Nappy.Metrics do
       |> where([i], i.image_id in ^images_id)
 
     Multi.new()
+    |> Carbonite.Multi.insert_transaction(%{meta: %{type: "image_approved"}})
     |> Multi.update_all(:approve_image, images, set: [image_status_id: active])
     |> Multi.update_all(:approve_dates, image_analytics,
       set: [approved_date: NaiveDateTime.utc_now()]
@@ -172,11 +190,14 @@ defmodule Nappy.Metrics do
       end)
       |> Repo.transaction()
 
-    case transaction do
-      {:ok, _} ->
+    case [transaction, status] do
+      [{:ok, _}, "approved"] ->
         images
         |> Task.async_stream(
           fn image ->
+            description = "Your image was approved."
+            {:ok, _} = create_notification_for_user(image.user_id, description, image.id)
+            notify_subscribers({:ok, image}, "approved")
             Admin.generate_tags_and_description(image)
           end,
           max_concurrency: 12,
@@ -184,9 +205,38 @@ defmodule Nappy.Metrics do
         )
         |> Stream.run()
 
-      {:error, reason} ->
+      [{:error, reason}, _] ->
         reason
     end
+  end
+
+  def create_notification_for_user(user_id, description, additional_foreign_key) do
+    attrs = %{
+      user_id: user_id,
+      description: description,
+      slug: Nanoid.generate(),
+      additional_foreign_key: additional_foreign_key
+    }
+
+    %Notifications{}
+    |> Notifications.changeset(attrs)
+    |> Repo.insert()
+  end
+
+  def get_notification_by_slug(slug) do
+    Notifications
+    |> where(slug: ^slug)
+    |> Repo.one()
+  end
+
+  def delete_notification(%Notifications{} = notification) do
+    Repo.delete!(notification)
+  end
+
+  def list_notifications_from_user(user_id) do
+    Notifications
+    |> where(user_id: ^user_id)
+    |> Repo.all()
   end
 
   @doc """

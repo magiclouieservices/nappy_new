@@ -48,7 +48,7 @@ defmodule NappyWeb do
   def live_view do
     quote do
       use Phoenix.LiveView,
-        layout: {NappyWeb.LayoutView, "live.html"}
+        layout: {NappyWeb.LayoutView, :live}
 
       unquote(view_helpers())
     end

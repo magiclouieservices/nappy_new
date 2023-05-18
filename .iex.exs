@@ -8,7 +8,7 @@ alias Nappy.Accounts.{AccountRole, AccountStatus, SocialMedia, User, UserToken}
 alias Nappy.Admin.{AdminSettings, Legal, Seo, Slug}
 alias Nappy.Builder.{Page}
 alias Nappy.Catalog.{Category, Collection, CollectionDescription, Images}
-alias Nappy.Metrics.{ImageAnalytics, ImageMetadata, ImageStatus}
+alias Nappy.Metrics.{ImageAnalytics, ImageMetadata, ImageStatus, Notifications}
 alias Nappy.Newsletter.{Referrer, Subscriber}
 alias Nappy.Search
 alias Nappy.SponsoredImages

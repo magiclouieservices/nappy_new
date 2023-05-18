@@ -1,5 +1,6 @@
 defmodule Nappy do
   alias Nappy.Admin.Slug
+  alias Nappy.Catalog
 
   @moduledoc """
   Nappy keeps the contexts that define your domain
@@ -42,6 +43,10 @@ defmodule Nappy do
 
   def get_root_path(conn) do
     URI.parse(Phoenix.Controller.current_path(conn)).path
+  end
+
+  def slug_link_by_id(image_id) do
+    Catalog.get_image!(image_id) |> slug_link()
   end
 
   def slug_link(image) do

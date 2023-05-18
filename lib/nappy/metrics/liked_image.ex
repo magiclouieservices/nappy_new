@@ -22,10 +22,10 @@ defmodule Nappy.Metrics.LikedImage do
       :image_id,
       :user_id
     ])
+    |> foreign_key_constraint(:image_id)
+    |> foreign_key_constraint(:user_id)
     |> validate_required([
-      :is_liked,
-      :image_id,
-      :user_id
+      :is_liked
     ])
   end
 end

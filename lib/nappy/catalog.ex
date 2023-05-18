@@ -375,6 +375,11 @@ defmodule Nappy.Catalog do
     |> imgix_url("photo", query)
   end
 
+  def imgix_url_by_id(image_id, query \\ nil) do
+    get_image!(image_id)
+    |> imgix_url("photo", query)
+  end
+
   def imgix_url(%Images{} = image, type, query \\ nil) do
     ext = Metrics.get_image_extension(image.id) || "jpg"
     filename = "#{image.slug}.#{ext}"
@@ -511,6 +516,8 @@ defmodule Nappy.Catalog do
   """
   def create_image(attrs \\ %{}) do
     Repo.transaction(fn ->
+      {:ok, _} = Carbonite.insert_transaction(Repo, %{meta: %{type: "image_inserted"}})
+
       created_image =
         %Images{}
         |> Images.changeset(attrs)
