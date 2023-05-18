@@ -58,7 +58,7 @@
         src={Catalog.imgix_url(@image, "photo")}
       />
       <img
-        class="hidden w-full"
+        class={~s(hidden w-[#{Catalog.zoomed_image(@image, "w")}px])}
         src={
           Catalog.imgix_url(@image, "photo",
             w: Catalog.zoomed_image(@image, "w"),

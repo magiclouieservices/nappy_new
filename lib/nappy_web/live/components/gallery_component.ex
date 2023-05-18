@@ -246,7 +246,7 @@ defmodule NappyWeb.Components.GalleryComponent do
                           class="zoom relative overflow-hidden hover:cursor-zoom-in rounded"
                           onclick="window.toggleFullscreen(&quot;[id^='fullscreen-img']&quot;)"
                           onmousemove="window.zoom(event)"
-                          style={"background-image: url(#{Catalog.imgix_url(image, "photo", w: Catalog.zoomed_image(image, "w"), h: Catalog.zoomed_image(image, "h"), cs: "tinysrgb", fm: "avif")})"}
+                          style={"background-image: url(#{Catalog.imgix_url(image, "photo", w: Catalog.zoomed_image(image, "w"), h: Catalog.zoomed_image(image, "h"), auto: "compress", cs: "strip", fm: "avif")})"}
                         >
                           <img
                             alt={image.title}
@@ -255,7 +255,7 @@ defmodule NappyWeb.Components.GalleryComponent do
                             src={Catalog.imgix_url(image, "photo")}
                           />
                           <img
-                            class="hidden w-full"
+                            class={~s(hidden w-[#{Catalog.zoomed_image(image, "w")}px])}
                             src={
                               Catalog.imgix_url(image, "photo",
                                 w: Catalog.zoomed_image(image, "w"),
