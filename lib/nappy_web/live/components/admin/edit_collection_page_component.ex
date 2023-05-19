@@ -268,7 +268,8 @@ defmodule NappyWeb.Components.Admin.EditCollectionPageComponent do
               <div class="mt-4 flex space-x-2 justify-center">
                 <.form
                   :let={_f}
-                  for={:update_collection}
+                  for={%{}}
+                  as={:update_collection}
                   id="update-collection"
                   phx-submit="update_collection"
                   phx-target={@myself}
@@ -380,7 +381,8 @@ defmodule NappyWeb.Components.Admin.EditCollectionPageComponent do
                 <.form
                   :let={_f}
                   id="confirm-disable-collection"
-                  for={:confirm_disable_collection}
+                  for={%{}}
+                  as={:confirm_disable_collection}
                   phx-submit="disable_collection"
                   phx-target={@myself}
                 >
@@ -493,7 +495,8 @@ defmodule NappyWeb.Components.Admin.EditCollectionPageComponent do
                 <.form
                   :let={_f}
                   id="update-thumbnail"
-                  for={:update_thumbnail}
+                  for={%{}}
+                  as={:update_thumbnail}
                   phx-submit="update_thumbnail"
                   phx-target={@myself}
                 >
@@ -609,7 +612,8 @@ defmodule NappyWeb.Components.Admin.EditCollectionPageComponent do
                 <.form
                   :let={_f}
                   id="confirm-update-related_tags"
-                  for={:confirm_update_related_tags}
+                  for={%{}}
+                  as={:confirm_update_related_tags}
                   phx-target={@myself}
                 >
                   <input type="hidden" name="slug" value={@slug} />
@@ -729,7 +733,8 @@ defmodule NappyWeb.Components.Admin.EditCollectionPageComponent do
                   :let={_f}
                   id="update-collection-description"
                   phx-submit="update_collection_description"
-                  for={:update_collection_description}
+                  for={%{}}
+                  as={:update_collection_description}
                   phx-target={@myself}
                 >
                   <input type="hidden" name="slug" value={@slug} />

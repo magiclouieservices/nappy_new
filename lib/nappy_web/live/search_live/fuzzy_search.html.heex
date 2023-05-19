@@ -1,5 +1,5 @@
 <div class="container mx-auto">
-  <.form :let={f} for={:search} phx-change="search">
+  <.form :let={f} for={%{}} as={:search} phx-change="search">
     <%= label f, :search_phrase, class: "tag-label" do %>
       <%= text_input(
         f,
