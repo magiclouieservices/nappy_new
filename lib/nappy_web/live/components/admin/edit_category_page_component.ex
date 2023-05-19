@@ -227,7 +227,8 @@ defmodule NappyWeb.Components.Admin.EditCategoryPageComponent do
               <div class="mt-4 flex space-x-2 justify-center">
                 <.form
                   :let={_f}
-                  for={:update_category_name}
+                  for={%{}}
+                  as={:update_category_name}
                   id="update-category-name"
                   phx-submit="update_category_name"
                   phx-target={@myself}
@@ -340,7 +341,8 @@ defmodule NappyWeb.Components.Admin.EditCategoryPageComponent do
                 <.form
                   :let={_f}
                   id="update-thumbnail"
-                  for={:update_thumbnail}
+                  for={%{}}
+                  as={:update_thumbnail}
                   phx-submit="update_thumbnail"
                   phx-target={@myself}
                 >
@@ -435,7 +437,8 @@ defmodule NappyWeb.Components.Admin.EditCategoryPageComponent do
                 <.form
                   :let={_f}
                   id="confirm-update-related_tags"
-                  for={:confirm_update_related_tags}
+                  for={%{}}
+                  as={:confirm_update_related_tags}
                   phx-target={@myself}
                 >
                   <input type="hidden" name="slug" value={@slug} />
