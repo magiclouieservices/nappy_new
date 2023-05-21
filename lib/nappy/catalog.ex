@@ -313,7 +313,9 @@ defmodule Nappy.Catalog do
     sponsored_search_terms = get_popular_keywords(4) |> Enum.join(",")
     sponsored = SponsoredImages.get_images("image_adverts_#{page}", sponsored_search_terms, 4)
 
-    unless Enum.empty?(sponsored) do
+    if Enum.empty?(sponsored) do
+      images
+    else
       index_pos = length(images.entries) - 1
       # if page === 1,
       #   do: length(images.entries) - 1,
