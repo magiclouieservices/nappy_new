@@ -14,7 +14,7 @@ defmodule Nappy.Accounts do
   alias Nappy.Repo
 
   def subscribe(user_id) do
-    Phoenix.PubSub.subscribe(Nappy.PubSub, "#{user_id}")
+    Phoenix.PubSub.subscribe(Nappy.PubSub, "user-#{user_id}")
   end
 
   ## Database getters

@@ -17,13 +17,13 @@ defmodule Nappy.Metrics do
 
   @notif_event ["approved", "featured"]
 
-  def notify_subscribers({:ok, image}, event)
+  def notify_subscribers({:ok, user_id}, event)
       when event in @notif_event do
     Phoenix.PubSub.broadcast_from(
       Nappy.PubSub,
       self(),
-      image.user_id,
-      image
+      "user-#{user_id}",
+      user_id
     )
 
     :ok
@@ -197,7 +197,7 @@ defmodule Nappy.Metrics do
           fn image ->
             description = "Your image was approved."
             {:ok, _} = create_notification_for_user(image.user_id, description, image.id)
-            notify_subscribers({:ok, image}, "approved")
+            notify_subscribers({:ok, image.user_id}, "approved")
             Admin.generate_tags_and_description(image)
           end,
           max_concurrency: 12,

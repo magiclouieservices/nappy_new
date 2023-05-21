@@ -1,5 +1,5 @@
 defmodule Nappy.Newsletter.Subscriber do
-  use Nappy.Schema
+  use Ecto.Schema
   import Ecto.Changeset
   alias Nappy.Accounts.User
   alias Nappy.Newsletter.Referrer
@@ -21,6 +21,10 @@ defmodule Nappy.Newsletter.Subscriber do
       :is_photographer,
       :referrer_id,
       :user_id
+    ])
+    |> validate_required([
+      :user_id,
+      :referrer_id
     ])
     |> foreign_key_constraint(:referrer_id)
     |> foreign_key_constraint(:user_id)

@@ -6,7 +6,7 @@ defmodule Nappy.Repo.Migrations.CreateCategories do
       add :name, :string, null: false
       add :slug, :string, null: false, comment: "URL path name for a specific category"
 
-      add :thumbnail, :binary_id, comment: "Can choose only from available approved images."
+      add :thumbnail, :integer, comment: "Can choose only from available approved images."
 
       add :is_enabled, :boolean,
         default: false,

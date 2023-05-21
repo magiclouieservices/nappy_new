@@ -1,5 +1,5 @@
 defmodule Nappy.Catalog.CollectionDescription do
-  use Nappy.Schema
+  use Ecto.Schema
   import Ecto.Changeset
   alias Nappy.Accounts.User
   alias Nappy.Catalog.{Collection, Images}
@@ -12,7 +12,7 @@ defmodule Nappy.Catalog.CollectionDescription do
     field :title, :string
     field :slug, :string
     field :related_tags, :string
-    field :thumbnail, :binary_id
+    field :thumbnail, :integer
     belongs_to :user, User
 
     many_to_many :image,
@@ -41,14 +41,16 @@ defmodule Nappy.Catalog.CollectionDescription do
       :related_tags,
       :thumbnail
     ])
-    |> foreign_key_constraint(:user_id)
-    |> foreign_key_constraint(:thumbnail)
     |> validate_required([
+      :user_id,
+      :thumbnail,
       :title,
       :slug,
       :description,
       :is_enabled
     ])
+    |> foreign_key_constraint(:user_id)
+    |> foreign_key_constraint(:thumbnail)
     |> unique_constraint(:slug)
   end
 end

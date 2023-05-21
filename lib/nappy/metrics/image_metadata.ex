@@ -1,5 +1,5 @@
 defmodule Nappy.Metrics.ImageMetadata do
-  use Nappy.Schema
+  use Ecto.Schema
   import Ecto.Changeset
   alias Nappy.Catalog.Images
 
@@ -41,8 +41,8 @@ defmodule Nappy.Metrics.ImageMetadata do
       :camera_software,
       :color_palette
     ])
-    |> foreign_key_constraint(:image_id)
     |> validate_required([
+      :image_id,
       :extension_type,
       :height,
       :width,
@@ -55,5 +55,6 @@ defmodule Nappy.Metrics.ImageMetadata do
       # :device_model,
       # :camera_software
     ])
+    |> foreign_key_constraint(:image_id)
   end
 end

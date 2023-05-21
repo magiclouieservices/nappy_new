@@ -10,10 +10,6 @@ import Config
 config :nappy,
   ecto_repos: [Nappy.Repo]
 
-config :nappy, Nappy.Repo,
-  migration_primary_key: [name: :id, type: :binary_id],
-  generators: [binary_id: true]
-
 # Configures the endpoint
 config :nappy, NappyWeb.Endpoint,
   url: [host: "localhost"],

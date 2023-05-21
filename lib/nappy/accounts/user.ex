@@ -1,5 +1,5 @@
 defmodule Nappy.Accounts.User do
-  use Nappy.Schema
+  use Ecto.Schema
   import Ecto.Changeset
   alias Nappy.Accounts
   alias Nappy.Accounts.{AccountRole, AccountStatus, SocialMedia}
@@ -56,12 +56,14 @@ defmodule Nappy.Accounts.User do
       :account_status_id,
       :account_role_id
     ])
-    |> foreign_key_constraint(:account_role_id)
-    |> foreign_key_constraint(:account_status_id)
     |> validate_required([
       :slug,
-      :username
+      :username,
+      :account_status_id,
+      :account_role_id
     ])
+    |> foreign_key_constraint(:account_role_id)
+    |> foreign_key_constraint(:account_status_id)
     |> unique_constraint(:slug)
     |> validate_username()
     |> validate_email()

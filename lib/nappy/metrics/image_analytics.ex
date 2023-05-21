@@ -1,5 +1,5 @@
 defmodule Nappy.Metrics.ImageAnalytics do
-  use Nappy.Schema
+  use Ecto.Schema
   import Ecto.Changeset
   alias Nappy.Catalog.Images
 
@@ -24,6 +24,9 @@ defmodule Nappy.Metrics.ImageAnalytics do
       :download_count,
       :approved_date,
       :featured_date
+    ])
+    |> validate_required([
+      :image_id
     ])
     |> foreign_key_constraint(:image_id)
   end

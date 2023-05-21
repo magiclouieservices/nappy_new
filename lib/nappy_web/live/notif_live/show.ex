@@ -48,8 +48,8 @@ defmodule NappyWeb.NotifLive.Show do
   end
 
   @impl true
-  def handle_info(image, socket) do
-    pubsub_notif = Metrics.list_notifications_from_user(image.user_id)
+  def handle_info(user_id, socket) do
+    pubsub_notif = Metrics.list_notifications_from_user(user_id)
 
     socket =
       socket

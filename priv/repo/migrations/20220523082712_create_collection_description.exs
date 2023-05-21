@@ -9,7 +9,7 @@ defmodule Nappy.Repo.Migrations.CreateCollectionDescription do
       add :description, :text
       add :is_enabled, :boolean, default: false, null: false
 
-      # add :thumbnail, :binary_id,
+      # add :thumbnail, :integer,
       #   comment: "Image displayed in a specific collection page. Can choose only from available approved images."
       add :thumbnail, references(:images, on_delete: :delete_all),
         null: false,

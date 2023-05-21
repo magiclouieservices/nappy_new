@@ -1,5 +1,5 @@
 defmodule Nappy.Metrics.ImageStatus do
-  use Nappy.Schema
+  use Ecto.Schema
   import Ecto.Changeset
   alias Nappy.Catalog.Images
 

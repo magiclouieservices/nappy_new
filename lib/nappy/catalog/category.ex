@@ -1,5 +1,5 @@
 defmodule Nappy.Catalog.Category do
-  use Nappy.Schema
+  use Ecto.Schema
   import Ecto.Changeset
   alias Nappy.Catalog.Images
 
@@ -10,7 +10,7 @@ defmodule Nappy.Catalog.Category do
     field :name, :string
     field :slug, :string
     field :related_tags, :string
-    field :thumbnail, :binary_id
+    field :thumbnail, :integer
     has_many :images, Images
   end
 
