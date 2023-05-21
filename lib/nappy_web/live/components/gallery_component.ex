@@ -70,7 +70,7 @@ defmodule NappyWeb.Components.GalleryComponent do
               id={"advert#{System.unique_integer()}"}
             >
               <div class="grid grid-cols-2 gap-1 pt-1 items-start h-full">
-                <p class="bg-black text-white text-center py-2 rounded col-span-2 self-center">
+                <p class="bg-black text-white text-center py-1 text-sm rounded col-span-2 self-center">
                   Sponsored Photos from <strong>iStock</strong>. Use code <strong>NAPPY15</strong>
                   for 15% off.
                 </p>
