@@ -1,5 +1,5 @@
 defmodule Nappy.Accounts.SocialMedia do
-  use Nappy.Schema
+  use Ecto.Schema
   import Ecto.Changeset
   alias Nappy.Accounts.User
 
@@ -27,6 +27,7 @@ defmodule Nappy.Accounts.SocialMedia do
       :contact_email,
       :bio
     ])
+    |> validate_required([:user_id])
     |> foreign_key_constraint(:user_id)
   end
 end

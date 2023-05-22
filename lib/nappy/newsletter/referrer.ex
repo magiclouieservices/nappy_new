@@ -1,5 +1,5 @@
 defmodule Nappy.Newsletter.Referrer do
-  use Nappy.Schema
+  use Ecto.Schema
   import Ecto.Changeset
   alias Nappy.Newsletter.Subscriber
 

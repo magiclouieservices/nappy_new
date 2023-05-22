@@ -1,5 +1,5 @@
 defmodule Nappy.Admin.AdminSettings do
-  use Nappy.Schema
+  use Ecto.Schema
   import Ecto.Changeset
 
   @moduledoc false

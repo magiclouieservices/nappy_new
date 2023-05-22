@@ -1,5 +1,5 @@
 defmodule Nappy.Metrics.Notifications do
-  use Nappy.Schema
+  use Ecto.Schema
   import Ecto.Changeset
   alias Nappy.Accounts.User
 
@@ -9,7 +9,7 @@ defmodule Nappy.Metrics.Notifications do
     belongs_to :user, User
     field :description, :string
     field :slug, :string
-    field :additional_foreign_key, :binary_id
+    field :additional_foreign_key, :integer
 
     timestamps()
   end
@@ -23,10 +23,11 @@ defmodule Nappy.Metrics.Notifications do
       :slug,
       :additional_foreign_key
     ])
-    |> foreign_key_constraint(:user_id)
     |> validate_required([
+      :user_id,
       :description,
       :slug
     ])
+    |> foreign_key_constraint(:user_id)
   end
 end

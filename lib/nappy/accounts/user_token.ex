@@ -1,5 +1,5 @@
 defmodule Nappy.Accounts.UserToken do
-  use Nappy.Schema
+  use Ecto.Schema
   import Ecto.Query
   alias Nappy.Accounts.UserToken
 

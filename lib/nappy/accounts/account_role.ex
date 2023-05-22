@@ -1,5 +1,5 @@
 defmodule Nappy.Accounts.AccountRole do
-  use Nappy.Schema
+  use Ecto.Schema
   import Ecto.Changeset
   alias Nappy.Accounts.User
 

@@ -1,5 +1,5 @@
 defmodule Nappy.Catalog.Images do
-  use Nappy.Schema
+  use Ecto.Schema
   import Ecto.Changeset
   alias Nappy.Accounts.User
   alias Nappy.Catalog.{Category, Collection, CollectionDescription}
