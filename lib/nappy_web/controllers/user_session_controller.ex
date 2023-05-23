@@ -5,10 +5,16 @@ defmodule NappyWeb.UserSessionController do
   alias NappyWeb.UserAuth
 
   def new(conn, _params) do
-    render(conn, "new.html", error_message: nil, page_title: "Sign in")
+    %{"redirect_path" => redirect_path} = conn.query_params
+
+    render(conn, "new.html",
+      error_message: nil,
+      page_title: "Sign in",
+      redirect_path: redirect_path
+    )
   end
 
-  def create(conn, %{"user" => user_params}) do
+  def create(conn, %{"redirect_path" => redirect_path, "user" => user_params}) do
     %{"email_or_username" => email_or_username, "password" => password} = user_params
     user = Accounts.get_user_by_email_or_username_and_password(email_or_username, password)
 
@@ -23,7 +29,9 @@ defmodule NappyWeb.UserSessionController do
           |> halt()
 
         :active ->
-          UserAuth.log_in_user(conn, user, user_params)
+          conn
+          |> put_session(:user_return_to, redirect_path)
+          |> UserAuth.log_in_user(user, user_params)
 
         :banned ->
           conn
@@ -38,8 +46,11 @@ defmodule NappyWeb.UserSessionController do
   end
 
   def delete(conn, _params) do
+    %{"redirect_path" => redirect_path} = conn.query_params
+
     conn
     |> put_flash(:info, "Logged out successfully.")
+    |> put_session(:user_return_to, redirect_path)
     |> UserAuth.log_out_user()
   end
 end

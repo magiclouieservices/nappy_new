@@ -7,6 +7,7 @@ defmodule NappyWeb.Components.GalleryComponent do
   alias NappyWeb.Components.DownloadComponent
   alias NappyWeb.Components.MoreInfoComponent
   alias NappyWeb.Components.RelatedImagesComponent
+  alias NappyWeb.Components.SaveToCollectionComponent
   alias NappyWeb.Components.ShareLinkComponent
   alias NappyWeb.Components.SponsoredImagesComponent
 
@@ -219,18 +220,20 @@ defmodule NappyWeb.Components.GalleryComponent do
                             id={"share-component-#{image.slug}"}
                           />
                           <%= if @current_user != nil do %>
-                            <button
-                              type="button"
-                              class="inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2"
-                            >
-                              <i class="fa-regular fa-heart"></i>
-                            </button>
+                            <.live_component
+                              module={SaveToCollectionComponent}
+                              id={"save-to-collection-component-#{image.slug}"}
+                            />
                           <% else %>
                             <a
                               class="inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2"
-                              href={Routes.user_session_path(@socket, :create)}
+                              href={
+                                Routes.user_session_path(@socket, :create,
+                                  redirect_path: redirect_path(image.slug)
+                                )
+                              }
                             >
-                              <i class="fa-regular fa-heart"></i>
+                              <i class="fa-solid fa-plus"></i>
                             </a>
                           <% end %>
                           <.live_component
@@ -325,6 +328,10 @@ defmodule NappyWeb.Components.GalleryComponent do
       </div>
     </div>
     """
+  end
+
+  defp redirect_path(image_slug) do
+    Path.join(["/", "photo", image_slug])
   end
 
   defp calc_span(metadata) do

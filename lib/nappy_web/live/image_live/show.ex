@@ -10,6 +10,7 @@ defmodule NappyWeb.ImageLive.Show do
   alias NappyWeb.Components.GalleryComponent
   alias NappyWeb.Components.MoreInfoComponent
   alias NappyWeb.Components.RelatedImagesComponent
+  alias NappyWeb.Components.SaveToCollectionComponent
   alias NappyWeb.Components.ShareLinkComponent
   alias NappyWeb.Components.SponsoredImagesComponent
   alias Plug.Conn.Status
@@ -33,7 +34,7 @@ defmodule NappyWeb.ImageLive.Show do
   end
 
   @impl true
-  def handle_params(%{"slug" => slug_path}, _uri, socket) do
+  def handle_params(%{"slug" => slug_path}, uri, socket) do
     active = Metrics.get_image_status_id(:active)
     featured = Metrics.get_image_status_id(:featured)
     list = String.split(slug_path, "+", trim: true)
@@ -65,6 +66,7 @@ defmodule NappyWeb.ImageLive.Show do
         tags = Catalog.image_tags_as_list(image.tags, image.generated_tags)
         sponsored_images = SponsoredImages.get_images(image.slug, image.tags)
         related_images = GalleryComponent.related_images(image.slug)
+        redirect_path = Path.join(["/", "photo", image.slug])
 
         socket =
           socket
@@ -72,6 +74,7 @@ defmodule NappyWeb.ImageLive.Show do
           |> assign(status: status)
           |> assign(ext: ext)
           |> assign(tags: tags)
+          |> assign(redirect_path: redirect_path)
           |> assign(sponsored_images: sponsored_images)
           |> assign(related_images: related_images)
           |> assign(page_title: image.title)
