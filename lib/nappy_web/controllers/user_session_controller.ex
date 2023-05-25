@@ -5,7 +5,15 @@ defmodule NappyWeb.UserSessionController do
   alias NappyWeb.UserAuth
 
   def new(conn, _params) do
-    %{"redirect_path" => redirect_path} = conn.query_params
+    user_return_to = get_session(conn, :user_return_to)
+    IO.inspect(user_return_to, label: "user_return_to")
+
+    redirect_path =
+      if user_return_to === "/" do
+        Map.get(conn.query_params, "redirect_path", "/")
+      else
+        user_return_to
+      end
 
     render(conn, "new.html",
       error_message: nil,
