@@ -222,6 +222,7 @@ defmodule NappyWeb.Components.GalleryComponent do
                           <%= if @current_user != nil do %>
                             <.live_component
                               current_user={@current_user}
+                              image={image}
                               module={SaveToCollectionComponent}
                               id={"save-to-collection-component-#{image.slug}"}
                             />

@@ -15,6 +15,7 @@ defmodule NappyWeb.Components.SaveToCollectionComponent do
       id="save-to-collection-component"
     />
   """
+  @impl true
   def render(assigns) do
     ~H"""
     <div x-data="{ open: false }" class="inline-flex justify-center">
@@ -70,58 +71,43 @@ defmodule NappyWeb.Components.SaveToCollectionComponent do
               </button>
             </div>
             <!-- Title -->
-            <h2 class="text-xl font-bold" x-bind:id="$id('modal-title')">Add to collection</h2>
+            <h2 class="text-xl font-bold" x-bind:id="$id('modal-title')">Move to collection</h2>
             <!-- Content -->
-            <fieldset class="mt-4">
+            <fieldset class="my-4 flex flex-col gap-2">
               <legend class="sr-only">Add to collection</legend>
-              <div class="space-y-2">
-                <div
-                  :for={coll_desc <- Catalog.get_collection_description_by_user_id(@current_user.id)}
-                  class="relative flex items-center justify-between"
-                >
-                  <div class="flex h-6 items-center">
-                    <input
-                      id={coll_desc.slug}
-                      aria-describedby={coll_desc.title}
-                      name="collection_description"
-                      type="radio"
-                      class="h-4 w-4 border-gray-300 text-gray-600 focus:ring-gray-600"
-                    />
-                    <div class="ml-3 leading-6">
-                      <label for={coll_desc.slug} class="font-medium text-gray-900">
-                        <%= coll_desc.title %>
-                      </label>
-                    </div>
-                  </div>
-                  <!-- Toggle -->
-                  <div
-                    x-data="{ value: false }"
-                    class="flex items-center justify-center"
-                    x-id="['toggle-label']"
+              <%= for coll_desc <- Catalog.get_collection_description_by_user_id(@current_user.id) do %>
+                <div class="relative flex items-center">
+                  <input
+                    id={"#{coll_desc.slug}#{@image.slug}"}
+                    aria-describedby={coll_desc.title}
+                    name={"collection_description-#{@image.slug}"}
+                    type="radio"
+                    checked={
+                      if @image.id == match_image_id(coll_desc.id, @image.id),
+                        do: "true",
+                        else: nil
+                    }
+                    class="h-4 w-4 border-gray-300 text-gray-600 focus:ring-gray-600"
+                  />
+                  <label
+                    for={"#{coll_desc.slug}#{@image.slug}"}
+                    class="px-3 font-medium text-gray-900"
                   >
-                    <input type="hidden" name="sendNotifications" x-bind:value="value" />
-                    <!-- Button -->
-                    <button
-                      x-ref="toggle"
-                      @click="value = ! value"
-                      type="button"
-                      role="switch"
-                      x-bind:aria-checked="value"
-                      x-bind:aria-labelledby="$id('toggle-label')"
-                      x-bind:class="value ? 'bg-slate-400' : 'bg-slate-300'"
-                      class="relative ml-4 inline-flex w-14 rounded-full py-1 transition"
-                    >
-                      <span
-                        x-bind:class="value ? 'translate-x-7' : 'translate-x-1'"
-                        class="bg-white h-6 w-6 rounded-full transition shadow-md"
-                        aria-hidden="true"
-                      >
-                      </span>
-                    </button>
-                  </div>
+                    <%= coll_desc.title %>
+                  </label>
                 </div>
-              </div>
+              <% end %>
             </fieldset>
+
+            <label for="new-collection" class="text-lg font-bold">
+              New collection
+            </label>
+            <input
+              type="text"
+              name={"new_collection-#{@image.slug}"}
+              id={"new-collection-#{@image.slug}"}
+              class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-gray-600 sm:leading-6 font-bold"
+            />
             <!-- Buttons -->
             <div class="mt-8 flex space-x-2">
               <button
@@ -145,5 +131,9 @@ defmodule NappyWeb.Components.SaveToCollectionComponent do
       </div>
     </div>
     """
+  end
+
+  defp match_image_id(coll_desc_id, image_id) do
+    Catalog.get_matched_collection(coll_desc_id, image_id)[:image_id]
   end
 end

@@ -1043,15 +1043,6 @@ defmodule Nappy.Catalog do
     Repo.all(Collection)
   end
 
-  def get_collection_by_slug(image_slug) do
-    image_id = from(i in Images, where: i.slug == ^image_slug, select: i.id) |> Repo.one()
-
-    Collection
-    |> where(image_id: ^image_id)
-    |> preload(:collection_description)
-    |> Repo.one()
-  end
-
   @doc """
   Gets a single collection.
 
@@ -1188,6 +1179,22 @@ defmodule Nappy.Catalog do
     CollectionDescription
     |> where(user_id: ^user_id)
     |> Repo.all()
+  end
+
+  def get_matched_collection(coll_desc_id, image_id) do
+    CollectionDescription
+    |> join(:inner, [cd], c in assoc(cd, :collections))
+    |> join(:inner, [_, c], i in assoc(c, :image))
+    |> where([_, c, _], c.image_id == ^image_id)
+    |> where([cd, _, _], cd.id == ^coll_desc_id)
+    |> select([cd, c, _i], %{
+      image_id: c.image_id,
+      coll_desc_id: cd.id,
+      coll_desc_slug: cd.slug,
+      is_enabled: cd.is_enabled,
+      title: cd.title
+    })
+    |> Repo.one()
   end
 
   def consolidate_tags_by_category(category_id, count \\ 24) do
