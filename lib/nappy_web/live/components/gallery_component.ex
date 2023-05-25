@@ -77,6 +77,7 @@ defmodule NappyWeb.Components.GalleryComponent do
                 </p>
                 <a
                   :for={spon <- image.sponsored}
+                  id={spon["id"]}
                   class="rounded h-full w-full bg-slate-300"
                   href={spon["referral_link"]}
                   target="_blank"
@@ -91,7 +92,7 @@ defmodule NappyWeb.Components.GalleryComponent do
               </div>
             </div>
           <% else %>
-            <%= unless Map.has_key?(image, :sponsored) do %>
+            <%= if !Map.has_key?(image, :sponsored) do %>
               <div
                 id={"view-count-#{image.slug}"}
                 phx-hook="ViewCount"
