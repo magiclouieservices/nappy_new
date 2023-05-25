@@ -1,6 +1,8 @@
 defmodule NappyWeb.Components.SaveToCollectionComponent do
   use NappyWeb, :live_component
 
+  alias Nappy.Catalog
+
   @moduledoc false
 
   @doc """
@@ -47,14 +49,79 @@ defmodule NappyWeb.Components.SaveToCollectionComponent do
           <div
             x-on:click.stop
             x-trap.noscroll.inert="open"
-            class="relative w-full max-w-2xl overflow-y-auto rounded-xl bg-white p-12 shadow-lg"
+            class="relative overflow-y-auto rounded-xl bg-white p-12 shadow-lg"
           >
+            <div x-on:click="open = false" class="absolute right-0 top-0 hidden pr-4 pt-4 sm:block">
+              <button
+                type="button"
+                class="rounded-md bg-white text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2"
+              >
+                <span class="sr-only">Close</span>
+                <svg
+                  class="h-6 w-6"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke-width="1.5"
+                  stroke="currentColor"
+                  aria-hidden="true"
+                >
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
             <!-- Title -->
-            <h2 class="text-3xl font-bold" x-bind:id="$id('modal-title')">Confirm</h2>
+            <h2 class="text-xl font-bold" x-bind:id="$id('modal-title')">Add to collection</h2>
             <!-- Content -->
-            <p class="mt-2 text-gray-600">
-              Are you sure you want to learn how to create an awesome modal?
-            </p>
+            <fieldset class="mt-4">
+              <legend class="sr-only">Add to collection</legend>
+              <div class="space-y-2">
+                <div
+                  :for={coll_desc <- Catalog.get_collection_description_by_user_id(@current_user.id)}
+                  class="relative flex items-center justify-between"
+                >
+                  <div class="flex h-6 items-center">
+                    <input
+                      id={coll_desc.slug}
+                      aria-describedby={coll_desc.title}
+                      name="collection_description"
+                      type="radio"
+                      class="h-4 w-4 border-gray-300 text-gray-600 focus:ring-gray-600"
+                    />
+                    <div class="ml-3 leading-6">
+                      <label for={coll_desc.slug} class="font-medium text-gray-900">
+                        <%= coll_desc.title %>
+                      </label>
+                    </div>
+                  </div>
+                  <!-- Toggle -->
+                  <div
+                    x-data="{ value: false }"
+                    class="flex items-center justify-center"
+                    x-id="['toggle-label']"
+                  >
+                    <input type="hidden" name="sendNotifications" x-bind:value="value" />
+                    <!-- Button -->
+                    <button
+                      x-ref="toggle"
+                      @click="value = ! value"
+                      type="button"
+                      role="switch"
+                      x-bind:aria-checked="value"
+                      x-bind:aria-labelledby="$id('toggle-label')"
+                      x-bind:class="value ? 'bg-slate-400' : 'bg-slate-300'"
+                      class="relative ml-4 inline-flex w-14 rounded-full py-1 transition"
+                    >
+                      <span
+                        x-bind:class="value ? 'translate-x-7' : 'translate-x-1'"
+                        class="bg-white h-6 w-6 rounded-full transition shadow-md"
+                        aria-hidden="true"
+                      >
+                      </span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </fieldset>
             <!-- Buttons -->
             <div class="mt-8 flex space-x-2">
               <button
@@ -62,7 +129,7 @@ defmodule NappyWeb.Components.SaveToCollectionComponent do
                 x-on:click="open = false"
                 class="rounded-md border border-gray-200 bg-white px-5 py-2.5"
               >
-                Confirm
+                Update
               </button>
 
               <button

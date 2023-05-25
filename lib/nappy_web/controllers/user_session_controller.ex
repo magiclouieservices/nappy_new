@@ -6,7 +6,6 @@ defmodule NappyWeb.UserSessionController do
 
   def new(conn, _params) do
     user_return_to = get_session(conn, :user_return_to)
-    IO.inspect(user_return_to, label: "user_return_to")
 
     redirect_path =
       if user_return_to === "/" do
