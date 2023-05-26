@@ -52,6 +52,7 @@ defmodule NappyWeb.Components.GalleryComponent do
     <div>
       <div
         id="infinite-scroll-body"
+        phx-hook="NewCollection"
         phx-update="append"
         phx-target={@myself}
         class="grid
@@ -305,6 +306,7 @@ defmodule NappyWeb.Components.GalleryComponent do
                       <.live_component
                         :if={length(@sponsored_images) > 1}
                         module={SponsoredImagesComponent}
+                        image_slug={image.slug}
                         id={"sponsored-image-#{image.slug}"}
                         sponsored_images={@sponsored_images}
                       />

@@ -18,12 +18,7 @@ defmodule NappyWeb.Components.SaveToCollectionComponent do
   @impl true
   def render(assigns) do
     ~H"""
-    <div
-      id={"new-collection-hook-#{@image.slug}"}
-      phx-hook="NewCollection"
-      x-data="{ open: false }"
-      class="inline-flex justify-center"
-    >
+    <div x-data="{ open: false }" class="inline-flex justify-center">
       <!-- Trigger -->
       <button
         x-on:click="open = true"
@@ -47,7 +42,7 @@ defmodule NappyWeb.Components.SaveToCollectionComponent do
         <div x-show="open" x-transition.opacity class="fixed inset-0 bg-black bg-opacity-50"></div>
         <!-- Panel -->
         <div
-          x-show.important="open"
+          x-show="open"
           x-transition
           x-on:click="open = false"
           class="relative flex min-h-screen items-center justify-center pt-4"

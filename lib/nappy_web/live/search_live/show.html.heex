@@ -15,6 +15,7 @@
   <.live_component
     :if={not Enum.empty?(@sponsored_images)}
     module={SponsoredImagesComponent}
+    image_slug={System.unique_integer()}
     id="sponsored-image"
     sponsored_images={@sponsored_images}
   />

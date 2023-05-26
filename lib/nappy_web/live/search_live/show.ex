@@ -59,6 +59,22 @@ defmodule NappyWeb.SearchLive.Show do
     {:noreply, assign(socket, page: assigns.page + 1) |> fetch()}
   end
 
+  @impl true
+  def handle_event("add_new_collection", %{"input" => value}, socket) do
+    socket =
+      socket
+      |> put_flash(:info, "value is #{value}")
+
+    Process.send_after(self(), :clear_info, 5_000)
+
+    {:noreply, socket}
+  end
+
+  @impl true
+  def handle_info(:clear_info, socket) do
+    {:noreply, clear_flash(socket, :info)}
+  end
+
   defp prepare_assigns(socket, uri) do
     socket
     |> assign(page: 1)

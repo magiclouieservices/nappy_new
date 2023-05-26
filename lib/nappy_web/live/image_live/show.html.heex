@@ -8,7 +8,11 @@
       <span><%= @image.user.username %></span>
     </a>
 
-    <div class="flex gap-2 xs:justify-between sm:justify-end">
+    <div
+      id="new-collection-hook"
+      phx-hook="NewCollection"
+      class="flex gap-2 xs:justify-between sm:justify-end"
+    >
       <div>
         <.live_component
           module={ShareLinkComponent}
@@ -100,6 +104,7 @@
   <.live_component
     module={SponsoredImagesComponent}
     id={"sponsored-image-#{@image.slug}"}
+    image_slug={@image.slug}
     sponsored_images={@sponsored_images}
   />
 </div>

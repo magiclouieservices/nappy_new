@@ -2,7 +2,6 @@ export default InfiniteScroll = {
   loadMore(entries) {
     const target = entries[0];
     if (target.isIntersecting) {
-      console.log("triggered");
       this.pushEvent("load-more", {});
     }
   },

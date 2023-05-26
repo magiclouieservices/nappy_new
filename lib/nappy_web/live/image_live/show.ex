@@ -34,7 +34,7 @@ defmodule NappyWeb.ImageLive.Show do
   end
 
   @impl true
-  def handle_params(%{"slug" => slug_path}, uri, socket) do
+  def handle_params(%{"slug" => slug_path}, _uri, socket) do
     active = Metrics.get_image_status_id(:active)
     featured = Metrics.get_image_status_id(:featured)
     list = String.split(slug_path, "+", trim: true)
