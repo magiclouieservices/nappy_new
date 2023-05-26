@@ -18,7 +18,12 @@ defmodule NappyWeb.Components.SaveToCollectionComponent do
   @impl true
   def render(assigns) do
     ~H"""
-    <div x-data="{ open: false }" class="inline-flex justify-center">
+    <div
+      id={"new-collection-hook-#{@image.slug}"}
+      phx-hook="NewCollection"
+      x-data="{ open: false }"
+      class="inline-flex justify-center"
+    >
       <!-- Trigger -->
       <button
         x-on:click="open = true"
@@ -42,15 +47,15 @@ defmodule NappyWeb.Components.SaveToCollectionComponent do
         <div x-show="open" x-transition.opacity class="fixed inset-0 bg-black bg-opacity-50"></div>
         <!-- Panel -->
         <div
-          x-show="open"
+          x-show.important="open"
           x-transition
           x-on:click="open = false"
-          class="relative flex min-h-screen items-center justify-center p-4"
+          class="relative flex min-h-screen items-center justify-center pt-4"
         >
           <div
             x-on:click.stop
             x-trap.noscroll.inert="open"
-            class="relative overflow-y-auto rounded-xl bg-white p-12 shadow-lg"
+            class="relative overflow-y-auto rounded-xl bg-white py-8 px-12 shadow-lg"
           >
             <div x-on:click="open = false" class="absolute right-0 top-0 hidden pr-4 pt-4 sm:block">
               <button
@@ -73,7 +78,7 @@ defmodule NappyWeb.Components.SaveToCollectionComponent do
             <!-- Title -->
             <h2 class="text-xl font-bold" x-bind:id="$id('modal-title')">Move to collection</h2>
             <!-- Content -->
-            <fieldset class="my-4 flex flex-col gap-2">
+            <fieldset class="my-2 flex flex-col gap-2">
               <legend class="sr-only">Add to collection</legend>
               <%= for coll_desc <- Catalog.get_collection_description_by_user_id(@current_user.id) do %>
                 <div class="relative flex items-center">
@@ -99,31 +104,20 @@ defmodule NappyWeb.Components.SaveToCollectionComponent do
               <% end %>
             </fieldset>
 
-            <label for="new-collection" class="text-lg font-bold">
-              New collection
-            </label>
+            <hr class="mt-12 mb-2" />
             <input
               type="text"
               name={"new_collection-#{@image.slug}"}
-              id={"new-collection-#{@image.slug}"}
-              class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-gray-600 sm:leading-6 font-bold"
+              class="inline rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-gray-600 sm:leading-6"
+              placeholder="or create new collection"
             />
-            <!-- Buttons -->
-            <div class="mt-8 flex space-x-2">
+            <div class="inline" x-on:click="open = false">
               <button
+                id={"new_collection-#{@image.slug}"}
                 type="button"
-                x-on:click="open = false"
-                class="rounded-md border border-gray-200 bg-white px-5 py-2.5"
+                class="rounded-md text-white bg-black hover:bg-gray-900 px-4 py-1.5"
               >
-                Update
-              </button>
-
-              <button
-                type="button"
-                x-on:click="open = false"
-                class="rounded-md border border-gray-200 bg-white px-5 py-2.5"
-              >
-                Cancel
+                Create
               </button>
             </div>
           </div>
