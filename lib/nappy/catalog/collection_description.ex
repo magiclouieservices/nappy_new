@@ -15,7 +15,7 @@ defmodule Nappy.Catalog.CollectionDescription do
     field :thumbnail, :integer
     belongs_to :user, User
 
-    many_to_many :image,
+    many_to_many :images,
                  Images,
                  join_through: Collection,
                  on_replace: :delete,

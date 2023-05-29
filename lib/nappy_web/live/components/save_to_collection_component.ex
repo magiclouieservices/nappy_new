@@ -74,13 +74,16 @@ defmodule NappyWeb.Components.SaveToCollectionComponent do
             <h2 class="text-xl font-bold" x-bind:id="$id('modal-title')">Move to collection</h2>
             <!-- Content -->
             <.form for={%{}} as={:set_collection} phx-submit="set_collection" phx-target={@myself}>
+              <input type="hidden" name="image_slug" value={@image.slug} />
               <fieldset class="my-2 flex flex-col gap-2">
                 <legend class="sr-only">Add to collection</legend>
                 <%= for coll_desc <- Catalog.get_collection_description_by_user_id(@current_user.id) do %>
                   <div class="relative flex items-center">
                     <input
+                      id={"#{coll_desc.slug}#{@image.slug}"}
                       aria-describedby={coll_desc.title}
-                      name={coll_desc.slug}
+                      name="selected"
+                      value={coll_desc.slug}
                       type="radio"
                       checked={
                         if @image.id == match_image_id(coll_desc.id, @image.id),
@@ -98,14 +101,16 @@ defmodule NappyWeb.Components.SaveToCollectionComponent do
                   </div>
                 <% end %>
               </fieldset>
-              <button
-                id={"set_collection-#{@image.slug}"}
-                type="submit"
-                phx-target={@myself}
-                class="rounded-md text-white bg-black hover:bg-gray-900 px-4 py-1.5"
-              >
-                Set collection
-              </button>
+              <div x-on:click="open = false">
+                <button
+                  id={"set_collection-#{@image.slug}"}
+                  type="submit"
+                  phx-target={@myself}
+                  class="rounded-md text-white bg-black hover:bg-gray-900 px-4 py-1.5"
+                >
+                  Set collection
+                </button>
+              </div>
             </.form>
 
             <hr class="mt-12 mb-2" />
@@ -116,6 +121,7 @@ defmodule NappyWeb.Components.SaveToCollectionComponent do
               phx-target={@myself}
               class="flex justify-center items-center gap-2"
             >
+              <input type="hidden" name="image_slug" value={@image.slug} />
               <input
                 id={"input-new_collection-#{@image.slug}"}
                 type="text"
@@ -143,29 +149,45 @@ defmodule NappyWeb.Components.SaveToCollectionComponent do
   end
 
   @impl true
-  def handle_event("set_collection", _, socket) do
+  def handle_event(
+        "set_collection",
+        %{"selected" => coll_desc_slug, "image_slug" => image_slug},
+        socket
+      ) do
     path = socket.assigns[:current_url]
+    current_user = socket.assigns[:current_user]
+    attrs = %{user_id: current_user.id}
 
     socket =
-      socket
-      |> put_flash(:info, "TODO")
+      case Catalog.add_image_to_collection(coll_desc_slug, image_slug, attrs) do
+        {:ok, _} -> put_flash(socket, :info, "Image added to collection")
+        {:error, _reason} -> put_flash(socket, :error, "Error adding image to collection")
+      end
 
     Process.send_after(self(), :clear_info, 5_000)
 
-    {:noreply, push_patch(socket, to: path)}
+    {:noreply, push_navigate(socket, to: path)}
   end
 
   @impl true
-  def handle_event("new_collection", %{"collection_name" => collection}, socket) do
+  def handle_event(
+        "new_collection",
+        %{"collection_name" => coll_desc_slug, "image_slug" => image_slug},
+        socket
+      ) do
     path = socket.assigns[:current_url]
+    current_user = socket.assigns[:current_user]
+    attrs = %{user_id: current_user.id}
 
     socket =
-      socket
-      |> put_flash(:info, "value is #{collection}")
+      case Catalog.add_image_to_collection(coll_desc_slug, image_slug, attrs) do
+        {:ok, _} -> put_flash(socket, :info, "Image added to collection")
+        {:error, _reason} -> put_flash(socket, :error, "Error adding image to collection")
+      end
 
     Process.send_after(self(), :clear_info, 5_000)
 
-    {:noreply, push_patch(socket, to: path)}
+    {:noreply, push_navigate(socket, to: path)}
   end
 
   defp match_image_id(coll_desc_id, image_id) do

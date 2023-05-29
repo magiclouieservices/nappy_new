@@ -1336,4 +1336,37 @@ defmodule Nappy.Catalog do
       related_tag
     end
   end
+
+  def add_image_to_collection(coll_desc_slug, image_slug, attrs \\ %{}) do
+    # CollectionDescription |> preload(images: ^query) |> where(id: ^2) |> Repo.all
+    new_image = Images |> where(slug: ^image_slug) |> Repo.one()
+
+    coll_desc =
+      CollectionDescription
+      |> preload(:images)
+      |> where(slug: ^coll_desc_slug)
+      |> Repo.one()
+
+    Repo.transaction(fn ->
+      CollectionDescription
+      |> preload(:images)
+      |> where(slug: ^coll_desc_slug)
+      |> Repo.one()
+      |> Ecto.Changeset.change(attrs)
+      |> Ecto.Changeset.put_assoc(:images, [new_image | coll_desc.images])
+      |> Repo.update!()
+    end)
+
+    # traverse_errors(changeset, fn {msg, opts} ->
+    #   Regex.replace(~r"%{(\w+)}", msg, fn _, key ->
+    #     opts |> Keyword.get(String.to_existing_atom(key), key) |> to_string()
+    #   end)
+    # end)
+    # params = %{"title" => "new post", "tags" => ["learner"]}
+    # tags = Repo.all(from t in Tag, where: t.name in ^params["tags"])
+    # post
+    # |> Repo.preload(:tags)
+    # |> Ecto.Changeset.cast(params, [:title]) # No need to allow :tags as we put them directly
+    # |> Ecto.Changeset.put_assoc(:tags, tags) # Explicitly set the tags
+  end
 end
