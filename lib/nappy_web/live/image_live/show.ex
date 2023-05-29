@@ -104,4 +104,9 @@ defmodule NappyWeb.ImageLive.Show do
 
     {:noreply, socket}
   end
+
+  @impl true
+  def handle_info(:clear_info, socket) do
+    {:noreply, clear_flash(socket, :info)}
+  end
 end

@@ -56,6 +56,11 @@ defmodule NappyWeb.CollectionsLive.Show do
     {:noreply, socket}
   end
 
+  @impl true
+  def handle_info(:clear_info, socket) do
+    {:noreply, clear_flash(socket, :info)}
+  end
+
   defp fetch(%{assigns: %{slug: slug, page: page, page_size: page_size}} = socket) do
     args = [slug, [page: page, page_size: page_size]]
     mfa = {Catalog, :paginate_collection, args}

@@ -79,9 +79,8 @@ defmodule NappyWeb.Components.SaveToCollectionComponent do
                 <%= for coll_desc <- Catalog.get_collection_description_by_user_id(@current_user.id) do %>
                   <div class="relative flex items-center">
                     <input
-                      id={"#{coll_desc.slug}#{@image.slug}"}
                       aria-describedby={coll_desc.title}
-                      name={"collection_description-#{@image.slug}"}
+                      name={coll_desc.slug}
                       type="radio"
                       checked={
                         if @image.id == match_image_id(coll_desc.id, @image.id),
@@ -167,10 +166,6 @@ defmodule NappyWeb.Components.SaveToCollectionComponent do
     Process.send_after(self(), :clear_info, 5_000)
 
     {:noreply, push_patch(socket, to: path)}
-  end
-
-  def handle_info(:clear_info, socket) do
-    {:noreply, clear_flash(socket, :info)}
   end
 
   defp match_image_id(coll_desc_id, image_id) do
