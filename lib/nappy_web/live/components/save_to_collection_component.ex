@@ -110,7 +110,8 @@ defmodule NappyWeb.Components.SaveToCollectionComponent do
               <button
                 id={"new_collection-#{@image.slug}"}
                 type="button"
-                class="rounded-md text-white bg-black hover:bg-gray-900 px-4 py-1.5"
+                class="rounded-md text-white bg-gray-500 px-4 py-1.5"
+                disabled
               >
                 Create
               </button>

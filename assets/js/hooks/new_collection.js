@@ -5,16 +5,9 @@ export default NewCollection = {
     if (addToCollectionButton) {
       addToCollectionButton
       .forEach(el => {
-        console.log("x")
-        el.setAttribute("disabled", "")
-        el.classList.replace("bg-black", "bg-gray-500")
-        el.classList.remove("hover:bg-gray-900")
         let input = el.parentElement.previousElementSibling
 
         input.addEventListener("input", event => {
-          console.log(event.target)
-          // event.preventDefault()
-
           if (!!event.target.value) {
             el.removeAttribute("disabled")
             el.classList.replace("bg-gray-500", "bg-black")

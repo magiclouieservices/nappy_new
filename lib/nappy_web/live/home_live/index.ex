@@ -42,16 +42,16 @@ defmodule NappyWeb.HomeLive.Index do
     {:noreply, socket}
   end
 
-  # @impl true
-  # def handle_event("add_new_collection", %{"input" => value}, socket) do
-  #   socket =
-  #     socket
-  #     |> put_flash(:info, "value is #{value}")
+  @impl true
+  def handle_event("add_new_collection", %{"input" => value}, socket) do
+    socket =
+      socket
+      |> put_flash(:info, "value is #{value}")
 
-  #   Process.send_after(self(), :clear_info, 5_000)
+    Process.send_after(self(), :clear_info, 5_000)
 
-  #   {:noreply, socket}
-  # end
+    {:noreply, socket}
+  end
 
   @impl true
   def handle_info(:clear_info, socket) do
