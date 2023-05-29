@@ -112,15 +112,15 @@ defmodule NappyWeb.Components.SaveToCollectionComponent do
             <hr class="mt-12 mb-2" />
             <.form
               for={%{}}
-              as={:create_collection}
-              phx-submit="create_new_collection"
+              as={:new_collection}
+              phx-submit="new_collection"
               phx-target={@myself}
               class="flex justify-center items-center gap-2"
             >
               <input
                 id={"input-new_collection-#{@image.slug}"}
                 type="text"
-                name={"new_collection-#{@image.slug}"}
+                name="collection_name"
                 class="inline rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-gray-600 sm:leading-6"
                 placeholder="or create new collection"
               />
@@ -150,6 +150,19 @@ defmodule NappyWeb.Components.SaveToCollectionComponent do
     socket =
       socket
       |> put_flash(:info, "TODO")
+
+    Process.send_after(self(), :clear_info, 5_000)
+
+    {:noreply, push_patch(socket, to: path)}
+  end
+
+  @impl true
+  def handle_event("new_collection", %{"collection_name" => collection}, socket) do
+    path = socket.assigns[:current_url]
+
+    socket =
+      socket
+      |> put_flash(:info, "value is #{collection}")
 
     Process.send_after(self(), :clear_info, 5_000)
 

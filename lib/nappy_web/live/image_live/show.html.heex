@@ -30,6 +30,7 @@
             module={SaveToCollectionComponent}
             id="save-to-collection-component"
             current_url={URI.parse(@current_url).path}
+            current_user={@current_user}
           />
         <% else %>
           <a

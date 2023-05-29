@@ -277,11 +277,6 @@ defmodule NappyWeb.Components.GalleryComponent do
                           <i class="fa-solid fa-eye"></i>
                           <%= get_metrics(image).view_count %> Views
                         </span>
-                        <!--
-                        <span>
-                          <i class="fa-solid fa-heart"></i> 23 Saves
-                        </span>
-                        -->
                         <span class="text-center p-0 m-0 flex sm:flex-row xs:flex-col sm:justify-center xs:justify-between items-center gap-2">
                           <i class="fa-solid fa-download"></i>
                           <%= get_metrics(image).download_count %> Downloads
@@ -357,9 +352,5 @@ defmodule NappyWeb.Components.GalleryComponent do
       view_count: view_count,
       download_count: download_count
     }
-  end
-
-  defp match_image_id(coll_desc_id, image_id) do
-    Catalog.get_matched_collection(coll_desc_id, image_id)[:image_id]
   end
 end

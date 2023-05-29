@@ -42,22 +42,6 @@ defmodule NappyWeb.HomeLive.Index do
     {:noreply, socket}
   end
 
-  @impl true
-  def handle_event("add_new_collection", %{"input" => value}, socket) do
-    socket =
-      socket
-      |> put_flash(:info, "value is #{value}")
-
-    Process.send_after(self(), :clear_info, 5_000)
-
-    {:noreply, socket}
-  end
-
-  @impl true
-  def handle_info(:clear_info, socket) do
-    {:noreply, clear_flash(socket, :info)}
-  end
-
   defp prepare_assigns(socket, uri, page_title \\ "Nappy", filter \\ [filter: :featured]) do
     socket
     |> assign(page: 1)

@@ -18,14 +18,6 @@ export default NewCollection = {
             el.classList.remove("hover:bg-gray-900")
           }
         })
-
-        el.addEventListener("click", event => {
-          event.preventDefault()
-
-          if (!!input.value) {
-            this.pushEvent("add_new_collection", {input: input.value})
-          }
-        })
       })
     }
   },
