@@ -25,10 +25,11 @@
         />
         <%= if @current_user != nil do %>
           <.live_component
-            current_user={@current_user}
+            :if={Nappy.Accounts.is_admin(@current_user)}
             image={@image}
             module={SaveToCollectionComponent}
             id="save-to-collection-component"
+            current_url={URI.parse(@current_url).path}
           />
         <% else %>
           <a

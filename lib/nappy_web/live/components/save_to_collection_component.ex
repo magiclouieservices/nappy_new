@@ -73,54 +73,91 @@ defmodule NappyWeb.Components.SaveToCollectionComponent do
             <!-- Title -->
             <h2 class="text-xl font-bold" x-bind:id="$id('modal-title')">Move to collection</h2>
             <!-- Content -->
-            <fieldset class="my-2 flex flex-col gap-2">
-              <legend class="sr-only">Add to collection</legend>
-              <%= for coll_desc <- Catalog.get_collection_description_by_user_id(@current_user.id) do %>
-                <div class="relative flex items-center">
-                  <input
-                    id={"#{coll_desc.slug}#{@image.slug}"}
-                    aria-describedby={coll_desc.title}
-                    name={"collection_description-#{@image.slug}"}
-                    type="radio"
-                    checked={
-                      if @image.id == match_image_id(coll_desc.id, @image.id),
-                        do: "true",
-                        else: nil
-                    }
-                    class="h-4 w-4 border-gray-300 text-gray-600 focus:ring-gray-600"
-                  />
-                  <label
-                    for={"#{coll_desc.slug}#{@image.slug}"}
-                    class="px-3 font-medium text-gray-900"
-                  >
-                    <%= coll_desc.title %>
-                  </label>
-                </div>
-              <% end %>
-            </fieldset>
+            <.form for={%{}} as={:set_collection} phx-submit="set_collection" phx-target={@myself}>
+              <fieldset class="my-2 flex flex-col gap-2">
+                <legend class="sr-only">Add to collection</legend>
+                <%= for coll_desc <- Catalog.get_collection_description_by_user_id(@current_user.id) do %>
+                  <div class="relative flex items-center">
+                    <input
+                      id={"#{coll_desc.slug}#{@image.slug}"}
+                      aria-describedby={coll_desc.title}
+                      name={"collection_description-#{@image.slug}"}
+                      type="radio"
+                      checked={
+                        if @image.id == match_image_id(coll_desc.id, @image.id),
+                          do: "true",
+                          else: nil
+                      }
+                      class="h-4 w-4 border-gray-300 text-gray-600 focus:ring-gray-600"
+                    />
+                    <label
+                      for={"#{coll_desc.slug}#{@image.slug}"}
+                      class="px-3 font-medium text-gray-900"
+                    >
+                      <%= coll_desc.title %>
+                    </label>
+                  </div>
+                <% end %>
+              </fieldset>
+              <button
+                id={"set_collection-#{@image.slug}"}
+                type="submit"
+                phx-target={@myself}
+                class="rounded-md text-white bg-black hover:bg-gray-900 px-4 py-1.5"
+              >
+                Set collection
+              </button>
+            </.form>
 
             <hr class="mt-12 mb-2" />
-            <input
-              type="text"
-              name={"new_collection-#{@image.slug}"}
-              class="inline rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-gray-600 sm:leading-6"
-              placeholder="or create new collection"
-            />
-            <div class="inline" x-on:click="open = false">
-              <button
-                id={"new_collection-#{@image.slug}"}
-                type="button"
-                class="rounded-md text-white bg-gray-500 px-4 py-1.5"
-                disabled
-              >
-                Create
-              </button>
-            </div>
+            <.form
+              for={%{}}
+              as={:create_collection}
+              phx-submit="create_new_collection"
+              phx-target={@myself}
+              class="flex justify-center items-center gap-2"
+            >
+              <input
+                id={"input-new_collection-#{@image.slug}"}
+                type="text"
+                name={"new_collection-#{@image.slug}"}
+                class="inline rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-gray-600 sm:leading-6"
+                placeholder="or create new collection"
+              />
+              <div class="inline" x-on:click="open = false">
+                <button
+                  id={"new_collection-#{@image.slug}"}
+                  type="submit"
+                  phx-target={@myself}
+                  class="rounded-md text-white bg-gray-500 px-4 py-1.5"
+                  disabled
+                >
+                  Create
+                </button>
+              </div>
+            </.form>
           </div>
         </div>
       </div>
     </div>
     """
+  end
+
+  @impl true
+  def handle_event("set_collection", _, socket) do
+    path = socket.assigns[:current_url]
+
+    socket =
+      socket
+      |> put_flash(:info, "TODO")
+
+    Process.send_after(self(), :clear_info, 5_000)
+
+    {:noreply, push_patch(socket, to: path)}
+  end
+
+  def handle_info(:clear_info, socket) do
+    {:noreply, clear_flash(socket, :info)}
   end
 
   defp match_image_id(coll_desc_id, image_id) do
