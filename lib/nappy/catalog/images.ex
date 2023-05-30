@@ -80,6 +80,7 @@ defmodule Nappy.Catalog.Images do
     ])
     |> foreign_key_constraint(:user_id)
     |> foreign_key_constraint(:category_id)
+    |> foreign_key_constraint(:image_status_id)
     |> unique_constraint(:slug)
   end
 end

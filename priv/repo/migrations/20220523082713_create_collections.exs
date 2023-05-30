@@ -3,11 +3,10 @@ defmodule Nappy.Repo.Migrations.CreateCollections do
 
   def change do
     create table(:collections) do
-      add :image_id, references(:images, on_delete: :delete_all), null: false, primary_key: true
+      add :image_id, references(:images, on_delete: :delete_all), null: false
 
       add :collection_description_id, references(:collection_description, on_delete: :delete_all),
-        null: false,
-        primary_key: true
+        null: false
 
       timestamps()
     end
