@@ -316,12 +316,14 @@ defmodule NappyWeb.Components.GalleryComponent do
         data-page={@page}
       >
       </div>
+      <!--
       <div class="mt-8 text-center text-sm">
         Looking for something specific?
         <a target="_blank" rel="noreferer noopener" class="underline" href="https://nappy.kampsite.co">
           Request a photo
         </a>
       </div>
+      -->
     </div>
     """
   end

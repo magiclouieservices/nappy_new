@@ -159,9 +159,13 @@ defmodule NappyWeb.Components.SaveToCollectionComponent do
     attrs = %{user_id: current_user.id}
 
     socket =
-      case Catalog.add_image_to_collection(coll_desc_slug, image_slug, attrs) do
-        {:ok, _} -> put_flash(socket, :info, "Image added to collection")
-        {:error, _reason} -> put_flash(socket, :error, "Error adding image to collection")
+      case Catalog.add_image_to_existing_collection(coll_desc_slug, image_slug, attrs) do
+        {:ok, _} ->
+          {:ok, true} = Cachex.del(Nappy.cache_name(), {"collection_#{coll_desc_slug}"})
+          put_flash(socket, :info, "Image added to collection")
+
+        {:error, _reason} ->
+          put_flash(socket, :error, "Error adding image to collection")
       end
 
     Process.send_after(self(), :clear_info, 5_000)
@@ -180,7 +184,7 @@ defmodule NappyWeb.Components.SaveToCollectionComponent do
     attrs = %{user_id: current_user.id}
 
     socket =
-      case Catalog.add_image_to_collection(coll_desc_slug, image_slug, attrs) do
+      case Catalog.add_image_to_new_collection(coll_desc_slug, image_slug, attrs) do
         {:ok, _} -> put_flash(socket, :info, "Image added to collection")
         {:error, _reason} -> put_flash(socket, :error, "Error adding image to collection")
       end

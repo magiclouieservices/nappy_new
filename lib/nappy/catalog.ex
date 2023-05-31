@@ -247,7 +247,7 @@ defmodule Nappy.Catalog do
     |> join(:inner, [_, i, _, _], ia in assoc(i, :image_analytics))
     |> where([_, i, _, _], i.image_status_id in ^[active, featured])
     |> where(collection_description_id: ^coll_desc_id)
-    |> order_by(fragment("RANDOM()"))
+    # |> order_by(fragment("RANDOM()"))
     |> select([_, i, u, im, ia], %Images{
       id: i.id,
       description: i.description,
@@ -1337,7 +1337,7 @@ defmodule Nappy.Catalog do
     end
   end
 
-  def add_image_to_collection(coll_desc_slug, image_slug, attrs \\ %{}) do
+  def add_image_to_existing_collection(coll_desc_slug, image_slug, attrs \\ %{}) do
     # CollectionDescription |> preload(images: ^query) |> where(id: ^2) |> Repo.all
     new_image = Images |> where(slug: ^image_slug) |> Repo.one()
 
@@ -1368,5 +1368,9 @@ defmodule Nappy.Catalog do
     # |> Repo.preload(:tags)
     # |> Ecto.Changeset.cast(params, [:title]) # No need to allow :tags as we put them directly
     # |> Ecto.Changeset.put_assoc(:tags, tags) # Explicitly set the tags
+  end
+
+  def add_image_to_new_collection(coll_desc_slug, image_slug, attrs \\ %{}) do
+    nil
   end
 end
