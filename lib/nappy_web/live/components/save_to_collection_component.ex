@@ -75,29 +75,33 @@ defmodule NappyWeb.Components.SaveToCollectionComponent do
             <!-- Content -->
             <.form for={%{}} as={:set_collection} phx-submit="set_collection" phx-target={@myself}>
               <input type="hidden" name="image_slug" value={@image.slug} />
-              <fieldset class="my-2 flex flex-col gap-2">
+              <fieldset class="my-2 flex flex-col">
                 <legend class="sr-only">Add to collection</legend>
                 <%= for coll_desc <- Catalog.get_collection_description_by_user_id(@current_user.id) do %>
-                  <div class="relative flex items-center">
-                    <input
-                      id={"#{coll_desc.slug}#{@image.slug}"}
-                      aria-describedby={coll_desc.title}
-                      name="selected"
-                      value={coll_desc.slug}
-                      type="radio"
-                      checked={
-                        if @image.id == match_image_id(coll_desc.id, @image.id),
-                          do: "true",
-                          else: nil
-                      }
-                      class="h-4 w-4 border-gray-300 text-gray-600 focus:ring-gray-600"
-                    />
-                    <label
-                      for={"#{coll_desc.slug}#{@image.slug}"}
-                      class="px-3 font-medium text-gray-900"
-                    >
-                      <%= coll_desc.title %>
-                    </label>
+                  <div class="relative flex items-start">
+                    <div class="flex h-6 items-center">
+                      <input
+                        id={"#{coll_desc.slug}#{@image.slug}"}
+                        aria-describedby={coll_desc.title}
+                        name="selected"
+                        value={coll_desc.slug}
+                        type="checkbox"
+                        checked={
+                          if @image.id == match_image_id(coll_desc.id, @image.id),
+                            do: "true",
+                            else: nil
+                        }
+                        class="h-4 w-4 border-gray-300 text-gray-600 focus:ring-gray-600"
+                      />
+                    </div>
+                    <div class="text-sm leading-6">
+                      <label
+                        for={"#{coll_desc.slug}#{@image.slug}"}
+                        class="px-3 font-medium text-gray-900"
+                      >
+                        <%= coll_desc.title %>
+                      </label>
+                    </div>
                   </div>
                 <% end %>
               </fieldset>
