@@ -11,7 +11,11 @@
           <.form
             :let={f}
             for={@conn}
-            action={Routes.user_session_path(@conn, :create, redirect_path: @redirect_path)}
+            action={
+              Routes.user_session_path(@conn, :create,
+                redirect_path: @conn.query_params["redirect_path"]
+              )
+            }
             as={:user}
             class="space-y-6"
           >

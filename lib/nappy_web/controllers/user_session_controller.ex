@@ -29,6 +29,7 @@ defmodule NappyWeb.UserSessionController do
   def create(conn, %{"redirect_path" => redirect_path, "user" => user_params}) do
     %{"email_or_username" => email_or_username, "password" => password} = user_params
     user = Accounts.get_user_by_email_or_username_and_password(email_or_username, password)
+    redirect_path = if redirect_path === "", do: "/", else: redirect_path
 
     if user do
       status_name = Accounts.get_account_status_name(user.account_status_id)
