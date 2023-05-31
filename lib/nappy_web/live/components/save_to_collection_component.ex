@@ -83,8 +83,7 @@ defmodule NappyWeb.Components.SaveToCollectionComponent do
                       <input
                         id={"#{coll_desc.slug}#{@image.slug}"}
                         aria-describedby={coll_desc.title}
-                        name="selected"
-                        value={coll_desc.slug}
+                        name={coll_desc.slug}
                         type="checkbox"
                         checked={
                           if @image.id == match_image_id(coll_desc.id, @image.id),
@@ -155,26 +154,29 @@ defmodule NappyWeb.Components.SaveToCollectionComponent do
   @impl true
   def handle_event(
         "set_collection",
-        %{"selected" => coll_desc_slug, "image_slug" => image_slug},
+        params,
         socket
       ) do
-    path = socket.assigns[:current_url]
-    current_user = socket.assigns[:current_user]
-    attrs = %{user_id: current_user.id}
+    # pending: separate image_slug and the rest so we can know
+    # how many will be set
+    {:noreply, socket}
+    # path = socket.assigns[:current_url]
+    # current_user = socket.assigns[:current_user]
+    # attrs = %{user_id: current_user.id}
 
-    socket =
-      case Catalog.set_image_to_existing_collection(coll_desc_slug, image_slug, attrs) do
-        {:ok, _} ->
-          {:ok, true} = Cachex.del(Nappy.cache_name(), {"collection_#{coll_desc_slug}"})
-          put_flash(socket, :info, "Image added to collection")
+    # socket =
+    #   case Catalog.set_image_to_existing_collection(coll_desc_slug, image_slug, attrs) do
+    #     {:ok, _} ->
+    #       {:ok, true} = Cachex.del(Nappy.cache_name(), {"collection_#{coll_desc_slug}"})
+    #       put_flash(socket, :info, "Image added to collection")
 
-        {:error, _reason} ->
-          put_flash(socket, :error, "Error adding image to collection")
-      end
+    #     {:error, _reason} ->
+    #       put_flash(socket, :error, "Error adding image to collection")
+    #   end
 
-    Process.send_after(self(), :clear_info, 5_000)
+    # Process.send_after(self(), :clear_info, 5_000)
 
-    {:noreply, push_navigate(socket, to: path)}
+    # {:noreply, push_navigate(socket, to: path)}
   end
 
   @impl true
