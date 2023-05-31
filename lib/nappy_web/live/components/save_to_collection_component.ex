@@ -159,7 +159,7 @@ defmodule NappyWeb.Components.SaveToCollectionComponent do
     attrs = %{user_id: current_user.id}
 
     socket =
-      case Catalog.add_image_to_existing_collection(coll_desc_slug, image_slug, attrs) do
+      case Catalog.set_image_to_existing_collection(coll_desc_slug, image_slug, attrs) do
         {:ok, _} ->
           {:ok, true} = Cachex.del(Nappy.cache_name(), {"collection_#{coll_desc_slug}"})
           put_flash(socket, :info, "Image added to collection")

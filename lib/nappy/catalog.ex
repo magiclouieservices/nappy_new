@@ -1337,12 +1337,16 @@ defmodule Nappy.Catalog do
     end
   end
 
-  def add_image_to_existing_collection(coll_desc_slug, image_slug, attrs \\ %{}) do
+  def set_image_to_existing_collection(coll_desc_slug, image_slug, attrs \\ %{}) do
+    # pending: write sql for duplicate entries in collections table
+    # pending: only duplicates for collection when setting an image
     new_image = Images |> where(slug: ^image_slug) |> Repo.one()
+
+    images = Images |> where(slug: ^image_slug)
 
     coll_desc =
       CollectionDescription
-      |> preload(:images)
+      |> preload(images: ^images)
       |> where(slug: ^coll_desc_slug)
       |> Repo.one()
 
