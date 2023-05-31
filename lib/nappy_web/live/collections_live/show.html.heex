@@ -24,7 +24,7 @@
     />
   </div>
 </div>
-<div class="container mx-auto mb-8" x-data="{ open: false }">
+<div :if={@collection.description} class="container mx-auto" x-data="{ open: false }">
   <h1 class="text-center font-tiempos-bold text-2xl mt-8 mb-2">
     About this Collection
   </h1>
@@ -42,7 +42,7 @@
   >
   </button>
 </div>
-<section class="container mx-auto">
+<section class="container mx-auto mt-8">
   <.live_component
     module={GalleryComponent}
     id="infinite-gallery-home"

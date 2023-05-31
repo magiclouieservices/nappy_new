@@ -46,7 +46,6 @@ defmodule Nappy.Catalog.CollectionDescription do
       :thumbnail,
       :title,
       :slug,
-      :description,
       :is_enabled
     ])
     |> foreign_key_constraint(:user_id)

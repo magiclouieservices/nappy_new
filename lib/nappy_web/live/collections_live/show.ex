@@ -24,8 +24,12 @@ defmodule NappyWeb.CollectionsLive.Show do
 
       _ ->
         related_tags =
-          coll_desc.related_tags
-          |> String.split(",", trim: true)
+          if coll_desc.related_tags do
+            coll_desc.related_tags
+            |> String.split(",", trim: true)
+          else
+            []
+          end
 
         socket =
           socket

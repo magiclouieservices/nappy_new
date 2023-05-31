@@ -1338,7 +1338,6 @@ defmodule Nappy.Catalog do
   end
 
   def add_image_to_existing_collection(coll_desc_slug, image_slug, attrs \\ %{}) do
-    # CollectionDescription |> preload(images: ^query) |> where(id: ^2) |> Repo.all
     new_image = Images |> where(slug: ^image_slug) |> Repo.one()
 
     coll_desc =
@@ -1356,21 +1355,36 @@ defmodule Nappy.Catalog do
       |> Ecto.Changeset.put_assoc(:images, [new_image | coll_desc.images])
       |> Repo.update!()
     end)
-
-    # traverse_errors(changeset, fn {msg, opts} ->
-    #   Regex.replace(~r"%{(\w+)}", msg, fn _, key ->
-    #     opts |> Keyword.get(String.to_existing_atom(key), key) |> to_string()
-    #   end)
-    # end)
-    # params = %{"title" => "new post", "tags" => ["learner"]}
-    # tags = Repo.all(from t in Tag, where: t.name in ^params["tags"])
-    # post
-    # |> Repo.preload(:tags)
-    # |> Ecto.Changeset.cast(params, [:title]) # No need to allow :tags as we put them directly
-    # |> Ecto.Changeset.put_assoc(:tags, tags) # Explicitly set the tags
   end
 
-  def add_image_to_new_collection(coll_desc_slug, image_slug, attrs \\ %{}) do
-    nil
+  def add_image_to_new_collection(image_slug, attrs \\ %{}) do
+    image =
+      Images
+      |> where(slug: ^image_slug)
+      |> Repo.one()
+
+    thumbnail = image.id
+    slug = Slug.slugify(attrs.title)
+
+    attrs =
+      attrs
+      |> Map.put(:thumbnail, thumbnail)
+      |> Map.put(:slug, slug)
+      |> Map.put(:is_enabled, true)
+
+    Repo.transaction(fn ->
+      %{id: coll_desc_id} =
+        %CollectionDescription{}
+        |> CollectionDescription.changeset(attrs)
+        |> Repo.insert!()
+
+      CollectionDescription
+      |> where(id: ^coll_desc_id)
+      |> preload(:images)
+      |> Repo.one()
+      |> CollectionDescription.changeset(attrs)
+      |> Ecto.Changeset.put_assoc(:images, [image | []])
+      |> Repo.update!()
+    end)
   end
 end

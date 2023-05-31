@@ -125,7 +125,7 @@ defmodule NappyWeb.Components.SaveToCollectionComponent do
               <input
                 id={"input-new_collection-#{@image.slug}"}
                 type="text"
-                name="collection_name"
+                name="collection_title"
                 class="inline rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-gray-600 sm:leading-6"
                 placeholder="or create new collection"
               />
@@ -176,15 +176,19 @@ defmodule NappyWeb.Components.SaveToCollectionComponent do
   @impl true
   def handle_event(
         "new_collection",
-        %{"collection_name" => coll_desc_slug, "image_slug" => image_slug},
+        %{"collection_title" => title, "image_slug" => image_slug},
         socket
       ) do
     path = socket.assigns[:current_url]
     current_user = socket.assigns[:current_user]
-    attrs = %{user_id: current_user.id}
+
+    attrs = %{
+      user_id: current_user.id,
+      title: title
+    }
 
     socket =
-      case Catalog.add_image_to_new_collection(coll_desc_slug, image_slug, attrs) do
+      case Catalog.add_image_to_new_collection(image_slug, attrs) do
         {:ok, _} -> put_flash(socket, :info, "Image added to collection")
         {:error, _reason} -> put_flash(socket, :error, "Error adding image to collection")
       end
