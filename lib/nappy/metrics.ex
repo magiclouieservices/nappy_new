@@ -7,7 +7,7 @@ defmodule Nappy.Metrics do
   alias Ecto.Multi
   alias Nappy.Accounts.UserNotifier
   alias Nappy.Admin
-  alias Nappy.Catalog.Images
+  alias Nappy.Catalog.Image
   alias Nappy.Metrics.ImageAnalytics
   alias Nappy.Metrics.ImageMetadata
   alias Nappy.Metrics.ImageStatus
@@ -90,7 +90,7 @@ defmodule Nappy.Metrics do
     active = get_image_status_id(:active)
     featured = get_image_status_id(:featured)
 
-    Images
+    Nappy.Catalog.Image
     |> join(:inner, [i], ia in assoc(i, :image_analytics))
     |> where(user_id: ^user.id)
     |> where([i, _], i.image_status_id in ^[active, featured])
@@ -108,12 +108,12 @@ defmodule Nappy.Metrics do
     featured = get_image_status_id(:featured)
 
     images =
-      Images
+      Nappy.Catalog.Image
       |> where([i], i.slug in ^slugs)
       |> where([i], i.image_status_id not in ^[active, featured])
 
     images_id =
-      from(i in Images,
+      from(i in Nappy.Catalog.Image,
         where: i.slug in ^slugs,
         select: i.id
       )
@@ -137,12 +137,12 @@ defmodule Nappy.Metrics do
     denied = get_image_status_id(:denied)
 
     images =
-      Images
+      Nappy.Catalog.Image
       |> where([i], i.slug in ^slugs)
       |> where([i], i.image_status_id != ^denied)
 
     images_id =
-      from(i in Images,
+      from(i in Nappy.Catalog.Image,
         where: i.slug in ^slugs,
         select: i.id
       )
@@ -162,7 +162,7 @@ defmodule Nappy.Metrics do
 
   defp multi_run_notify_users(multi, slugs, status) do
     images =
-      Images
+      Nappy.Catalog.Image
       |> where([i], i.slug in ^slugs)
       |> preload(:user)
       |> Repo.all()
@@ -499,7 +499,7 @@ defmodule Nappy.Metrics do
   def get_image_analytics!(id), do: Repo.get!(ImageAnalytics, id)
 
   def get_image_analytics_by_slug(image_slug) when is_binary(image_slug) do
-    Images
+    Nappy.Catalog.Image
     |> where(slug: ^image_slug)
     |> preload(:image_analytics)
     |> Repo.one()

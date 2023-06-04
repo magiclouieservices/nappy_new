@@ -1,12 +1,12 @@
 defmodule Nappy.Metrics.ImageAnalytics do
   use Ecto.Schema
   import Ecto.Changeset
-  alias Nappy.Catalog.Images
+  alias Nappy.Catalog.Image
 
   @moduledoc false
 
   schema "image_analytics" do
-    belongs_to :image, Images
+    belongs_to :image, Image
     field :approved_date, :naive_datetime
     field :download_count, :integer
     field :featured_date, :naive_datetime

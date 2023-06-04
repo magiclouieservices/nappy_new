@@ -29,13 +29,13 @@ defmodule NappyWeb.Components.Admin.EditCollectionPageComponent do
       slug: slug
     }
 
-    collection_description = Catalog.update_collection_description(attrs)
+    collection = Catalog.update_collection(attrs)
 
     socket =
       socket
       |> put_flash(:info, "Succesfully updated the collection")
 
-    path = Routes.collections_show_path(socket, :show, collection_description.slug)
+    path = Routes.collections_show_path(socket, :show, collection.slug)
 
     {:noreply, push_navigate(socket, to: path)}
   end
@@ -53,13 +53,13 @@ defmodule NappyWeb.Components.Admin.EditCollectionPageComponent do
       slug: slug
     }
 
-    collection_description = Catalog.update_collection_description(attrs)
+    collection = Catalog.update_collection(attrs)
 
     socket =
       socket
       |> put_flash(:info, "Succesfully updated thumbnail")
 
-    path = Routes.collections_show_path(socket, :show, collection_description.slug)
+    path = Routes.collections_show_path(socket, :show, collection.slug)
 
     {:noreply, push_navigate(socket, to: path)}
   end
@@ -76,13 +76,13 @@ defmodule NappyWeb.Components.Admin.EditCollectionPageComponent do
       related_tags: related_tags
     }
 
-    collection_description = Catalog.update_collection_description(attrs)
+    collection = Catalog.update_collection(attrs)
 
     socket =
       socket
       |> put_flash(:info, "Succesfully updated the related tags")
 
-    path = Routes.collections_show_path(socket, :show, collection_description.slug)
+    path = Routes.collections_show_path(socket, :show, collection.slug)
 
     {:noreply, push_navigate(socket, to: path)}
   end
@@ -98,13 +98,13 @@ defmodule NappyWeb.Components.Admin.EditCollectionPageComponent do
       description: String.trim(description)
     }
 
-    collection_description = Catalog.update_collection_description(attrs)
+    collection = Catalog.update_collection(attrs)
 
     socket =
       socket
       |> put_flash(:info, "Succesfully updated description")
 
-    path = Routes.collections_show_path(socket, :show, collection_description.slug)
+    path = Routes.collections_show_path(socket, :show, collection.slug)
 
     {:noreply, push_navigate(socket, to: path)}
 
@@ -136,7 +136,7 @@ defmodule NappyWeb.Components.Admin.EditCollectionPageComponent do
       <div
         x-data={"{
           open: false,
-          value: #{@collection_desc.is_enabled}
+          value: #{@collection.is_enabled}
         }"}
         class="text-black inline-flex justify-center"
       >
@@ -167,7 +167,7 @@ defmodule NappyWeb.Components.Admin.EditCollectionPageComponent do
         <div
           x-show="open"
           style="display: none"
-          x-on:keydown.escape.prevent.stop={"open = false; value = #{@collection_desc.is_enabled}; document.getElementById('update-collection').reset()"}
+          x-on:keydown.escape.prevent.stop={"open = false; value = #{@collection.is_enabled}; document.getElementById('update-collection').reset()"}
           role="dialog"
           aria-modal="true"
           x-id="['modal-title']"
@@ -180,7 +180,7 @@ defmodule NappyWeb.Components.Admin.EditCollectionPageComponent do
           <div
             x-show="open"
             x-transition
-            x-on:click={"open = false; value = #{@collection_desc.is_enabled}; document.getElementById('update-collection').reset()"}
+            x-on:click={"open = false; value = #{@collection.is_enabled}; document.getElementById('update-collection').reset()"}
             class="relative flex min-h-screen items-center justify-center p-4"
           >
             <div
@@ -189,7 +189,7 @@ defmodule NappyWeb.Components.Admin.EditCollectionPageComponent do
               class="relative overflow-y-auto rounded-xl bg-white p-12 shadow-lg"
             >
               <div
-                x-on:click={"open = false; value = #{@collection_desc.is_enabled}; document.getElementById('update-collection').reset()"}
+                x-on:click={"open = false; value = #{@collection.is_enabled}; document.getElementById('update-collection').reset()"}
                 class="absolute right-0 top-0 hidden pr-4 pt-4 sm:block"
               >
                 <button
@@ -223,7 +223,7 @@ defmodule NappyWeb.Components.Admin.EditCollectionPageComponent do
                   name="collection_title"
                   id="collection-title"
                   form="update-collection"
-                  value={@collection_desc.title}
+                  value={@collection.title}
                   required
                   class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-gray-600 sm:leading-6 font-bold"
                 />
@@ -231,12 +231,7 @@ defmodule NappyWeb.Components.Admin.EditCollectionPageComponent do
               <!-- Toggle -->
               <div class="my-4 flex items-center justify-center" x-id="['toggle-label']">
                 <input type="hidden" name="is_enabled" x-bind:value="value" form="update-collection" />
-                <input
-                  type="hidden"
-                  name="slug"
-                  value={@collection_desc.slug}
-                  form="update-collection"
-                />
+                <input type="hidden" name="slug" value={@collection.slug} form="update-collection" />
                 <!-- Label -->
                 <label
                   @click="$refs.toggle.click(); $refs.toggle.focus()"
@@ -285,7 +280,7 @@ defmodule NappyWeb.Components.Admin.EditCollectionPageComponent do
                 </.form>
                 <button
                   type="button"
-                  x-on:click={"open = false; value = #{@collection_desc.is_enabled}; document.getElementById('update-collection').reset()"}
+                  x-on:click={"open = false; value = #{@collection.is_enabled}; document.getElementById('update-collection').reset()"}
                   class="rounded-md text-white bg-black hover:bg-gray-900 px-5 py-2.5"
                 >
                   Cancel
@@ -369,7 +364,7 @@ defmodule NappyWeb.Components.Admin.EditCollectionPageComponent do
               <h2 class="text-xl font-bold" x-bind:id="$id('modal-title')">
                 Confirm disable
                 <span class="bg-black text-white py-0.5 px-1.5 rounded">
-                  <%= @collection_desc.title %>
+                  <%= @collection.title %>
                 </span>
               </h2>
               <!-- Content -->
@@ -487,7 +482,7 @@ defmodule NappyWeb.Components.Admin.EditCollectionPageComponent do
                 module={ThumbnailPickerComponent}
                 id="thumbnail-picker"
                 slug={@slug}
-                page={@collection_desc}
+                page={@collection}
                 page_type="collection"
               />
               <!-- Buttons -->
@@ -553,7 +548,7 @@ defmodule NappyWeb.Components.Admin.EditCollectionPageComponent do
         <div
           x-show="open"
           style="display: none"
-          x-on:keydown.escape={"open = false; window.resetTags('#{@collection_desc.related_tags}')"}
+          x-on:keydown.escape={"open = false; window.resetTags('#{@collection.related_tags}')"}
           role="dialog"
           aria-modal="true"
           x-id="['modal-title']"
@@ -566,7 +561,7 @@ defmodule NappyWeb.Components.Admin.EditCollectionPageComponent do
           <div
             x-show="open"
             x-transition
-            x-on:click={"open = false; window.resetTags('#{@collection_desc.related_tags}')"}
+            x-on:click={"open = false; window.resetTags('#{@collection.related_tags}')"}
             class="relative flex min-h-screen items-center justify-center p-4"
           >
             <div
@@ -575,7 +570,7 @@ defmodule NappyWeb.Components.Admin.EditCollectionPageComponent do
               class="relative w-full max-w-2xl overflow-y-auto rounded-xl bg-white p-12 shadow-lg"
             >
               <div
-                x-on:click={"open = false; window.resetTags('#{@collection_desc.related_tags}')"}
+                x-on:click={"open = false; window.resetTags('#{@collection.related_tags}')"}
                 class="absolute right-0 top-0 hidden pr-4 pt-4 sm:block"
               >
                 <button
@@ -597,13 +592,13 @@ defmodule NappyWeb.Components.Admin.EditCollectionPageComponent do
               </div>
               <!-- Title -->
               <h2 class="text-xl font-tiempos-bold" x-bind:id="$id('modal-title')">
-                Set tags for "<%= @collection_desc.title %>"
+                Set tags for "<%= @collection.title %>"
               </h2>
               <!-- Content -->
               <input
-                id={"input-tags-#{@collection_desc.slug}"}
+                id={"input-tags-#{@collection.slug}"}
                 name="input-tags"
-                value={@collection_desc.related_tags}
+                value={@collection.related_tags}
                 form="confirm-update-related_tags"
                 class="mt-1 appearance-none block w-full border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-gray-500 focus:border-gray-500 sm:text-sm"
               />
@@ -629,8 +624,8 @@ defmodule NappyWeb.Components.Admin.EditCollectionPageComponent do
 
                 <button
                   type="button"
-                  x-on:click={"open = false; window.resetTags('#{@collection_desc.related_tags}')"}
-                  value={@collection_desc.related_tags}
+                  x-on:click={"open = false; window.resetTags('#{@collection.related_tags}')"}
+                  value={@collection.related_tags}
                   class="rounded-md text-white bg-black hover:bg-gray-900 px-5 py-2.5"
                 >
                   Cancel
@@ -725,7 +720,7 @@ defmodule NappyWeb.Components.Admin.EditCollectionPageComponent do
                 name="description"
                 class="mt-1 appearance-none block w-full border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-gray-500 focus:border-gray-500 sm:text-sm"
               >
-                <%= @collection_desc.description %>
+                <%= @collection.description %>
               </textarea>
               <!-- Buttons -->
               <div class="mt-8 flex space-x-2 justify-center">

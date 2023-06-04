@@ -7,7 +7,7 @@ defmodule Nappy.Repo.Migrations.CreatePages do
       add :content, :text, null: false
       add :slug, :string, null: false, comment: "URL path name for a specific page"
 
-      add :thumbnail, references(:images, on_delete: :delete_all),
+      add :image_id, references(:images, on_delete: :delete_all),
         comment: "Image for SEO purposes. If empty or incorrect, returns the default image."
 
       add :is_enabled, :boolean, null: false, comment: "Is the image displayed publicly?"

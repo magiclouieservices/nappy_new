@@ -16,16 +16,16 @@ defmodule NappyWeb.CollectionsLive.Show do
       Process.send_after(self(), :clear_info, 5_000)
     end
 
-    coll_desc = Catalog.get_collection_description_by_slug(slug)
+    collection = Catalog.get_collection_by_slug(slug)
 
-    case coll_desc do
+    case collection do
       nil ->
         raise NappyWeb.FallbackController, Status.code(:not_found)
 
       _ ->
         related_tags =
-          if coll_desc.related_tags do
-            coll_desc.related_tags
+          if collection.related_tags do
+            collection.related_tags
             |> String.split(",", trim: true)
           else
             []
@@ -36,10 +36,10 @@ defmodule NappyWeb.CollectionsLive.Show do
           |> assign(page: 1)
           |> assign(page_size: 12)
           |> assign(slug: slug)
-          |> assign(collection: coll_desc)
+          |> assign(collection: collection)
           |> assign(current_url: uri)
           |> assign(related_tags: related_tags)
-          |> assign(page_title: coll_desc.title)
+          |> assign(page_title: collection.title)
           |> fetch()
 
         {:noreply, socket}

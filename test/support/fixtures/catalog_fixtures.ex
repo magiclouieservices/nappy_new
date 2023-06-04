@@ -97,21 +97,9 @@ defmodule Nappy.CatalogFixtures do
   Generate a collection.
   """
   def collection_fixture(attrs \\ %{}) do
-    {:ok, collection} =
-      attrs
-      |> Enum.into(%{})
-      |> Nappy.Catalog.create_collection()
-
-    collection
-  end
-
-  @doc """
-  Generate a collection_description.
-  """
-  def collection_description_fixture(attrs \\ %{}) do
     image = image_fixture(%{}, :active)
 
-    collection_description =
+    {:ok, collection} =
       attrs
       |> Enum.into(%{
         description: "some description",
@@ -121,13 +109,15 @@ defmodule Nappy.CatalogFixtures do
         user_id: image.user_id,
         thumbnail: image.id
       })
-      |> Nappy.Catalog.create_collection_description()
-      |> elem(1)
-      |> Nappy.Repo.preload(:image)
+      |> Nappy.Catalog.create_collection()
 
-    collection_description
+    collection =
+      collection
+      |> Nappy.Repo.preload(:images)
+
+    collection
     |> Ecto.Changeset.change()
-    |> Ecto.Changeset.put_assoc(:image, [image | collection_description.image])
+    |> Ecto.Changeset.put_assoc(:images, [image | collection.images])
     |> Nappy.Repo.update!()
   end
 end

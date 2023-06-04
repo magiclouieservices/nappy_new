@@ -2,7 +2,7 @@ defmodule NappyWeb.Components.DownloadComponent do
   use NappyWeb, :live_component
 
   alias Nappy.Catalog
-  alias Nappy.Catalog.Images
+  alias Nappy.Catalog.Image
 
   @moduledoc false
 
@@ -110,7 +110,7 @@ defmodule NappyWeb.Components.DownloadComponent do
     """
   end
 
-  def set_filename(%Images{} = image, width, height) do
+  def set_filename(%Image{} = image, width, height) do
     slug = image.slug
     ext = image.image_metadata.extension_type
 

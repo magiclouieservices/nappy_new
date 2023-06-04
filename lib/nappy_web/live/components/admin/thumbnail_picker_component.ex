@@ -41,7 +41,7 @@ defmodule NappyWeb.Components.Admin.ThumbnailPickerComponent do
             name="thumbnail"
             value={image.slug}
             form="update-thumbnail"
-            checked={if image.id === @page.thumbnail, do: "true", else: nil}
+            checked={if image.id === @page.image_id, do: "true", else: nil}
           />
           <div
             x-on:mouseenter="hidden = false"
@@ -69,7 +69,7 @@ defmodule NappyWeb.Components.Admin.ThumbnailPickerComponent do
             </svg>
           </span>
           <span
-            :if={image.id === @page.thumbnail}
+            :if={image.id === @page.image_id}
             class="font-tiempos-bold text-2xl p-4 w-full h-full text-white absolute bottom-0 left-0 flex justify-center items-center bg-[rgba(0,0,0,0.7)] rounded"
             href="#"
           >

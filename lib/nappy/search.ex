@@ -7,12 +7,12 @@ defmodule Nappy.Search do
 
   import Ecto.Query, warn: false
   import Ecto.Changeset
-  alias Nappy.Catalog.Images
+  alias Nappy.Catalog.Image
   alias Nappy.Metrics
   alias Nappy.Repo
 
   @image_status_names Ecto.Enum.values(Metrics.ImageStatus, :name)
-  @full_list_status_names [:all, :popular | @image_status_names]
+  # @full_list_status_names [:all, :popular | @image_status_names]
   @types %{search_phrase: :string}
 
   def changeset(search_phrase) do
@@ -33,7 +33,7 @@ defmodule Nappy.Search do
     featured = Metrics.get_image_status_id(:featured)
     order_by = :random
 
-    Images
+    Image
     |> where([i], i.image_status_id in ^[active, featured])
     |> prepare_paginated_query(search_string, params, order_by)
   end
@@ -45,10 +45,10 @@ defmodule Nappy.Search do
 
     case image_status do
       :all ->
-        Images
+        Image
 
       _ ->
-        Images
+        Image
         |> where(image_status_id: ^Metrics.get_image_status_id(image_status))
     end
     |> prepare_paginated_query(search_string, params, order_by)
@@ -132,11 +132,11 @@ defmodule Nappy.Search do
   ## Examples
 
     iex> Search.search_image("umbrella")
-    [%Images{...}, ...]
+    [%Image{...}, ...]
 
   """
   def search_image(search_term) do
-    Images
+    Image
     |> where(
       fragment(
         "to_tsvector('english', title || ' ' || tags || ' ' || coalesce(title, ' ')) @@ to_tsquery(?)",
@@ -163,7 +163,7 @@ defmodule Nappy.Search do
       total_entries: 1,
       total_pages: 1,
       entries: [
-        %Nappy.Catalog.Images{...}
+        %Nappy.Catalog.Image{...}
       ]
     }
 
@@ -171,7 +171,7 @@ defmodule Nappy.Search do
   def paginate_admin_fuzzy_search(search_term, params) do
     first_letter = String.slice(search_term, 0..3)
 
-    Images
+    Image
     |> where([i], fragment("SIMILARITY(?, ?) > 0 ", i.title, ^search_term))
     |> where([i], ilike(i.title, ^"%#{first_letter}%"))
     |> or_where([i], ilike(i.tags, ^"%#{first_letter}%"))

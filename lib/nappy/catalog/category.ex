@@ -1,7 +1,7 @@
 defmodule Nappy.Catalog.Category do
   use Ecto.Schema
   import Ecto.Changeset
-  alias Nappy.Catalog.Images
+  alias Nappy.Catalog.Image
 
   @moduledoc false
 
@@ -10,8 +10,8 @@ defmodule Nappy.Catalog.Category do
     field :name, :string
     field :slug, :string
     field :related_tags, :string
-    field :thumbnail, :integer
-    has_many :images, Images
+    field :image_id, :integer
+    has_many :images, Image
   end
 
   @doc false
@@ -21,13 +21,13 @@ defmodule Nappy.Catalog.Category do
       :name,
       :slug,
       :related_tags,
-      :thumbnail,
+      :image_id,
       :is_enabled
     ])
     |> validate_required([
       :name,
       :slug,
-      :thumbnail,
+      :image_id,
       :is_enabled
     ])
     |> unique_constraint(:slug)

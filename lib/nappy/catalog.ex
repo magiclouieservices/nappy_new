@@ -7,14 +7,15 @@ defmodule Nappy.Catalog do
   import Ecto.Query, warn: false
   alias Ecto.Multi
   alias ExAws.S3
+  alias Image, as: ExtractImage
   alias Nappy.Accounts.User
   alias Nappy.Accounts.UserNotifier
   alias Nappy.Admin
   alias Nappy.Admin.Slug
+  alias Nappy.Catalog
   alias Nappy.Catalog.Category
   alias Nappy.Catalog.Collection
-  alias Nappy.Catalog.CollectionDescription
-  alias Nappy.Catalog.Images
+  alias Nappy.Catalog.ImageCollection
   alias Nappy.Metrics
   alias Nappy.Metrics.ImageAnalytics
   alias Nappy.Metrics.ImageMetadata
@@ -31,14 +32,14 @@ defmodule Nappy.Catalog do
   ## Examples
 
       iex> list_images()
-      [%Images{}, ...]
+      [%Nappy.Catalog.Image{}, ...]
 
   """
   def list_images(preload \\ []) do
     active = Metrics.get_image_status_id(:active)
     featured = Metrics.get_image_status_id(:featured)
 
-    Images
+    Nappy.Catalog.Image
     |> where([i], i.image_status_id in ^[active, featured])
     |> preload(^preload)
     |> Repo.all()
@@ -48,7 +49,7 @@ defmodule Nappy.Catalog do
     active = Metrics.get_image_status_id(:active)
     featured = Metrics.get_image_status_id(:featured)
 
-    Images
+    Nappy.Catalog.Image
     |> where([i], i.image_status_id in ^[active, featured])
     |> order_by(fragment("RANDOM()"))
     |> limit(6)
@@ -59,7 +60,7 @@ defmodule Nappy.Catalog do
     active = Metrics.get_image_status_id(:active)
     featured = Metrics.get_image_status_id(:featured)
 
-    Images
+    Nappy.Catalog.Image
     |> join(:inner, [i], ia in assoc(i, :image_analytics))
     |> where([i, _], i.image_status_id in ^[active, featured])
     |> order_by([_, ia], desc: ia.view_count)
@@ -71,7 +72,7 @@ defmodule Nappy.Catalog do
     active = Metrics.get_image_status_id(:active)
     featured = Metrics.get_image_status_id(:featured)
 
-    Images
+    Nappy.Catalog.Image
     |> join(:inner, [i], ia in assoc(i, :image_analytics))
     |> where([i, _], i.image_status_id in ^[active, featured])
     |> order_by([_, ia], desc: ia.view_count)
@@ -98,7 +99,7 @@ defmodule Nappy.Catalog do
     |> join(:inner, [_, i, _, _], ia in assoc(i, :image_analytics))
     |> where([_, i, _, _, _], i.image_status_id in ^[active, featured])
     |> order_by([ia, ...], desc: ia.view_count)
-    |> select([_, i, u, im, ia], %Images{
+    |> select([_, i, u, im, ia], %Nappy.Catalog.Image{
       id: i.id,
       description: i.description,
       generated_description: i.generated_description,
@@ -126,11 +127,11 @@ defmodule Nappy.Catalog do
 
     case status_name do
       :all ->
-        Images
+        Nappy.Catalog.Image
         |> where([i], i.image_status_id in ^[active, featured])
 
       _ ->
-        Images
+        Nappy.Catalog.Image
         |> where(image_status_id: ^Metrics.get_image_status_id(status_name))
     end
     |> order_by(fragment("RANDOM()"))
@@ -146,10 +147,10 @@ defmodule Nappy.Catalog do
     join_query =
       case status_name do
         :all ->
-          Images
+          Nappy.Catalog.Image
 
         _ ->
-          Images
+          Nappy.Catalog.Image
           |> where(image_status_id: ^Metrics.get_image_status_id(status_name))
       end
       |> preload([:user, :image_metadata, :image_analytics])
@@ -191,7 +192,7 @@ defmodule Nappy.Catalog do
     |> where([_, i, _, _], i.image_status_id in ^[active, featured])
     |> where(username: ^username)
     |> order_by(fragment("RANDOM()"))
-    |> select([u, i, im, ia], %Images{
+    |> select([u, i, im, ia], %Nappy.Catalog.Image{
       id: i.id,
       description: i.description,
       generated_description: i.generated_description,
@@ -221,7 +222,7 @@ defmodule Nappy.Catalog do
       |> select([c], c.id)
       |> Repo.one()
 
-    Images
+    Nappy.Catalog.Image
     |> where([i], i.image_status_id in ^[active, featured])
     |> where(category_id: ^category_id)
     |> order_by(fragment("RANDOM()"))
@@ -233,22 +234,22 @@ defmodule Nappy.Catalog do
     active = Metrics.get_image_status_id(:active)
     featured = Metrics.get_image_status_id(:featured)
 
-    coll_desc_id =
-      from(cd in CollectionDescription,
+    collection_id =
+      from(cd in Collection,
         where: cd.slug == ^slug,
         select: cd.id
       )
       |> Repo.one()
 
-    Collection
+    ImageCollection
     |> join(:inner, [c], i in assoc(c, :image))
     |> join(:inner, [_, i], u in assoc(i, :user))
     |> join(:inner, [_, i, _], im in assoc(i, :image_metadata))
     |> join(:inner, [_, i, _, _], ia in assoc(i, :image_analytics))
     |> where([_, i, _, _], i.image_status_id in ^[active, featured])
-    |> where(collection_description_id: ^coll_desc_id)
+    |> where(collection_id: ^collection_id)
     # |> order_by(fragment("RANDOM()"))
-    |> select([_, i, u, im, ia], %Images{
+    |> select([_, i, u, im, ia], %Nappy.Catalog.Image{
       id: i.id,
       description: i.description,
       generated_description: i.generated_description,
@@ -272,12 +273,12 @@ defmodule Nappy.Catalog do
     active = Metrics.get_image_status_id(:active)
     featured = Metrics.get_image_status_id(:featured)
 
-    Collection
-    |> join(:inner, [coll], coll_desc in assoc(coll, :collection_description))
-    |> join(:inner, [coll, _coll_desc], i in assoc(coll, :image))
-    |> where([_coll, _coll_desc, i], i.image_status_id in ^[active, featured])
-    |> where([_coll, coll_desc, _], coll_desc.slug == ^slug)
-    |> select([_coll, _coll_desc, i], %Images{id: i.id, slug: i.slug})
+    ImageCollection
+    |> join(:inner, [image_coll], collection in assoc(image_coll, :collection))
+    |> join(:inner, [image_coll, _collection], i in assoc(image_coll, :image))
+    |> where([_image_coll, _collection, i], i.image_status_id in ^[active, featured])
+    |> where([_image_coll, collection, _], collection.slug == ^slug)
+    |> select([_image_coll, _collection, i], %Nappy.Catalog.Image{id: i.id, slug: i.slug})
     |> Repo.all()
   end
 
@@ -286,10 +287,10 @@ defmodule Nappy.Catalog do
     featured = Metrics.get_image_status_id(:featured)
 
     Category
-    |> join(:inner, [category], i in assoc(category, :images))
+    |> join(:inner, [category], i in assoc(category, :image))
     |> where([_category, i], i.image_status_id in ^[active, featured])
     |> where([category, _i], category.slug == ^slug)
-    |> select([_category, i], %Images{id: i.id, slug: i.slug})
+    |> select([_category, i], %Nappy.Catalog.Image{id: i.id, slug: i.slug})
     |> Repo.all()
   end
 
@@ -357,7 +358,7 @@ defmodule Nappy.Catalog do
     active = Metrics.get_image_status_id(:active)
     featured = Metrics.get_image_status_id(:featured)
 
-    Images
+    Nappy.Catalog.Image
     |> order_by(fragment("RANDOM()"))
     |> where([i], i.image_status_id in ^[active, featured])
     |> limit(1)
@@ -369,7 +370,7 @@ defmodule Nappy.Catalog do
     active = Metrics.get_image_status_id(:active)
     featured = Metrics.get_image_status_id(:featured)
 
-    Images
+    Nappy.Catalog.Image
     |> where(slug: ^slug)
     |> where([i], i.image_status_id in ^[active, featured])
     |> limit(1)
@@ -382,7 +383,7 @@ defmodule Nappy.Catalog do
     |> imgix_url("photo", query)
   end
 
-  def imgix_url(%Images{} = image, type, query \\ nil) do
+  def imgix_url(%Nappy.Catalog.Image{} = image, type, query \\ nil) do
     ext = Metrics.get_image_extension(image.id) || "jpg"
     filename = "#{image.slug}.#{ext}"
     host = Nappy.image_src_host()
@@ -429,13 +430,13 @@ defmodule Nappy.Catalog do
   ## Examples
 
       iex> get_image!(123)
-      %Images{}
+      %Nappy.Catalog.Image{}
 
       iex> get_image!(456)
       ** (Ecto.NoResultsError)
 
   """
-  def get_image!(id), do: Repo.get!(Images, id)
+  def get_image!(id), do: Repo.get!(Nappy.Catalog.Image, id)
 
   @doc """
   Get an Image based from slug. Do note that
@@ -444,10 +445,10 @@ defmodule Nappy.Catalog do
   ## Examples
 
       iex> get_image_by_slug("12345abcdefg", [preload: [:user], select: [:title]])
-      %Images{}
+      %Nappy.Catalog.Image{}
 
       iex> get_image_by_slug("12345abcdefg", [preload: [:user]])
-      %Images{}
+      %Nappy.Catalog.Image{}
 
       iex> get_image_by_slug("don't exists")
       nil
@@ -456,9 +457,9 @@ defmodule Nappy.Catalog do
   def get_image_by_slug(slug, opts \\ [preload: [], select: nil])
       when is_binary(slug) do
     if opts[:select] do
-      select(Images, ^opts[:select])
+      select(Nappy.Catalog.Image, ^opts[:select])
     else
-      select(Images, [i], i)
+      select(Nappy.Catalog.Image, [i], i)
     end
     |> where(slug: ^slug)
     |> preload(^opts[:preload])
@@ -466,7 +467,7 @@ defmodule Nappy.Catalog do
   end
 
   def get_related_images(slug) do
-    image = Repo.get_by!(Images, slug: slug)
+    image = Repo.get_by!(Nappy.Catalog.Image, slug: slug)
 
     active = Metrics.get_image_status_id(:active)
     featured = Metrics.get_image_status_id(:featured)
@@ -477,7 +478,7 @@ defmodule Nappy.Catalog do
       |> Enum.take_random(1)
 
     related_images =
-      Images
+      Nappy.Catalog.Image
       |> where([i], i.id != ^image.id)
       |> where(category_id: ^image.category_id)
       |> where([i], i.image_status_id in ^[active, featured])
@@ -510,7 +511,7 @@ defmodule Nappy.Catalog do
   ## Examples
 
       iex> create_image(%{field: value})
-      {:ok, %Images{}}
+      {:ok, %Nappy.Catalog.Image{}}
 
       iex> create_image(%{field: bad_value})
       {:error, %Ecto.Changeset{}}
@@ -521,8 +522,8 @@ defmodule Nappy.Catalog do
       {:ok, _} = Carbonite.insert_transaction(Repo, %{meta: %{type: "image_inserted"}})
 
       created_image =
-        %Images{}
-        |> Images.changeset(attrs)
+        %Catalog.Image{}
+        |> Catalog.Image.changeset(attrs)
         |> Repo.insert!()
 
       stringify = fn bitstring ->
@@ -532,10 +533,10 @@ defmodule Nappy.Catalog do
         |> to_string()
       end
 
-      {:ok, image} = Image.open(attrs.path)
+      {:ok, image} = ExtractImage.open(attrs.path)
 
       image_metadata_attrs =
-        case Image.exif(image) do
+        case ExtractImage.exif(image) do
           {:ok, data} ->
             {:ok, stat} = File.stat(attrs.path)
 
@@ -564,8 +565,8 @@ defmodule Nappy.Catalog do
             %{
               image_id: created_image.id,
               extension_type: attrs.ext,
-              height: Image.height(image),
-              width: Image.width(image),
+              height: ExtractImage.height(image),
+              width: ExtractImage.width(image),
               # converts to float
               file_size: stat.size * 1.0
             }
@@ -592,12 +593,12 @@ defmodule Nappy.Catalog do
     end)
   end
 
-  def zoomed_image(%Images{} = image, "w") do
+  def zoomed_image(%Nappy.Catalog.Image{} = image, "w") do
     width = image.image_metadata.width
     round(width * 0.45)
   end
 
-  def zoomed_image(%Images{} = image, "h") do
+  def zoomed_image(%Nappy.Catalog.Image{} = image, "h") do
     height = image.image_metadata.height
     round(height * 0.45)
   end
@@ -630,15 +631,15 @@ defmodule Nappy.Catalog do
   ## Examples
 
       iex> update_image(image, %{field: new_value})
-      {:ok, %Images{}}
+      {:ok, %Nappy.Catalog.Image{}}
 
       iex> update_image(image, %{field: bad_value})
       {:error, %Ecto.Changeset{}}
 
   """
-  def update_image(%Images{} = image, attrs) do
+  def update_image(%Nappy.Catalog.Image{} = image, attrs) do
     image
-    |> Images.changeset(attrs)
+    |> Catalog.Image.changeset(attrs)
     |> Repo.update()
   end
 
@@ -655,7 +656,7 @@ defmodule Nappy.Catalog do
       } = params,
 
       iex> admin_update_image(params)
-      {:ok, %Images{}}
+      {:ok, %Nappy.Catalog.Image{}}
   """
   def admin_update_image(params) do
     category = params["category"]
@@ -709,7 +710,7 @@ defmodule Nappy.Catalog do
       :image_analytics,
       ImageAnalytics.changeset(image_analytics, image_analytics_attrs)
     )
-    |> Multi.update(:image, Images.changeset(image, image_attrs))
+    |> Multi.update(:image, Catalog.Image.changeset(image, image_attrs))
     |> Multi.run(:notify_user, fn repo, %{image: image} ->
       image =
         image
@@ -735,13 +736,13 @@ defmodule Nappy.Catalog do
   ## Examples
 
       iex> delete_image(image)
-      {:ok, %Images{}}
+      {:ok, %Nappy.Catalog.Image{}}
 
       iex> delete_image(image)
       {:error, %Ecto.Changeset{}}
 
   """
-  def delete_image(%Images{} = image, bucket_name \\ Nappy.bucket_name()) do
+  def delete_image(%Nappy.Catalog.Image{} = image, bucket_name \\ Nappy.bucket_name()) do
     Repo.transaction(fn ->
       ext = Metrics.get_image_extension(image.id)
       filename = "photos/#{image.slug}.#{ext}"
@@ -756,7 +757,7 @@ defmodule Nappy.Catalog do
 
   def delete_multiple_images(slugs, bucket_name \\ Nappy.bucket_name()) do
     images =
-      Images
+      Nappy.Catalog.Image
       |> where([i], i.slug in ^slugs)
 
     objects =
@@ -783,11 +784,11 @@ defmodule Nappy.Catalog do
   ## Examples
 
       iex> change_image(image)
-      %Ecto.Changeset{data: %Images{}}
+      %Ecto.Changeset{data: %Nappy.Catalog.Image{}}
 
   """
-  def change_image(%Images{} = image, attrs \\ %{}) do
-    Images.changeset(image, attrs)
+  def change_image(%Nappy.Catalog.Image{} = image, attrs \\ %{}) do
+    Catalog.Image.changeset(image, attrs)
   end
 
   def image_tags_as_list(tags, generated_tags) do
@@ -1031,35 +1032,6 @@ defmodule Nappy.Catalog do
   end
 
   @doc """
-  Returns the list of collections.
-
-  ## Examples
-
-      iex> list_collections()
-      [%Collection{}, ...]
-
-  """
-  def list_collections do
-    Repo.all(Collection)
-  end
-
-  @doc """
-  Gets a single collection.
-
-  Raises `Ecto.NoResultsError` if the Collection does not exist.
-
-  ## Examples
-
-      iex> get_collection!(123)
-      %Collection{}
-
-      iex> get_collection!(456)
-      ** (Ecto.NoResultsError)
-
-  """
-  def get_collection!(id), do: Repo.get!(Collection, id)
-
-  @doc """
   Creates a collection.
 
   ## Examples
@@ -1078,6 +1050,110 @@ defmodule Nappy.Catalog do
   end
 
   @doc """
+  Returns the list of collections.
+
+  ## Examples
+
+      iex> list_collections()
+      [%Collection{}, ...]
+
+  """
+  def list_collections do
+    active = Metrics.get_image_status_id(:active)
+    featured = Metrics.get_image_status_id(:featured)
+
+    images = Nappy.Catalog.Image |> where([i], i.image_status_id in ^[active, featured])
+
+    Collection
+    |> preload(images: ^images)
+    |> Repo.all()
+  end
+
+  @doc """
+  Gets a single collection.
+
+  Raises `Ecto.NoResultsError` if a Collection does not exist.
+
+  ## Examples
+
+      iex> get_collection!(123)
+      %Collection{}
+
+      iex> get_collection!(456)
+      ** (Ecto.NoResultsError)
+
+  """
+  def get_collection!(id), do: Repo.get!(Collection, id)
+
+  def get_collection_by_slug(slug) do
+    Collection
+    |> where(slug: ^slug)
+    |> preload(:user)
+    |> Repo.one()
+  end
+
+  def get_collection_by_user_id(user_id) do
+    Collection
+    |> where(user_id: ^user_id)
+    |> Repo.all()
+  end
+
+  def get_matched_collection(collection_id, image_id) do
+    collections =
+      Collection
+      |> where(id: ^collection_id)
+      |> select([c], c.id)
+
+    Nappy.Catalog.Image
+    |> where(id: ^image_id)
+    |> preload(collections: ^collections)
+    |> Repo.one()
+  end
+
+  def consolidate_tags_by_category(category_id, count \\ 24) do
+    active = Metrics.get_image_status_id(:active)
+    featured = Metrics.get_image_status_id(:featured)
+
+    Nappy.Catalog.Image
+    |> where([i], i.image_status_id in ^[active, featured])
+    |> where(category_id: ^category_id)
+    |> randomize_and_flatten(3, count, &[String.split(&1.tags, ",") | &2])
+  end
+
+  @doc """
+  Related tags by group of images
+  """
+  @spec consolidate_tags_by_collection(String.t(), integer()) :: [String.t()]
+  def consolidate_tags_by_collection(slug, count \\ 24) do
+    images = Nappy.Catalog.Image |> select([:tags])
+
+    Collection
+    |> where(slug: ^slug)
+    |> preload(images: ^images)
+    |> randomize_and_flatten(3, count, &[String.split(&1.image.tags, ",") | &2])
+  end
+
+  def random_tags(count \\ 24) do
+    active = Metrics.get_image_status_id(:active)
+    featured = Metrics.get_image_status_id(:featured)
+
+    Nappy.Catalog.Image
+    |> where([i], i.image_status_id in ^[active, featured])
+    |> randomize_and_flatten(3, count, &[String.split(&1.tags, ",") | &2])
+  end
+
+  defp randomize_and_flatten(query, limit, count, split_method) do
+    query
+    |> order_by(fragment("RANDOM()"))
+    |> limit(^limit)
+    |> Repo.all()
+    |> Enum.reduce([], &split_method.(&1, &2))
+    |> List.flatten()
+    |> Enum.uniq()
+    |> Enum.take_random(count)
+  end
+
+  @doc """
   Updates a collection.
 
   ## Examples
@@ -1089,10 +1165,24 @@ defmodule Nappy.Catalog do
       {:error, %Ecto.Changeset{}}
 
   """
+  def update_collection(attrs) do
+    collection =
+      Collection
+      |> where(slug: ^attrs.slug)
+      |> Repo.one()
+
+    attrs =
+      if Map.has_key?(attrs, :title),
+        do: Map.put(attrs, :slug, Slug.slugify(attrs.title)),
+        else: attrs
+
+    update_collection(collection, attrs)
+  end
+
   def update_collection(%Collection{} = collection, attrs) do
     collection
     |> Collection.changeset(attrs)
-    |> Repo.update()
+    |> Repo.update!()
   end
 
   @doc """
@@ -1124,211 +1214,6 @@ defmodule Nappy.Catalog do
     Collection.changeset(collection, attrs)
   end
 
-  @doc """
-  Returns the list of collection_description.
-
-  ## Examples
-
-      iex> list_collection_description()
-      [%CollectionDescription{}, ...]
-
-  """
-  def list_collection_description do
-    active = Metrics.get_image_status_id(:active)
-    featured = Metrics.get_image_status_id(:featured)
-
-    image_query =
-      Images
-      |> where([i], i.image_status_id in ^[active, featured])
-
-    collection_query =
-      Collection
-      |> preload(image: ^image_query)
-      |> order_by(fragment("RANDOM()"))
-
-    CollectionDescription
-    |> preload(collections: ^collection_query)
-    |> Repo.all()
-  end
-
-  @doc """
-  Gets a single collection_description.
-
-  Raises `Ecto.NoResultsError` if the Collection description does not exist.
-
-  ## Examples
-
-      iex> get_collection_description!(123)
-      %CollectionDescription{}
-
-      iex> get_collection_description!(456)
-      ** (Ecto.NoResultsError)
-
-  """
-  def get_collection_description!(id), do: Repo.get!(CollectionDescription, id)
-
-  def get_collection_description_by_slug(slug) do
-    CollectionDescription
-    |> where(slug: ^slug)
-    |> limit(1)
-    |> preload(:user)
-    |> Repo.one()
-  end
-
-  def get_collection_description_by_user_id(user_id) do
-    CollectionDescription
-    |> where(user_id: ^user_id)
-    |> Repo.all()
-  end
-
-  def get_matched_collection(coll_desc_id, image_id) do
-    CollectionDescription
-    |> join(:inner, [cd], c in assoc(cd, :collections))
-    |> join(:inner, [_, c], i in assoc(c, :image))
-    |> where([_, c, _], c.image_id == ^image_id)
-    |> where([cd, _, _], cd.id == ^coll_desc_id)
-    |> select([cd, c, _i], %{
-      image_id: c.image_id,
-      coll_desc_id: cd.id,
-      coll_desc_slug: cd.slug,
-      is_enabled: cd.is_enabled,
-      title: cd.title
-    })
-    |> Repo.one()
-  end
-
-  def consolidate_tags_by_category(category_id, count \\ 24) do
-    active = Metrics.get_image_status_id(:active)
-    featured = Metrics.get_image_status_id(:featured)
-
-    Images
-    |> where([i], i.image_status_id in ^[active, featured])
-    |> where(category_id: ^category_id)
-    |> randomize_and_flatten(3, count, &[String.split(&1.tags, ",") | &2])
-  end
-
-  @doc """
-  Related tags by group of images
-  """
-  @spec consolidate_tags_by_collection(String.t(), integer()) :: [String.t()]
-  def consolidate_tags_by_collection(slug, count \\ 24) do
-    collection_description_id =
-      from(cd in CollectionDescription,
-        where: cd.slug == ^slug,
-        select: cd.id
-      )
-      |> Repo.one()
-
-    image_query = Images |> select([:tags])
-
-    Collection
-    |> where(collection_description_id: ^collection_description_id)
-    |> preload(image: ^image_query)
-    |> randomize_and_flatten(3, count, &[String.split(&1.image.tags, ",") | &2])
-  end
-
-  def random_tags(count \\ 24) do
-    active = Metrics.get_image_status_id(:active)
-    featured = Metrics.get_image_status_id(:featured)
-
-    Images
-    |> where([i], i.image_status_id in ^[active, featured])
-    |> randomize_and_flatten(3, count, &[String.split(&1.tags, ",") | &2])
-  end
-
-  defp randomize_and_flatten(query, limit, count, split_method) do
-    query
-    |> order_by(fragment("RANDOM()"))
-    |> limit(^limit)
-    |> Repo.all()
-    |> Enum.reduce([], &split_method.(&1, &2))
-    |> List.flatten()
-    |> Enum.uniq()
-    |> Enum.take_random(count)
-  end
-
-  @doc """
-  Creates a collection_description.
-
-  ## Examples
-
-      iex> create_collection_description(%{field: value})
-      {:ok, %CollectionDescription{}}
-
-      iex> create_collection_description(%{field: bad_value})
-      {:error, %Ecto.Changeset{}}
-
-  """
-  def create_collection_description(attrs \\ %{}) do
-    %CollectionDescription{}
-    |> CollectionDescription.changeset(attrs)
-    |> Repo.insert()
-  end
-
-  @doc """
-  Updates a collection_description.
-
-  ## Examples
-
-      iex> update_collection_description(collection_description, %{field: new_value})
-      {:ok, %CollectionDescription{}}
-
-      iex> update_collection_description(collection_description, %{field: bad_value})
-      {:error, %Ecto.Changeset{}}
-
-  """
-  def update_collection_description(attrs) do
-    collection_description =
-      CollectionDescription
-      |> where(slug: ^attrs.slug)
-      |> Repo.one()
-
-    attrs =
-      if Map.has_key?(attrs, :title),
-        do: Map.put(attrs, :slug, Slug.slugify(attrs.title)),
-        else: attrs
-
-    update_collection_description(collection_description, attrs)
-  end
-
-  def update_collection_description(%CollectionDescription{} = collection_description, attrs) do
-    collection_description
-    |> CollectionDescription.changeset(attrs)
-    |> Repo.update!()
-  end
-
-  @doc """
-  Deletes a collection_description.
-
-  ## Examples
-
-      iex> delete_collection_description(collection_description)
-      {:ok, %CollectionDescription{}}
-
-      iex> delete_collection_description(collection_description)
-      {:error, %Ecto.Changeset{}}
-
-  """
-  def delete_collection_description(%CollectionDescription{} = collection_description) do
-    Repo.delete(collection_description)
-  end
-
-  @doc """
-  Returns an `%Ecto.Changeset{}` for tracking collection_description changes.
-
-  ## Examples
-
-      iex> change_collection_description(collection_description)
-      %Ecto.Changeset{data: %CollectionDescription{}}
-
-  """
-  def change_collection_description(
-        %CollectionDescription{} = collection_description,
-        attrs \\ %{}
-      ) do
-    CollectionDescription.changeset(collection_description, attrs)
-  end
-
   def truncate_related_tags(related_tag) do
     if String.length(related_tag) > 13 do
       String.slice(related_tag, 0..12) <> "..."
@@ -1337,56 +1222,50 @@ defmodule Nappy.Catalog do
     end
   end
 
-  def set_image_to_existing_collection(coll_desc_slug, image_slug, attrs \\ %{}) do
-    # pending: write sql for duplicate entries in collections table
-    # pending: only duplicates for collection when setting an image
-    new_image = Images |> where(slug: ^image_slug) |> Repo.one()
+  def set_image_to_existing_collection(collection_slug, image_slug, attrs \\ %{}) do
+    new_image = Nappy.Catalog.Image |> where(slug: ^image_slug) |> Repo.one()
 
-    images = Images |> where(slug: ^image_slug)
+    images = Nappy.Catalog.Image |> where(slug: ^image_slug)
 
-    coll_desc =
-      CollectionDescription
+    collection =
+      Collection
       |> preload(images: ^images)
-      |> where(slug: ^coll_desc_slug)
+      |> where(slug: ^collection_slug)
       |> Repo.one()
 
     Repo.transaction(fn ->
-      CollectionDescription
-      |> preload(:images)
-      |> where(slug: ^coll_desc_slug)
-      |> Repo.one()
+      collection
       |> Ecto.Changeset.change(attrs)
-      |> Ecto.Changeset.put_assoc(:images, [new_image | coll_desc.images])
+      |> Ecto.Changeset.put_assoc(:images, [new_image | collection.images])
       |> Repo.update!()
     end)
   end
 
   def add_image_to_new_collection(image_slug, attrs \\ %{}) do
     image =
-      Images
+      Nappy.Catalog.Image
       |> where(slug: ^image_slug)
       |> Repo.one()
 
-    thumbnail = image.id
     slug = Slug.slugify(attrs.title)
 
     attrs =
       attrs
-      |> Map.put(:thumbnail, thumbnail)
+      |> Map.put(:image_id, image.id)
       |> Map.put(:slug, slug)
       |> Map.put(:is_enabled, true)
 
     Repo.transaction(fn ->
-      %{id: coll_desc_id} =
-        %CollectionDescription{}
-        |> CollectionDescription.changeset(attrs)
+      %{id: collection_id} =
+        %Collection{}
+        |> Collection.changeset(attrs)
         |> Repo.insert!()
 
-      CollectionDescription
-      |> where(id: ^coll_desc_id)
+      Collection
+      |> where(id: ^collection_id)
       |> preload(:images)
       |> Repo.one()
-      |> CollectionDescription.changeset(attrs)
+      |> Collection.changeset(attrs)
       |> Ecto.Changeset.put_assoc(:images, [image | []])
       |> Repo.update!()
     end)

@@ -2,13 +2,13 @@ defmodule Nappy.Metrics.LikedImage do
   use Ecto.Schema
   import Ecto.Changeset
   alias Nappy.Accounts.User
-  alias Nappy.Catalog.Images
+  alias Nappy.Catalog.Image
 
   @moduledoc false
 
   schema "liked_images" do
     field :is_liked, :boolean, default: false
-    belongs_to :image, Images
+    belongs_to :image, Image
     belongs_to :user, User
 
     timestamps()

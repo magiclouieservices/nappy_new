@@ -10,7 +10,7 @@ defmodule Nappy.Admin do
   alias Nappy.Admin.Legal
   alias Nappy.Admin.Seo
   alias Nappy.Catalog
-  alias Nappy.Catalog.Images
+  alias Nappy.Catalog.Image
   alias Nappy.Repo
 
   @doc """
@@ -297,7 +297,7 @@ defmodule Nappy.Admin do
     Seo.changeset(seo, attrs)
   end
 
-  def generate_tags_and_description(%Images{} = image) do
+  def generate_tags_and_description(%Image{} = image) do
     image_url = Catalog.imgix_url(image, "photo")
 
     query_params = %{
@@ -336,7 +336,7 @@ defmodule Nappy.Admin do
           |> Map.put(:generated_tags, generated_tags)
 
         Multi.new()
-        |> Multi.update(:image, Images.changeset(image, image_attrs))
+        |> Multi.update(:image, Image.changeset(image, image_attrs))
         |> Repo.transaction()
 
       {:error, reason} ->

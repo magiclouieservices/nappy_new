@@ -77,16 +77,16 @@ defmodule NappyWeb.Components.SaveToCollectionComponent do
               <input type="hidden" name="image_slug" value={@image.slug} />
               <fieldset class="my-2 flex flex-col">
                 <legend class="sr-only">Add to collection</legend>
-                <%= for coll_desc <- Catalog.get_collection_description_by_user_id(@current_user.id) do %>
+                <%= for collection <- Catalog.get_collection_by_user_id(@current_user.id) do %>
                   <div class="relative flex items-start">
                     <div class="flex h-6 items-center">
                       <input
-                        id={"#{coll_desc.slug}#{@image.slug}"}
-                        aria-describedby={coll_desc.title}
-                        name={coll_desc.slug}
+                        id={"#{collection.slug}#{@image.slug}"}
+                        aria-describedby={collection.title}
+                        name={collection.slug}
                         type="checkbox"
                         checked={
-                          if @image.id == match_image_id(coll_desc.id, @image.id),
+                          if @image.id == match_image_id(collection.id, @image.id),
                             do: "true",
                             else: nil
                         }
@@ -95,10 +95,10 @@ defmodule NappyWeb.Components.SaveToCollectionComponent do
                     </div>
                     <div class="text-sm leading-6">
                       <label
-                        for={"#{coll_desc.slug}#{@image.slug}"}
+                        for={"#{collection.slug}#{@image.slug}"}
                         class="px-3 font-medium text-gray-900"
                       >
-                        <%= coll_desc.title %>
+                        <%= collection.title %>
                       </label>
                     </div>
                   </div>
@@ -165,9 +165,9 @@ defmodule NappyWeb.Components.SaveToCollectionComponent do
     # attrs = %{user_id: current_user.id}
 
     # socket =
-    #   case Catalog.set_image_to_existing_collection(coll_desc_slug, image_slug, attrs) do
+    #   case Catalog.set_image_to_existing_collection(collection_slug, image_slug, attrs) do
     #     {:ok, _} ->
-    #       {:ok, true} = Cachex.del(Nappy.cache_name(), {"collection_#{coll_desc_slug}"})
+    #       {:ok, true} = Cachex.del(Nappy.cache_name(), {"collection_#{collection_slug}"})
     #       put_flash(socket, :info, "Image added to collection")
 
     #     {:error, _reason} ->
@@ -204,7 +204,13 @@ defmodule NappyWeb.Components.SaveToCollectionComponent do
     {:noreply, push_navigate(socket, to: path)}
   end
 
-  defp match_image_id(coll_desc_id, image_id) do
-    Catalog.get_matched_collection(coll_desc_id, image_id)[:image_id]
+  defp match_image_id(collection_id, image_id) do
+    image = Catalog.get_matched_collection(collection_id, image_id)
+
+    if Enum.empty?(image.collections) do
+      false
+    else
+      image.id
+    end
   end
 end
