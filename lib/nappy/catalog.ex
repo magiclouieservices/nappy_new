@@ -1225,63 +1225,58 @@ defmodule Nappy.Catalog do
   end
 
   def set_image_to_existing_collections(collection_slugs, image_slug, attrs \\ %{}) do
-    image_id =
+    image_id = Nappy.Catalog.Image |> where(slug: ^image_slug) |> select([i], i.id) |> Repo.one()
+
+    collections =
+      Collection
+      |> where([c], c.slug in ^collection_slugs)
+      |> where(user_id: ^attrs.user_id)
+
+    collection_ids =
+      collections
+      |> select([c], c.id)
+      |> Repo.all()
+
+    collection =
+      Collection
+      |> join(:left, [c], ic in ImageCollection, on: c.id == ic.collection_id)
+      |> join(:left, [_c, ic], i in Nappy.Catalog.Image, on: ic.image_id == i.id)
+
+    remove_image_collection_id =
+      collection
+      |> where([c, _ic, _i], c.slug not in ^collection_slugs)
+      |> where([_c, _ic, i], i.slug == ^image_slug)
+      |> select([c, _ic, _i], c.id)
+      |> Repo.all()
+
+    image =
       Nappy.Catalog.Image
+      |> preload(:collections)
       |> where(slug: ^image_slug)
-      |> select([i], i.id)
       |> Repo.one()
 
-    if Enum.empty?(collection_slugs) do
-      image_collection = ImageCollection |> where(image_id: ^image_id)
-
-      collection_ids =
-        image_collection
-        |> select([ic], ic.collection_id)
-        |> Repo.all()
-
-      Repo.delete_all(image_collection)
-
-      collection_ids
-      |> Enum.filter(fn collection_id ->
-        ImageCollection
-        |> where(collection_id: ^collection_id)
-        |> limit(1)
-        |> Repo.one()
-        |> is_nil()
-      end)
-      |> Enum.each(fn id ->
-        Collection
-        |> where(user_id: ^attrs.user_id)
-        |> where(id: ^id)
-        |> Repo.one()
-        |> delete_collection()
-      end)
-
-      {:ok, "deleted"}
-    else
-      upsert_image_collection(collection_slugs, image_slug, attrs)
-    end
-  end
-
-  def upsert_image_collection(collection_slugs, image_slug, attrs) do
     Repo.transaction(fn ->
-      new_image = Nappy.Catalog.Image |> where(slug: ^image_slug) |> Repo.one()
+      ImageCollection
+      |> where([ic], ic.collection_id in ^remove_image_collection_id)
+      |> where(image_id: ^image_id)
+      |> Repo.delete_all()
 
-      images = Nappy.Catalog.Image |> where(slug: ^image_slug)
-
-      collection_slugs
-      |> Enum.each(fn collection_slug ->
-        collection =
-          Collection
-          |> preload(images: ^images)
-          |> where(slug: ^collection_slug)
-          |> Repo.one()
-
+      remove_collection_ids =
         collection
-        |> Ecto.Changeset.change(attrs)
-        |> Ecto.Changeset.put_assoc(:images, [new_image | collection.images])
-        |> Repo.update!()
-      end)
+        |> where([c], c.id in ^remove_image_collection_id)
+        |> preload(images: ^from(i in Nappy.Catalog.Image, limit: 1, select: i.id))
+        |> Repo.all()
+        |> Enum.filter(&Enum.empty?(&1.images))
+        |> Enum.map(& &1.id)
+
+      Collection
+      |> where([c], c.id in ^remove_collection_ids)
+      |> Repo.delete_all()
+
+      image
+      |> Ecto.Changeset.change()
+      |> Ecto.Changeset.put_assoc(:collections, Repo.all(collections))
+      |> Repo.update!()
     end)
   end
 

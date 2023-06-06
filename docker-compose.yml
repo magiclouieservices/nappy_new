@@ -48,13 +48,13 @@ services:
     volumes:
       - minio_data:/data
 
-  typesense:
-    image: typesense/typesense:0.23.1
-    entrypoint: sh -c "/opt/typesense-server --data-dir /data --api-key=xyz"
-    ports:
-      - "8108:8108"
-    volumes:
-      - typesense:/data
+  # typesense:
+  #   image: typesense/typesense:0.23.1
+  #   entrypoint: sh -c "/opt/typesense-server --data-dir /data --api-key=xyz"
+  #   ports:
+  #     - "8108:8108"
+  #   volumes:
+  #     - typesense:/data
 
 volumes:
   minio_data:

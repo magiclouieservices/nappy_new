@@ -73,7 +73,7 @@ defmodule NappyWeb.Components.SaveToCollectionComponent do
             <!-- Title -->
             <h2 class="text-xl font-bold" x-bind:id="$id('modal-title')">Move to collection</h2>
             <!-- Content -->
-            <.form for={%{}} as={:set_collection} phx-submit="set_collection" phx-target={@myself}>
+            <.form for={%{}} as={:set_collection} phx-submit="set_collection">
               <input type="hidden" name="image_slug" value={@image.slug} />
               <fieldset class="my-2 flex flex-col">
                 <legend class="sr-only">Add to collection</legend>
@@ -108,7 +108,6 @@ defmodule NappyWeb.Components.SaveToCollectionComponent do
                 <button
                   id={"set_collection-#{@image.slug}"}
                   type="submit"
-                  phx-target={@myself}
                   class="rounded-md text-white bg-black hover:bg-gray-900 px-4 py-1.5"
                 >
                   Set collection
@@ -121,7 +120,6 @@ defmodule NappyWeb.Components.SaveToCollectionComponent do
               for={%{}}
               as={:new_collection}
               phx-submit="new_collection"
-              phx-target={@myself}
               class="flex justify-center items-center gap-2"
             >
               <input type="hidden" name="image_slug" value={@image.slug} />
@@ -136,7 +134,6 @@ defmodule NappyWeb.Components.SaveToCollectionComponent do
                 <button
                   id={"new_collection-#{@image.slug}"}
                   type="submit"
-                  phx-target={@myself}
                   class="rounded-md text-white bg-gray-500 px-4 py-1.5"
                   disabled
                 >
@@ -149,74 +146,6 @@ defmodule NappyWeb.Components.SaveToCollectionComponent do
       </div>
     </div>
     """
-  end
-
-  @impl true
-  def handle_event("set_collection", params, socket) do
-    collection_slugs =
-      params
-      |> Enum.reduce([], fn {slug, state}, acc ->
-        if state === "on" do
-          [slug | acc]
-        else
-          acc
-        end
-      end)
-
-    image_slug = Map.get(params, "image_slug")
-
-    path = socket.assigns[:current_url]
-    current_user = socket.assigns[:current_user]
-    attrs = %{user_id: current_user.id}
-
-    socket =
-      case Catalog.set_image_to_existing_collections(collection_slugs, image_slug, attrs) do
-        {:ok, "deleted"} ->
-          # Enum.each(collection_slugs, fn collection_slug ->
-          #   Cachex.del(Nappy.cache_name(), {"collection_#{collection_slug}"})
-          # end)
-
-          put_flash(socket, :info, "Successfully removed from collections")
-
-        {:ok, _} ->
-          Enum.each(collection_slugs, fn collection_slug ->
-            Cachex.del(Nappy.cache_name(), {"collection_#{collection_slug}"})
-          end)
-
-          put_flash(socket, :info, "Image added to collections")
-
-        {:error, _reason} ->
-          put_flash(socket, :error, "Error adding image to collections")
-      end
-
-    Process.send_after(self(), :clear_info, 5_000)
-
-    {:noreply, push_navigate(socket, to: path)}
-  end
-
-  @impl true
-  def handle_event(
-        "new_collection",
-        %{"collection_title" => title, "image_slug" => image_slug},
-        socket
-      ) do
-    path = socket.assigns[:current_url]
-    current_user = socket.assigns[:current_user]
-
-    attrs = %{
-      user_id: current_user.id,
-      title: title
-    }
-
-    socket =
-      case Catalog.add_image_to_new_collection(image_slug, attrs) do
-        {:ok, _} -> put_flash(socket, :info, "Image added to collection")
-        {:error, _reason} -> put_flash(socket, :error, "Error adding image to collection")
-      end
-
-    Process.send_after(self(), :clear_info, 5_000)
-
-    {:noreply, push_navigate(socket, to: path)}
   end
 
   defp match_image_id(collection_id, image_id) do
