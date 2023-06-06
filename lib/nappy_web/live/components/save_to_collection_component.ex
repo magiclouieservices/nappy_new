@@ -152,31 +152,46 @@ defmodule NappyWeb.Components.SaveToCollectionComponent do
   end
 
   @impl true
-  def handle_event(
-        "set_collection",
-        params,
-        socket
-      ) do
-    # pending: separate image_slug and the rest so we can know
-    # how many will be set
-    {:noreply, socket}
-    # path = socket.assigns[:current_url]
-    # current_user = socket.assigns[:current_user]
-    # attrs = %{user_id: current_user.id}
+  def handle_event("set_collection", params, socket) do
+    collection_slugs =
+      params
+      |> Enum.reduce([], fn {slug, state}, acc ->
+        if state === "on" do
+          [slug | acc]
+        else
+          acc
+        end
+      end)
 
-    # socket =
-    #   case Catalog.set_image_to_existing_collection(collection_slug, image_slug, attrs) do
-    #     {:ok, _} ->
-    #       {:ok, true} = Cachex.del(Nappy.cache_name(), {"collection_#{collection_slug}"})
-    #       put_flash(socket, :info, "Image added to collection")
+    image_slug = Map.get(params, "image_slug")
 
-    #     {:error, _reason} ->
-    #       put_flash(socket, :error, "Error adding image to collection")
-    #   end
+    path = socket.assigns[:current_url]
+    current_user = socket.assigns[:current_user]
+    attrs = %{user_id: current_user.id}
 
-    # Process.send_after(self(), :clear_info, 5_000)
+    socket =
+      case Catalog.set_image_to_existing_collections(collection_slugs, image_slug, attrs) do
+        {:ok, "deleted"} ->
+          # Enum.each(collection_slugs, fn collection_slug ->
+          #   Cachex.del(Nappy.cache_name(), {"collection_#{collection_slug}"})
+          # end)
 
-    # {:noreply, push_navigate(socket, to: path)}
+          put_flash(socket, :info, "Successfully removed from collections")
+
+        {:ok, _} ->
+          Enum.each(collection_slugs, fn collection_slug ->
+            Cachex.del(Nappy.cache_name(), {"collection_#{collection_slug}"})
+          end)
+
+          put_flash(socket, :info, "Image added to collections")
+
+        {:error, _reason} ->
+          put_flash(socket, :error, "Error adding image to collections")
+      end
+
+    Process.send_after(self(), :clear_info, 5_000)
+
+    {:noreply, push_navigate(socket, to: path)}
   end
 
   @impl true

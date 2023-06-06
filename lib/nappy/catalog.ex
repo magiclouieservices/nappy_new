@@ -1198,7 +1198,9 @@ defmodule Nappy.Catalog do
 
   """
   def delete_collection(%Collection{} = collection) do
-    Repo.delete(collection)
+    Repo.transaction(fn ->
+      Repo.delete(collection)
+    end)
   end
 
   @doc """
@@ -1222,22 +1224,64 @@ defmodule Nappy.Catalog do
     end
   end
 
-  def set_image_to_existing_collection(collection_slug, image_slug, attrs \\ %{}) do
-    new_image = Nappy.Catalog.Image |> where(slug: ^image_slug) |> Repo.one()
-
-    images = Nappy.Catalog.Image |> where(slug: ^image_slug)
-
-    collection =
-      Collection
-      |> preload(images: ^images)
-      |> where(slug: ^collection_slug)
+  def set_image_to_existing_collections(collection_slugs, image_slug, attrs \\ %{}) do
+    image_id =
+      Nappy.Catalog.Image
+      |> where(slug: ^image_slug)
+      |> select([i], i.id)
       |> Repo.one()
 
+    if Enum.empty?(collection_slugs) do
+      image_collection = ImageCollection |> where(image_id: ^image_id)
+
+      collection_ids =
+        image_collection
+        |> select([ic], ic.collection_id)
+        |> Repo.all()
+
+      Repo.delete_all(image_collection)
+
+      collection_ids
+      |> Enum.filter(fn collection_id ->
+        ImageCollection
+        |> where(collection_id: ^collection_id)
+        |> limit(1)
+        |> Repo.one()
+        |> is_nil()
+      end)
+      |> Enum.each(fn id ->
+        Collection
+        |> where(user_id: ^attrs.user_id)
+        |> where(id: ^id)
+        |> Repo.one()
+        |> delete_collection()
+      end)
+
+      {:ok, "deleted"}
+    else
+      upsert_image_collection(collection_slugs, image_slug, attrs)
+    end
+  end
+
+  def upsert_image_collection(collection_slugs, image_slug, attrs) do
     Repo.transaction(fn ->
-      collection
-      |> Ecto.Changeset.change(attrs)
-      |> Ecto.Changeset.put_assoc(:images, [new_image | collection.images])
-      |> Repo.update!()
+      new_image = Nappy.Catalog.Image |> where(slug: ^image_slug) |> Repo.one()
+
+      images = Nappy.Catalog.Image |> where(slug: ^image_slug)
+
+      collection_slugs
+      |> Enum.each(fn collection_slug ->
+        collection =
+          Collection
+          |> preload(images: ^images)
+          |> where(slug: ^collection_slug)
+          |> Repo.one()
+
+        collection
+        |> Ecto.Changeset.change(attrs)
+        |> Ecto.Changeset.put_assoc(:images, [new_image | collection.images])
+        |> Repo.update!()
+      end)
     end)
   end
 
