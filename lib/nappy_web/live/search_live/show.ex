@@ -60,11 +60,6 @@ defmodule NappyWeb.SearchLive.Show do
   end
 
   @impl true
-  def handle_info(:clear_info, socket) do
-    {:noreply, clear_flash(socket, :info)}
-  end
-
-  @impl true
   def handle_event("set_collection", params, socket) do
     collection_slugs =
       Enum.reduce(params, [], fn {slug, state}, acc ->
