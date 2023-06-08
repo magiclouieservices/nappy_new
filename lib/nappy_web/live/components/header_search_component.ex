@@ -49,6 +49,7 @@ defmodule NappyWeb.Components.HeaderSearchComponent do
             type="text"
             placeholder="Search for photos..."
             class="appearance-none block lg:w-[28rem] md:w-96 xs:w-72 rounded border-gray-300 placeholder-gray-500 focus:outline-none focus:ring-gray-500 focus:border-gray-500 text-black xs:text-base"
+            required
           />
           <div
             x-cloak

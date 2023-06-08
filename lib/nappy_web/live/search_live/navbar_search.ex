@@ -53,6 +53,7 @@ defmodule NappyWeb.SearchLive.NavbarSearch do
             type="text"
             placeholder="Search for photos"
             class="appearance-none block w-96 rounded border-gray-300 placeholder-gray-500 focus:outline-none focus:ring-gray-500 focus:border-gray-500 text-black"
+            required
           />
           <div
             x-cloak
@@ -83,6 +84,8 @@ defmodule NappyWeb.SearchLive.NavbarSearch do
         <% end %>
       </.form>
       <button
+        type="submit"
+        id="navbar-search-button"
         x-show="parentOpen"
         @click="open = !open, parentOpen = !parentOpen, toggle()"
         @click.outside="open = false, parentOpen = true"
