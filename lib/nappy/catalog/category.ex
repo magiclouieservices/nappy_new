@@ -10,7 +10,7 @@ defmodule Nappy.Catalog.Category do
     field :name, :string
     field :slug, :string
     field :related_tags, :string
-    field :image_id, :integer
+    belongs_to :image, Image
     has_many :images, Image
   end
 

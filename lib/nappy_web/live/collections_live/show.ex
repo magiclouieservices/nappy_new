@@ -75,7 +75,7 @@ defmodule NappyWeb.CollectionsLive.Show do
 
     socket =
       case Catalog.set_image_to_existing_collections(collection_slugs, image_slug, attrs) do
-        {:ok, _} ->
+        {:ok, collection_slugs} ->
           Enum.each(collection_slugs, &Cachex.del(Nappy.cache_name(), {"collection_#{&1}"}))
 
           put_flash(socket, :info, "Successfully updated")

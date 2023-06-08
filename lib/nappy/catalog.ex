@@ -287,7 +287,7 @@ defmodule Nappy.Catalog do
     featured = Metrics.get_image_status_id(:featured)
 
     Category
-    |> join(:inner, [category], i in assoc(category, :image))
+    |> join(:inner, [category], i in assoc(category, :images))
     |> where([_category, i], i.image_status_id in ^[active, featured])
     |> where([category, _i], category.slug == ^slug)
     |> select([_category, i], %Nappy.Catalog.Image{id: i.id, slug: i.slug})
@@ -1232,11 +1232,6 @@ defmodule Nappy.Catalog do
       |> where([c], c.slug in ^collection_slugs)
       |> where(user_id: ^attrs.user_id)
 
-    collection_ids =
-      collections
-      |> select([c], c.id)
-      |> Repo.all()
-
     collection =
       Collection
       |> join(:left, [c], ic in ImageCollection, on: c.id == ic.collection_id)
@@ -1261,13 +1256,16 @@ defmodule Nappy.Catalog do
       |> where(image_id: ^image_id)
       |> Repo.delete_all()
 
-      remove_collection_ids =
+      map =
         collection
         |> where([c], c.id in ^remove_image_collection_id)
         |> preload(images: ^from(i in Nappy.Catalog.Image, limit: 1, select: i.id))
         |> Repo.all()
         |> Enum.filter(&Enum.empty?(&1.images))
-        |> Enum.map(& &1.id)
+        |> Enum.map(&{&1.slug, &1.id})
+        |> Map.new()
+
+      remove_collection_ids = Map.values(map)
 
       Collection
       |> where([c], c.id in ^remove_collection_ids)
@@ -1277,6 +1275,8 @@ defmodule Nappy.Catalog do
       |> Ecto.Changeset.change()
       |> Ecto.Changeset.put_assoc(:collections, Repo.all(collections))
       |> Repo.update!()
+
+      Map.keys(map)
     end)
   end
 
