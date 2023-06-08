@@ -28,9 +28,11 @@ defmodule NappyWeb.Components.Admin.ImagesPaginationComponent do
       <th class="pl-4">
         <div class="flex items-center gap-2">
           <!-- selected images count -->
+          <!--
           <span class="text-sm font-normal">
             0 selected
           </span>
+          -->
           <!-- end selected images count -->
 
           <!-- page count -->
