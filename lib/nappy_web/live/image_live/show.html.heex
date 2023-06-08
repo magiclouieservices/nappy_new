@@ -8,14 +8,12 @@
       <span><%= @image.user.username %></span>
     </a>
 
-    <div class="flex gap-2 xs:justify-between sm:justify-end">
+    <div
+      id="new-collection-hook"
+      phx-hook="NewCollection"
+      class="flex gap-2 xs:justify-between sm:justify-end"
+    >
       <div>
-        <button
-          type="button"
-          class="inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2"
-        >
-          <i class="fa-solid fa-circle-dollar-to-slot"></i>
-        </button>
         <.live_component
           module={ShareLinkComponent}
           user={@image.user}
@@ -26,18 +24,20 @@
           id="share-component"
         />
         <%= if @current_user != nil do %>
-          <button
-            type="button"
-            class="inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2"
-          >
-            <i class="fa-regular fa-heart"></i>
-          </button>
+          <.live_component
+            :if={Nappy.Accounts.is_admin(@current_user)}
+            image={@image}
+            module={SaveToCollectionComponent}
+            id="save-to-collection-component"
+            current_url={URI.parse(@current_url).path}
+            current_user={@current_user}
+          />
         <% else %>
           <a
             class="inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2"
-            href={Routes.user_session_path(@socket, :create)}
+            href={Routes.user_session_path(@socket, :create, redirect_path: @redirect_path)}
           >
-            <i class="fa-regular fa-heart"></i>
+            <i class="fa-solid fa-plus"></i>
           </a>
         <% end %>
       </div>
@@ -106,6 +106,7 @@
   <.live_component
     module={SponsoredImagesComponent}
     id={"sponsored-image-#{@image.slug}"}
+    image_slug={@image.slug}
     sponsored_images={@sponsored_images}
   />
 </div>

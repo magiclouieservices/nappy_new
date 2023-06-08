@@ -90,6 +90,9 @@ jobs:
 
       - name: test incrementing view counts
         run: mix test --trace test/nappy_web/live/increment_view_count_test.exs
+      
+      - name: cache mounted images
+        run: mix test --trace test/nappy_web/live/cache_mounted_images_test.exs
 
       # reason for disabling: cant display image struct event created
       # when ran in ci (localhost is working)

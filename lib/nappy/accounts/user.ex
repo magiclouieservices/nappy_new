@@ -2,8 +2,10 @@ defmodule Nappy.Accounts.User do
   use Ecto.Schema
   import Ecto.Changeset
   alias Nappy.Accounts
-  alias Nappy.Accounts.{AccountRole, AccountStatus, SocialMedia}
-  alias Nappy.Catalog.Images
+  alias Nappy.Accounts.AccountRole
+  alias Nappy.Accounts.AccountStatus
+  alias Nappy.Accounts.SocialMedia
+  alias Nappy.Catalog.Image
   alias Nappy.Newsletter.Subscriber
 
   @moduledoc false
@@ -18,7 +20,7 @@ defmodule Nappy.Accounts.User do
     belongs_to :account_role, AccountRole
     has_one :social_media, SocialMedia
     has_one :subscriber, Subscriber
-    has_many :images, Images
+    has_many :images, Image
     field :avatar_link, :string
     field :password, :string, virtual: true, redact: true
     field :hashed_password, :string, redact: true

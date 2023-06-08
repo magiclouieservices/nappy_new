@@ -67,6 +67,8 @@ defmodule NappyWeb.AdminLive.Images do
       socket
       |> put_flash(:info, "updated an image")
 
+    Process.send_after(self(), :clear_info, 5_000)
+
     path = Routes.admin_images_path(socket, :images)
 
     {:noreply, push_navigate(socket, to: path, replace: true)}
@@ -141,6 +143,11 @@ defmodule NappyWeb.AdminLive.Images do
     path = Routes.admin_images_path(socket, :images, params)
 
     {:noreply, push_navigate(socket, to: path, replace: true)}
+  end
+
+  @impl true
+  def handle_info(:clear_info, socket) do
+    {:noreply, clear_flash(socket, :info)}
   end
 
   defp fetch(%{assigns: assigns} = socket) do

@@ -26,6 +26,7 @@ defmodule NappyWeb.Components.SponsoredImagesComponent do
         >
           <%= unless sponsored_img === "#" do %>
             <a
+              id={"#{sponsored_img["id"]}-slug-#{@image_slug}"}
               class="relative bg-slate-300"
               href={sponsored_img["referral_link"]}
               title={sponsored_img["image_alt"]}

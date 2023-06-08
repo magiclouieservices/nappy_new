@@ -65,7 +65,6 @@
           <a class="hover:text-slate-300" href={Routes.custom_page_studio_path(@conn, :studio)}>
             For Brands
           </a>
-          <a class="hover:text-slate-300" href="https://nappy.kampsite.co">Photo Request</a>
           <a class="hover:text-slate-300" href={Routes.custom_page_new_path(@conn, :new)}>
             What's New
           </a>
@@ -224,7 +223,10 @@
               Settings
             </a>
             <%= button("Log out",
-              to: Routes.user_session_path(@conn, :delete),
+              to:
+                Routes.user_session_path(@conn, :delete,
+                  redirect_path: Phoenix.Controller.current_path(@conn)
+                ),
               method: :delete,
               class: "hover:text-slate-300"
             ) %>
@@ -388,7 +390,6 @@
                 >
                   For Brands
                 </a>
-                <a class="hover:text-slate-300" href="https://nappy.kampsite.co">Photo Request</a>
                 <a class="hover:text-slate-300" href={Routes.custom_page_new_path(@conn, :new)}>
                   What's New
                 </a>
@@ -570,10 +571,14 @@
                     Settings
                   </a>
                   <%= button("Log out",
-                    to: Routes.user_session_path(@conn, :delete),
+                    to:
+                      Routes.user_session_path(@conn, :delete,
+                        redirect_path: Phoenix.Controller.current_path(@conn)
+                      ),
                     method: :delete,
                     class: "hover:text-slate-300"
                   ) %>
+                  <%= Phoenix.Controller.current_path(@conn) %>
                 </div>
               </div>
             <% else %>

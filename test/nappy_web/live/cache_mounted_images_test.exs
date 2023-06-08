@@ -2,7 +2,7 @@ defmodule NappyWeb.CacheMountedImagesTest do
   use ExUnit.Case, async: true
   use NappyWeb.ConnCase
 
-  alias Nappy.Catalog.CollectionDescription
+  alias Nappy.Catalog.Collection
   alias Nappy.CatalogFixtures
 
   import Ecto.Query, warn: false
@@ -79,7 +79,7 @@ defmodule NappyWeb.CacheMountedImagesTest do
       slug = "good-hair"
 
       %{title: title, slug: slug}
-      |> CatalogFixtures.collection_description_fixture()
+      |> CatalogFixtures.collection_fixture()
 
       assert {:ok, _view, _html} = live(conn, Routes.collections_show_path(conn, :show, slug))
       assert {:ok, keys} = Nappy.cache_name() |> Cachex.keys()

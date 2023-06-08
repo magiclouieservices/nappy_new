@@ -78,6 +78,7 @@ defmodule NappyWeb.UserAuth do
   def log_out_user(conn) do
     user_token = get_session(conn, :user_token)
     user_token && Accounts.delete_session_token(user_token)
+    user_return_to = get_session(conn, :user_return_to)
 
     if live_socket_id = get_session(conn, :live_socket_id) do
       NappyWeb.Endpoint.broadcast(live_socket_id, "disconnect", %{})
@@ -86,7 +87,7 @@ defmodule NappyWeb.UserAuth do
     conn
     |> renew_session()
     |> delete_resp_cookie(@remember_me_cookie)
-    |> redirect(to: "/")
+    |> redirect(to: user_return_to || signed_in_path(conn))
   end
 
   @doc """

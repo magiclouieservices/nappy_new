@@ -2,12 +2,12 @@ import Ecto.{Changeset, Query}
 import Logger
 
 alias ExAws.{S3}
-alias Image
+alias Image, as: ExtractImage
 alias Nappy.{Accounts, Admin, Builder, Catalog, Metrics, Newsletter, Repo}
 alias Nappy.Accounts.{AccountRole, AccountStatus, SocialMedia, User, UserToken}
 alias Nappy.Admin.{AdminSettings, Legal, Seo, Slug}
 alias Nappy.Builder.{Page}
-alias Nappy.Catalog.{Category, Collection, CollectionDescription, Images}
+alias Nappy.Catalog.{Category, Collection, ImageCollection}
 alias Nappy.Metrics.{ImageAnalytics, ImageMetadata, ImageStatus, Notifications}
 alias Nappy.Newsletter.{Referrer, Subscriber}
 alias Nappy.Search

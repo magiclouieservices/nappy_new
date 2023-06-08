@@ -66,6 +66,7 @@ defmodule Nappy.SponsoredImages do
               |> Map.get("uri")
 
             %{
+              "id" => image["id"],
               "image_alt" => image_alt,
               "image_src" => image_src,
               "referral_link" => referral_link

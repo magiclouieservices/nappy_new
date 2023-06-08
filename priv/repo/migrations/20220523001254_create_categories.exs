@@ -6,7 +6,7 @@ defmodule Nappy.Repo.Migrations.CreateCategories do
       add :name, :string, null: false
       add :slug, :string, null: false, comment: "URL path name for a specific category"
 
-      add :thumbnail, :integer, comment: "Can choose only from available approved images."
+      add :image_id, :integer, comment: "Can choose only from available approved images."
 
       add :is_enabled, :boolean,
         default: false,
@@ -15,7 +15,7 @@ defmodule Nappy.Repo.Migrations.CreateCategories do
     end
 
     create unique_index(:categories, [:slug])
-    create index(:categories, [:thumbnail])
+    create index(:categories, [:image_id])
 
     alter table(:images) do
       add :category_id,

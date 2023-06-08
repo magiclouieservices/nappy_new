@@ -16,26 +16,30 @@ defmodule NappyWeb.CollectionsLive.Show do
       Process.send_after(self(), :clear_info, 5_000)
     end
 
-    coll_desc = Catalog.get_collection_description_by_slug(slug)
+    collection = Catalog.get_collection_by_slug(slug)
 
-    case coll_desc do
+    case collection do
       nil ->
         raise NappyWeb.FallbackController, Status.code(:not_found)
 
       _ ->
         related_tags =
-          coll_desc.related_tags
-          |> String.split(",", trim: true)
+          if collection.related_tags do
+            collection.related_tags
+            |> String.split(",", trim: true)
+          else
+            []
+          end
 
         socket =
           socket
           |> assign(page: 1)
           |> assign(page_size: 12)
           |> assign(slug: slug)
-          |> assign(collection: coll_desc)
+          |> assign(collection: collection)
           |> assign(current_url: uri)
           |> assign(related_tags: related_tags)
-          |> assign(page_title: coll_desc.title)
+          |> assign(page_title: collection.title)
           |> fetch()
 
         {:noreply, socket}
@@ -54,6 +58,57 @@ defmodule NappyWeb.CollectionsLive.Show do
     |> Metrics.increment_view_count()
 
     {:noreply, socket}
+  end
+
+  @impl true
+  def handle_event("set_collection", params, socket) do
+    collection_slugs =
+      Enum.reduce(params, [], fn {slug, state}, acc ->
+        if state === "on", do: [slug | acc], else: acc
+      end)
+
+    image_slug = Map.get(params, "image_slug")
+
+    path = URI.parse(socket.assigns[:current_url]).path
+    current_user = socket.assigns[:current_user]
+    attrs = %{user_id: current_user.id}
+
+    socket =
+      case Catalog.set_image_to_existing_collections(collection_slugs, image_slug, attrs) do
+        {:ok, collection_slugs} ->
+          Enum.each(collection_slugs, &Cachex.del(Nappy.cache_name(), {"collection_#{&1}"}))
+
+          put_flash(socket, :info, "Successfully updated")
+
+        {:error, _reason} ->
+          put_flash(socket, :error, "Error adding image to collections")
+      end
+
+    Process.send_after(self(), :clear_info, 5_000)
+
+    {:noreply, push_navigate(socket, to: path)}
+  end
+
+  @impl true
+  def handle_event(
+        "new_collection",
+        %{"collection_title" => title, "image_slug" => image_slug},
+        socket
+      ) do
+    path = URI.parse(socket.assigns[:current_url]).path
+    current_user = socket.assigns[:current_user]
+
+    attrs = %{user_id: current_user.id, title: title}
+
+    socket =
+      case Catalog.add_image_to_new_collection(image_slug, attrs) do
+        {:ok, _} -> put_flash(socket, :info, "Image added to collection")
+        {:error, _reason} -> put_flash(socket, :error, "Error adding image to collection")
+      end
+
+    Process.send_after(self(), :clear_info, 5_000)
+
+    {:noreply, push_navigate(socket, to: path)}
   end
 
   @impl true

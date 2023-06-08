@@ -19,7 +19,7 @@ defmodule NappyWeb.SearchLive.FuzzySearch do
       %{valid?: true, changes: %{search_phrase: search_phrase}} ->
         # images = Search.search_image(search_phrase)
         images =
-          Catalog.Images
+          Catalog.Image
           |> Search.run(search_phrase)
           |> Nappy.Repo.all()
 

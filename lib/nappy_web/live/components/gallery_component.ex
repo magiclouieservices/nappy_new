@@ -7,6 +7,7 @@ defmodule NappyWeb.Components.GalleryComponent do
   alias NappyWeb.Components.DownloadComponent
   alias NappyWeb.Components.MoreInfoComponent
   alias NappyWeb.Components.RelatedImagesComponent
+  alias NappyWeb.Components.SaveToCollectionComponent
   alias NappyWeb.Components.ShareLinkComponent
   alias NappyWeb.Components.SponsoredImagesComponent
 
@@ -51,6 +52,7 @@ defmodule NappyWeb.Components.GalleryComponent do
     <div>
       <div
         id="infinite-scroll-body"
+        phx-hook="NewCollection"
         phx-update="append"
         phx-target={@myself}
         class="grid
@@ -76,6 +78,7 @@ defmodule NappyWeb.Components.GalleryComponent do
                 </p>
                 <a
                   :for={spon <- image.sponsored}
+                  id={spon["id"]}
                   class="rounded h-full w-full bg-slate-300"
                   href={spon["referral_link"]}
                   target="_blank"
@@ -90,7 +93,7 @@ defmodule NappyWeb.Components.GalleryComponent do
               </div>
             </div>
           <% else %>
-            <%= unless Map.has_key?(image, :sponsored) do %>
+            <%= if !Map.has_key?(image, :sponsored) do %>
               <div
                 id={"view-count-#{image.slug}"}
                 phx-hook="ViewCount"
@@ -203,12 +206,6 @@ defmodule NappyWeb.Components.GalleryComponent do
                         </a>
 
                         <div class="flex gap-2">
-                          <button
-                            type="button"
-                            class="inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2"
-                          >
-                            <i class="fa-solid fa-circle-dollar-to-slot"></i>
-                          </button>
                           <.live_component
                             module={ShareLinkComponent}
                             user={image.user}
@@ -219,18 +216,24 @@ defmodule NappyWeb.Components.GalleryComponent do
                             id={"share-component-#{image.slug}"}
                           />
                           <%= if @current_user != nil do %>
-                            <button
-                              type="button"
-                              class="inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2"
-                            >
-                              <i class="fa-regular fa-heart"></i>
-                            </button>
+                            <.live_component
+                              :if={Nappy.Accounts.is_admin(@current_user)}
+                              current_user={@current_user}
+                              image={image}
+                              module={SaveToCollectionComponent}
+                              id={"save-to-collection-component-#{image.slug}"}
+                              current_url={URI.parse(@current_url).path}
+                            />
                           <% else %>
                             <a
                               class="inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2"
-                              href={Routes.user_session_path(@socket, :create)}
+                              href={
+                                Routes.user_session_path(@socket, :create,
+                                  redirect_path: redirect_path(image.slug)
+                                )
+                              }
                             >
-                              <i class="fa-regular fa-heart"></i>
+                              <i class="fa-solid fa-plus"></i>
                             </a>
                           <% end %>
                           <.live_component
@@ -274,11 +277,6 @@ defmodule NappyWeb.Components.GalleryComponent do
                           <i class="fa-solid fa-eye"></i>
                           <%= get_metrics(image).view_count %> Views
                         </span>
-                        <!--
-                        <span>
-                          <i class="fa-solid fa-heart"></i> 23 Saves
-                        </span>
-                        -->
                         <span class="text-center p-0 m-0 flex sm:flex-row xs:flex-col sm:justify-center xs:justify-between items-center gap-2">
                           <i class="fa-solid fa-download"></i>
                           <%= get_metrics(image).download_count %> Downloads
@@ -299,6 +297,7 @@ defmodule NappyWeb.Components.GalleryComponent do
                       <.live_component
                         :if={length(@sponsored_images) > 1}
                         module={SponsoredImagesComponent}
+                        image_slug={image.slug}
                         id={"sponsored-image-#{image.slug}"}
                         sponsored_images={@sponsored_images}
                       />
@@ -317,14 +316,20 @@ defmodule NappyWeb.Components.GalleryComponent do
         data-page={@page}
       >
       </div>
+      <!--
       <div class="mt-8 text-center text-sm">
         Looking for something specific?
         <a target="_blank" rel="noreferer noopener" class="underline" href="https://nappy.kampsite.co">
           Request a photo
         </a>
       </div>
+      -->
     </div>
     """
+  end
+
+  defp redirect_path(image_slug) do
+    Path.join(["/", "photo", image_slug])
   end
 
   defp calc_span(metadata) do

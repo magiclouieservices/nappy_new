@@ -21,8 +21,6 @@ defmodule NappyWeb.Router do
   scope "/", NappyWeb do
     pipe_through :browser
 
-    live "/deploy", NotifLive.GithubDeploy, :github_deploy
-
     # usage: Sendy "Webform" placed at footer
     get "/confirm-newsletter", SubscriberController, :confirm
     get "/thankyou", SubscriberController, :confirmed
@@ -57,31 +55,6 @@ defmodule NappyWeb.Router do
       live "/search", SearchLive.Show, :show
       live "/search/:query", SearchLive.Show, :show
     end
-
-    # resources "/legal", LegalController
-    # resources "/seo", SeoController
-    # resources "/subscribers", SubscriberController
-
-    # paths =
-    #   with {:ok, file} <- File.read(Nappy.slug_paths_filename()) do
-    #     String.split(file, "\n", trim: true)
-    #   else
-    #     {:error, _posix} ->
-    #       Nappy.Builder.write_slug_paths_to_file()
-
-    #       Nappy.slug_paths_filename()
-    #       |> File.read!()
-    #       |> String.split("\n", trim: true)
-    #   end
-
-    # paths =
-    #   "priv/repo/slug_paths.txt"
-    #   |> File.read!()
-    #   |> String.split("\n", trim: true)
-
-    # for path <- paths do
-    #   get "/#{path}", CustomPageController, :index
-    # end
   end
 
   # Other scopes may use custom stacks.

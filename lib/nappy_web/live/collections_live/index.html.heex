@@ -37,41 +37,41 @@
       md:auto-rows-max
       xs:auto-rows-min
       gap-4">
-    <%= for item <- @collections do %>
-      <a class="mb-4 block" href={Routes.collections_show_path(@socket, :show, item.slug)}>
+    <%= for collection <- @collections do %>
+      <a class="mb-4 block" href={Routes.collections_show_path(@socket, :show, collection.slug)}>
         <div class="relative rounded-t bg-slate-300">
           <img
             loading="lazy"
             class="w-full h-96 object-cover rounded-t"
-            src={Catalog.image_url_by_id(item.thumbnail)}
-            alt={item.title}
+            src={Catalog.image_url_by_id(collection.image_id)}
+            alt={collection.title}
           />
           <div class="absolute rounded-t inset-0 z-1 bg-[rgba(0,0,0,.2)]">
             <span class="absolute bottom-2 left-4 flex gap-2 items-center text-white font-tiempos-bold text-xl">
-              <%= item.title %>
+              <%= collection.title %>
             </span>
           </div>
         </div>
         <div class="flex flex-row gap-1 my-1 overflow-hidden">
-          <%= if length(item.collections) > 3 do %>
-            <%= for {coll, index} <- Enum.with_index(Enum.take(item.collections, 3)) do %>
+          <%= if length(collection.images) > 3 do %>
+            <%= for {image, index} <- Enum.with_index(Enum.take(collection.images, 3)) do %>
               <%= if index === 2 do %>
                 <div class="relative w-1/3 bg-slate-300">
                   <img
                     loading="lazy"
                     class="object-cover w-full h-24"
-                    src={Catalog.imgix_url(coll.image, "photo", w: 280, auto: "format")}
+                    src={Catalog.imgix_url(image, "photo", w: 280, auto: "format")}
                   />
                   <span class="absolute inset-0 flex gap-2 items-center justify-center bg-[rgba(0,0,0,.5)] text-white">
                     <i class="fa-regular fa-images"></i>
-                    <%= length(item.collections) %>
+                    <%= length(collection.images) %>
                   </span>
                 </div>
               <% else %>
                 <img
                   loading="lazy"
                   class="bg-slate-300 object-cover w-1/3 h-24"
-                  src={Catalog.imgix_url(coll.image, "photo", w: 280, auto: "format")}
+                  src={Catalog.imgix_url(image, "photo", w: 280, auto: "format")}
                 />
               <% end %>
             <% end %>

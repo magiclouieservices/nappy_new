@@ -31,7 +31,6 @@
           <li><%= link("Login", to: Routes.user_session_path(@conn, :new)) %></li>
           <li><%= link("Sign up", to: Routes.user_registration_path(@conn, :new)) %></li>
         <% end %>
-        <li><%= link("Photo request", to: URI.parse("https://nappy.kampsite.co")) %></li>
         <li><%= link("Status", to: URI.parse("https://status.nappy.co")) %></li>
       </ul>
     </div>

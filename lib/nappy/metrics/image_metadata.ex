@@ -1,12 +1,12 @@
 defmodule Nappy.Metrics.ImageMetadata do
   use Ecto.Schema
   import Ecto.Changeset
-  alias Nappy.Catalog.Images
+  alias Nappy.Catalog.Image
 
   @moduledoc false
 
   schema "image_metadata" do
-    belongs_to :image, Images
+    belongs_to :image, Image
     field :aperture, :float
     field :aspect_ratio, :float
     field :camera_software, :string

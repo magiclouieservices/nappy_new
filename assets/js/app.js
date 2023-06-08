@@ -74,7 +74,6 @@ window.toggleFullscreen = function (selector) {
     elem.classList.toggle("hidden")
   })
 }
-
 window.reset_tags = function (tagify, tags) {
   tagify.loadOriginalValues(tags)
 }

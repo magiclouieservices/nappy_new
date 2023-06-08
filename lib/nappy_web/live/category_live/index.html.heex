@@ -39,13 +39,13 @@
     gap-2">
     <%= for category <- @categories do %>
       <a
-        class={"#{calc_span(category.thumbnail)} relative h-96 bg-slate-300 rounded"}
+        class={"#{calc_span(category.image_id)} relative h-96 bg-slate-300 rounded"}
         href={Routes.category_show_path(@socket, :show, category.slug)}
       >
         <img
           loading="lazy"
           class="w-full h-96 object-cover rounded"
-          src={Nappy.Catalog.image_url_by_id(category.thumbnail)}
+          src={Nappy.Catalog.image_url_by_id(category.image_id)}
           alt={category.name}
         />
         <div class="absolute rounded inset-0 z-1 bg-[rgba(0,0,0,.3)]">

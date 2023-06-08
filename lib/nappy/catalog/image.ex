@@ -1,9 +1,13 @@
-defmodule Nappy.Catalog.Images do
+defmodule Nappy.Catalog.Image do
   use Ecto.Schema
   import Ecto.Changeset
   alias Nappy.Accounts.User
-  alias Nappy.Catalog.{Category, Collection, CollectionDescription}
-  alias Nappy.Metrics.{ImageAnalytics, ImageMetadata, ImageStatus}
+  alias Nappy.Catalog.Category
+  alias Nappy.Catalog.Collection
+  alias Nappy.Catalog.ImageCollection
+  alias Nappy.Metrics.ImageAnalytics
+  alias Nappy.Metrics.ImageMetadata
+  alias Nappy.Metrics.ImageStatus
 
   @moduledoc false
 
@@ -35,18 +39,12 @@ defmodule Nappy.Catalog.Images do
     field :slug, :string
     field :tags, :string
     field :title, :string
-    has_many :collections, Collection, foreign_key: :image_id
 
-    many_to_many :collection_description,
-                 CollectionDescription,
-                 join_through: Collection,
-                 on_replace: :delete,
-                 join_keys: [
-                   collection_description_id: :id,
-                   image_id: :id
-                 ]
+    many_to_many :collections,
+                 Collection,
+                 join_through: ImageCollection,
+                 on_replace: :delete
 
-    # has_many :collections, Collection
     belongs_to :category, Category
     belongs_to :user, User
     has_one :image_analytics, ImageAnalytics, foreign_key: :image_id
@@ -80,6 +78,7 @@ defmodule Nappy.Catalog.Images do
     ])
     |> foreign_key_constraint(:user_id)
     |> foreign_key_constraint(:category_id)
+    |> foreign_key_constraint(:image_status_id)
     |> unique_constraint(:slug)
   end
 end

@@ -6,7 +6,7 @@ defmodule NappyWeb.CollectionsLive.Index do
 
   @impl true
   def mount(_params, _session, socket) do
-    collections = Catalog.list_collection_description()
+    collections = Catalog.list_collections()
     related_tags = Catalog.random_tags(10)
 
     socket =

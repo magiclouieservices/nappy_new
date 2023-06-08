@@ -4,7 +4,7 @@ defmodule Nappy.CatalogTest do
   alias Nappy.Catalog
 
   describe "images" do
-    alias Nappy.Catalog.Images
+    alias Nappy.Catalog.Image
 
     import Nappy.CatalogFixtures
 
@@ -35,7 +35,7 @@ defmodule Nappy.CatalogTest do
         title: "some title"
       }
 
-      assert {:ok, %Images{} = image} = Catalog.create_image(valid_attrs)
+      assert {:ok, %Image{} = image} = Catalog.create_image(valid_attrs)
       assert image.description == "some description"
       assert image.generated_description == "some generated_description"
       assert image.generated_tags == "some generated_tags"
@@ -58,7 +58,7 @@ defmodule Nappy.CatalogTest do
         title: "some updated title"
       }
 
-      assert {:ok, %Images{} = image} = Catalog.update_image(image, update_attrs)
+      assert {:ok, %Image{} = image} = Catalog.update_image(image, update_attrs)
       assert image.description == "some updated description"
       assert image.generated_description == "some updated generated_description"
       assert image.generated_tags == "some updated generated_tags"
@@ -74,7 +74,7 @@ defmodule Nappy.CatalogTest do
 
     test "delete_image/1 deletes the image" do
       image = image_fixture()
-      assert {:ok, %Images{}} = Catalog.delete_image(image)
+      assert {:ok, %Image{}} = Catalog.delete_image(image)
       assert_raise Ecto.NoResultsError, fn -> Catalog.get_image!(image.id) end
     end
 
@@ -264,84 +264,6 @@ defmodule Nappy.CatalogTest do
     test "change_collection/1 returns a collection changeset" do
       collection = collection_fixture()
       assert %Ecto.Changeset{} = Catalog.change_collection(collection)
-    end
-  end
-
-  describe "collection_description" do
-    alias Nappy.Catalog.CollectionDescription
-
-    import Nappy.CatalogFixtures
-
-    @invalid_attrs %{description: nil, is_enabled: nil, title: nil}
-
-    test "list_collection_description/0 returns all collection_description" do
-      collection_description = collection_description_fixture()
-      assert Catalog.list_collection_description() == [collection_description]
-    end
-
-    test "get_collection_description!/1 returns the collection_description with given id" do
-      collection_description = collection_description_fixture()
-
-      assert Catalog.get_collection_description!(collection_description.id) ==
-               collection_description
-    end
-
-    test "create_collection_description/1 with valid data creates a collection_description" do
-      valid_attrs = %{description: "some description", is_enabled: true, title: "some title"}
-
-      assert {:ok, %CollectionDescription{} = collection_description} =
-               Catalog.create_collection_description(valid_attrs)
-
-      assert collection_description.description == "some description"
-      assert collection_description.is_enabled == true
-      assert collection_description.title == "some title"
-    end
-
-    test "create_collection_description/1 with invalid data returns error changeset" do
-      assert {:error, %Ecto.Changeset{}} = Catalog.create_collection_description(@invalid_attrs)
-    end
-
-    test "update_collection_description/2 with valid data updates the collection_description" do
-      collection_description = collection_description_fixture()
-
-      update_attrs = %{
-        description: "some updated description",
-        is_enabled: false,
-        title: "some updated title"
-      }
-
-      assert {:ok, %CollectionDescription{} = collection_description} =
-               Catalog.update_collection_description(collection_description, update_attrs)
-
-      assert collection_description.description == "some updated description"
-      assert collection_description.is_enabled == false
-      assert collection_description.title == "some updated title"
-    end
-
-    test "update_collection_description/2 with invalid data returns error changeset" do
-      collection_description = collection_description_fixture()
-
-      assert {:error, %Ecto.Changeset{}} =
-               Catalog.update_collection_description(collection_description, @invalid_attrs)
-
-      assert collection_description ==
-               Catalog.get_collection_description!(collection_description.id)
-    end
-
-    test "delete_collection_description/1 deletes the collection_description" do
-      collection_description = collection_description_fixture()
-
-      assert {:ok, %CollectionDescription{}} =
-               Catalog.delete_collection_description(collection_description)
-
-      assert_raise Ecto.NoResultsError, fn ->
-        Catalog.get_collection_description!(collection_description.id)
-      end
-    end
-
-    test "change_collection_description/1 returns a collection_description changeset" do
-      collection_description = collection_description_fixture()
-      assert %Ecto.Changeset{} = Catalog.change_collection_description(collection_description)
     end
   end
 

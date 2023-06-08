@@ -96,22 +96,6 @@ defmodule NappyWeb.Components.ShareLinkComponent do
             <!-- End Content -->
 
             <!-- Follow button -->
-            <button
-              type="button"
-              class="mx-auto rounded bg-white px-3 py-2 text text-gray-700 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-100 flex items-center justify-center gap-1"
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke-width="4"
-                stroke="currentColor"
-                class="w-5 h-5 text-gray-700"
-              >
-                <path d="M12 4.5v15m7.5-7.5h-15" />
-              </svg>
-              Follow
-            </button>
             <!-- End follow button -->
 
             <!-- Tab shared links -->
