@@ -11,6 +11,11 @@ defmodule NappyWeb.CollectionsLive.Show do
   @moduledoc false
 
   @impl true
+  def mount(_params, _session, socket) do
+    {:ok, socket, temporary_assigns: [{SEO.key(), nil}]}
+  end
+
+  @impl true
   def handle_params(%{"slug" => slug}, uri, socket) do
     if Map.get(socket.assigns, :flash) do
       Process.send_after(self(), :clear_info, 5_000)
@@ -40,6 +45,7 @@ defmodule NappyWeb.CollectionsLive.Show do
           |> assign(current_url: uri)
           |> assign(related_tags: related_tags)
           |> assign(page_title: collection.title)
+          |> SEO.assign(collection)
           |> fetch()
 
         {:noreply, socket}

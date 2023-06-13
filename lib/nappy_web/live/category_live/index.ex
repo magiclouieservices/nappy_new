@@ -8,12 +8,20 @@ defmodule NappyWeb.CategoryLive.Index do
   def mount(_params, _session, socket) do
     categories = Catalog.list_categories()
     related_tags = Catalog.random_tags(10)
+    page_title = "Categories"
+
+    seo = %{
+      title: page_title,
+      description: "Photos tagged according to their categories.",
+      url: Routes.category_index_url(socket, :index)
+    }
 
     socket =
       socket
       |> assign(categories: categories)
       |> assign(related_tags: related_tags)
-      |> assign(page_title: "Categories")
+      |> assign(page_title: page_title)
+      |> SEO.assign(seo)
 
     {:ok, socket}
   end

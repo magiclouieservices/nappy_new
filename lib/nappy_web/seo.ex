@@ -8,8 +8,6 @@ defmodule NappyWeb.SEO do
     site: &__MODULE__.site_config/1,
     open_graph:
       SEO.OpenGraph.build(
-        description:
-          "Beautiful photos of Black and Brown people, for free. For commercial and personal use.",
         site_name: "Nappy",
         locale: "en_US"
       ),
@@ -26,7 +24,7 @@ defmodule NappyWeb.SEO do
   def site_config(conn) do
     SEO.Site.build(
       default_title: "Nappy",
-      description:
+      default_description:
         "Beautiful photos of Black and Brown people, for free. For commercial and personal use.",
       title_suffix: " | Beautifully Diverse Stock Photos",
       theme_color: "#000000",

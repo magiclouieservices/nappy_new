@@ -8,7 +8,6 @@ defmodule Nappy.Admin do
   alias Ecto.Multi
   alias Nappy.Admin.AdminSettings
   alias Nappy.Admin.Legal
-  alias Nappy.Admin.SeoDetail
   alias Nappy.Catalog
   alias Nappy.Catalog.Image
   alias Nappy.Repo
@@ -201,107 +200,6 @@ defmodule Nappy.Admin do
   """
   def change_legal(%Legal{} = legal, attrs \\ %{}) do
     Legal.changeset(legal, attrs)
-  end
-
-  @doc """
-  Returns the list of seo details.
-
-  ## Examples
-
-      iex> list_seo_details()
-      [%SeoDetail{}, ...]
-
-  """
-  def list_seo_details do
-    Repo.all(SeoDetail)
-  end
-
-  @doc """
-  Gets a single seo detail.
-
-  Raises `Ecto.NoResultsError` if the SeoDetail does not exist.
-
-  ## Examples
-
-      iex> get_seo_detail!(123)
-      %SeoDetail{}
-
-      iex> get_seo_detail!(456)
-      ** (Ecto.NoResultsError)
-
-  """
-  def get_seo_detail!(id), do: Repo.get!(SeoDetail, id)
-
-  @doc """
-  Creates a seo detail.
-
-  ## Examples
-
-      iex> create_seo_detail(%{field: value})
-      {:ok, %SeoDetail{}}
-
-      iex> create_seo_detail(%{field: bad_value})
-      {:error, %Ecto.Changeset{}}
-
-  """
-  def create_seo_detail(attrs \\ %{}) do
-    %SeoDetail{}
-    |> SeoDetail.changeset(attrs)
-    |> Repo.insert()
-  end
-
-  @doc """
-  Updates a seo detail.
-
-  ## Examples
-
-      iex> update_seo_detail(seo, %{field: new_value})
-      {:ok, %SeoDetail{}}
-
-      iex> update_seo_detail(seo, %{field: bad_value})
-      {:error, %Ecto.Changeset{}}
-
-  """
-  def update_seo_detail(%SeoDetail{} = seo, attrs) do
-    seo
-    |> SeoDetail.changeset(attrs)
-    |> Repo.update()
-  end
-
-  @doc """
-  Deletes a seo.
-
-  ## Examples
-
-      iex> delete_seo_detail(seo)
-      {:ok, %SeoDetail{}}
-
-      iex> delete_seo_detail(seo)
-      {:error, %Ecto.Changeset{}}
-
-  """
-  def delete_seo_detail(%SeoDetail{} = seo) do
-    Repo.delete(seo)
-  end
-
-  @doc """
-  Returns an `%Ecto.Changeset{}` for tracking seo changes.
-
-  ## Examples
-
-      iex> change_seo(seo)
-      %Ecto.Changeset{data: %SeoDetail{}}
-
-  """
-  def change_seo(%SeoDetail{} = seo, attrs \\ %{}) do
-    SeoDetail.changeset(seo, attrs)
-  end
-
-  @spec get_seo_by_type(String.t()) :: struct()
-  def get_seo_by_type(type) do
-    SeoDetail
-    |> where(type: ^type)
-    |> Repo.one()
   end
 
   def generate_tags_and_description(%Image{} = image) do

@@ -12,6 +12,11 @@ defmodule NappyWeb.CategoryLive.Show do
   @moduledoc false
 
   @impl true
+  def mount(_params, _session, socket) do
+    {:ok, socket, temporary_assigns: [{SEO.key(), nil}]}
+  end
+
+  @impl true
   def handle_params(%{"slug" => slug}, uri, socket) do
     category = Catalog.get_category(slug: slug)
 
@@ -33,6 +38,7 @@ defmodule NappyWeb.CategoryLive.Show do
           |> assign(related_tags: related_tags)
           |> assign(category: category)
           |> assign(page_title: category.name)
+          |> SEO.assign(category)
           |> fetch()
 
         {:noreply, socket}

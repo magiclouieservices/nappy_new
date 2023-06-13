@@ -376,12 +376,10 @@ defmodule Nappy.Metrics do
 
   """
   def get_image_extension(image_id) do
-    query =
-      from i in ImageMetadata,
-        where: i.image_id == ^image_id,
-        select: i.extension_type
-
-    Repo.one(query)
+    ImageMetadata
+    |> where(image_id: ^image_id)
+    |> select([im], im.extension_type)
+    |> Repo.one()
   end
 
   @doc """

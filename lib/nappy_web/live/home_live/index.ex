@@ -105,7 +105,19 @@ defmodule NappyWeb.HomeLive.Index do
 
   defp prepare_assigns(socket, uri, page_title \\ "Nappy", filter \\ [filter: :featured]) do
     [filter: seo_filter] = filter
-    seo_filter = seo_filter |> to_string() |> Nappy.Admin.get_seo_by_type()
+
+    description =
+      case seo_filter do
+        :all -> "All photos that are verified by Nappy team and uploaded by users."
+        :featured -> "Featured photos are handpicked and curated by Nappy team."
+        :popular -> "These are the most viewed picks of Black and Brown People."
+      end
+
+    seo = %{
+      title: page_title,
+      description: description,
+      url: Routes.home_index_url(socket, :index, filter: seo_filter)
+    }
 
     socket
     |> assign(page: 1)
@@ -113,7 +125,7 @@ defmodule NappyWeb.HomeLive.Index do
     |> assign(current_url: uri)
     |> assign(page_title: page_title)
     |> assign(filter)
-    |> SEO.assign(seo_filter)
+    |> SEO.assign(seo)
     |> fetch()
   end
 

@@ -64,6 +64,7 @@ defmodule Nappy.Catalog do
     |> join(:inner, [i], ia in assoc(i, :image_analytics))
     |> where([i, _], i.image_status_id in ^[active, featured])
     |> order_by([_, ia], desc: ia.view_count)
+    |> distinct([i, _ia], i.id)
     |> limit(20)
     |> Repo.all()
   end
