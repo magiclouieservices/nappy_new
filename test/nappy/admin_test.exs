@@ -193,7 +193,7 @@ defmodule Nappy.AdminTest do
   end
 
   describe "seo" do
-    alias Nappy.Admin.Seo
+    alias Nappy.Admin.SeoDetail
 
     import Nappy.AdminFixtures
 
@@ -205,17 +205,17 @@ defmodule Nappy.AdminTest do
       global_banner_text: nil
     }
 
-    test "list_seo/0 returns all seo" do
+    test "list_seo_details/0 returns all seo" do
       seo = seo_fixture()
-      assert Admin.list_seo() == [seo]
+      assert Admin.list_seo_details() == [seo]
     end
 
-    test "get_seo!/1 returns the seo with given id" do
+    test "get_seo_detail!/1 returns the seo with given id" do
       seo = seo_fixture()
-      assert Admin.get_seo!(seo.id) == seo
+      assert Admin.get_seo_detail!(seo.id) == seo
     end
 
-    test "create_seo/1 with valid data creates a seo" do
+    test "create_seo_detail/1 with valid data creates a seo" do
       valid_attrs = %{
         default_categories_description: "some default_categories_description",
         default_collections_description: "some default_collections_description",
@@ -224,7 +224,7 @@ defmodule Nappy.AdminTest do
         global_banner_text: "some global_banner_text"
       }
 
-      assert {:ok, %Seo{} = seo} = Admin.create_seo(valid_attrs)
+      assert {:ok, %SeoDetail{} = seo} = Admin.create_seo_detail(valid_attrs)
       assert seo.default_categories_description == "some default_categories_description"
       assert seo.default_collections_description == "some default_collections_description"
       assert seo.default_description == "some default_description"
@@ -232,11 +232,11 @@ defmodule Nappy.AdminTest do
       assert seo.global_banner_text == "some global_banner_text"
     end
 
-    test "create_seo/1 with invalid data returns error changeset" do
-      assert {:error, %Ecto.Changeset{}} = Admin.create_seo(@invalid_attrs)
+    test "create_seo_detail/1 with invalid data returns error changeset" do
+      assert {:error, %Ecto.Changeset{}} = Admin.create_seo_detail(@invalid_attrs)
     end
 
-    test "update_seo/2 with valid data updates the seo" do
+    test "update_seo_detail/2 with valid data updates the seo" do
       seo = seo_fixture()
 
       update_attrs = %{
@@ -247,7 +247,7 @@ defmodule Nappy.AdminTest do
         global_banner_text: "some updated global_banner_text"
       }
 
-      assert {:ok, %Seo{} = seo} = Admin.update_seo(seo, update_attrs)
+      assert {:ok, %SeoDetail{} = seo} = Admin.update_seo_detail(seo, update_attrs)
       assert seo.default_categories_description == "some updated default_categories_description"
       assert seo.default_collections_description == "some updated default_collections_description"
       assert seo.default_description == "some updated default_description"
@@ -255,16 +255,16 @@ defmodule Nappy.AdminTest do
       assert seo.global_banner_text == "some updated global_banner_text"
     end
 
-    test "update_seo/2 with invalid data returns error changeset" do
+    test "update_seo_detail/2 with invalid data returns error changeset" do
       seo = seo_fixture()
-      assert {:error, %Ecto.Changeset{}} = Admin.update_seo(seo, @invalid_attrs)
-      assert seo == Admin.get_seo!(seo.id)
+      assert {:error, %Ecto.Changeset{}} = Admin.update_seo_detail(seo, @invalid_attrs)
+      assert seo == Admin.get_seo_detail!(seo.id)
     end
 
-    test "delete_seo/1 deletes the seo" do
+    test "delete_seo_detail/1 deletes the seo" do
       seo = seo_fixture()
-      assert {:ok, %Seo{}} = Admin.delete_seo(seo)
-      assert_raise Ecto.NoResultsError, fn -> Admin.get_seo!(seo.id) end
+      assert {:ok, %SeoDetail{}} = Admin.delete_seo_detail(seo)
+      assert_raise Ecto.NoResultsError, fn -> Admin.get_seo_detail!(seo.id) end
     end
 
     test "change_seo/1 returns a seo changeset" do

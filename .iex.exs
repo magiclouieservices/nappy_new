@@ -5,7 +5,7 @@ alias ExAws.{S3}
 alias Image, as: ExtractImage
 alias Nappy.{Accounts, Admin, Builder, Catalog, Metrics, Newsletter, Repo}
 alias Nappy.Accounts.{AccountRole, AccountStatus, SocialMedia, User, UserToken}
-alias Nappy.Admin.{AdminSettings, Legal, Seo, Slug}
+alias Nappy.Admin.{AdminSettings, Legal, SeoDetail, Slug}
 alias Nappy.Builder.{Page}
 alias Nappy.Catalog.{Category, Collection, ImageCollection}
 alias Nappy.Metrics.{ImageAnalytics, ImageMetadata, ImageStatus, Notifications}

@@ -27,6 +27,7 @@ defmodule NappyWeb.ImageLive.Show do
      |> assign(ext: nil)
      |> assign(tags: []),
      temporary_assigns: [
+       {SEO.key(), nil},
        image: [],
        sponsored_images: placeholder,
        related_images: placeholder
@@ -80,7 +81,7 @@ defmodule NappyWeb.ImageLive.Show do
           |> assign(page_title: image.title)
           |> assign(current_url: uri)
 
-        {:noreply, socket}
+        {:noreply, SEO.assign(socket, image)}
       end
     else
       raise NappyWeb.FallbackController, Status.code(:not_found)
@@ -131,8 +132,7 @@ defmodule NappyWeb.ImageLive.Show do
 
     Process.send_after(self(), :clear_info, 5_000)
 
-    # {:noreply, push_navigate(socket, to: path)}
-    {:noreply, socket}
+    {:noreply, push_navigate(socket, to: path)}
   end
 
   @impl true

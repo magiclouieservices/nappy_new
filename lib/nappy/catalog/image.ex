@@ -82,3 +82,69 @@ defmodule Nappy.Catalog.Image do
     |> unique_constraint(:slug)
   end
 end
+
+defimpl SEO.OpenGraph.Build, for: Nappy.Catalog.Image do
+  alias Nappy.Catalog
+  alias NappyWeb.Router.Helpers, as: Routes
+
+  def build(image, conn) do
+    SEO.OpenGraph.build(
+      detail: SEO.OpenGraph.Profile.build(username: image.user.username),
+      image: image(image, conn),
+      title: image.title,
+      description: image.title
+    )
+  end
+
+  defp image(image, _conn) do
+    SEO.OpenGraph.Image.build(
+      alt: image.title,
+      height: Catalog.default_imgix_height(),
+      width: Catalog.default_imgix_width(),
+      type: image.image_metadata.extension_type,
+      url: Catalog.imgix_url(image, "photo")
+    )
+  end
+end
+
+defimpl SEO.Site.Build, for: Nappy.Catalog.Image do
+  alias NappyWeb.Router.Helpers, as: Routes
+
+  def build(image, conn) do
+    SEO.Site.build(
+      url: Routes.image_show_url(conn, :show, image.slug),
+      title: image.title,
+      description: image.title
+    )
+  end
+end
+
+defimpl SEO.Twitter.Build, for: Nappy.Catalog.Image do
+  def build(image, _conn) do
+    SEO.Twitter.build(description: image.title, title: image.title)
+  end
+end
+
+defimpl SEO.Unfurl.Build, for: Nappy.Catalog.Image do
+  alias NappyWeb.Router.Helpers, as: Routes
+
+  def build(image, conn) do
+    SEO.Unfurl.build(
+      label1: "Nappy",
+      data1: image.title,
+      label2: "Photographer",
+      data2: Routes.user_profile_show_url(conn, :show, image.user.username)
+    )
+  end
+end
+
+defimpl SEO.Breadcrumb.Build, for: Nappy.Catalog.Image do
+  alias NappyWeb.Router.Helpers, as: Routes
+
+  def build(image, conn) do
+    SEO.Breadcrumb.List.build([
+      %{name: "Featured", item: Routes.home_index_url(conn, :index)},
+      %{name: "Image details", item: Routes.image_show_url(conn, :show, image.slug)}
+    ])
+  end
+end

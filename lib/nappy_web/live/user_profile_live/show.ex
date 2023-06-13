@@ -10,6 +10,11 @@ defmodule NappyWeb.UserProfileLive.Show do
   @moduledoc false
 
   @impl true
+  def mount(_params, _session, socket) do
+    {:ok, socket, temporary_assigns: [{SEO.key(), nil}]}
+  end
+
+  @impl true
   def handle_params(%{"username" => username} = _params, uri, socket) do
     user = Accounts.get_user_by_username(username)
     profile_metrics = Metrics.get_profile_page_metrics(user)
@@ -24,7 +29,7 @@ defmodule NappyWeb.UserProfileLive.Show do
       |> assign(page_title: ~s(#{user.username}'s Profile))
       |> fetch()
 
-    {:noreply, socket}
+    {:noreply, SEO.assign(socket, user)}
   end
 
   @impl true

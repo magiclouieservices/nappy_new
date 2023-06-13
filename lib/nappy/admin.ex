@@ -8,7 +8,7 @@ defmodule Nappy.Admin do
   alias Ecto.Multi
   alias Nappy.Admin.AdminSettings
   alias Nappy.Admin.Legal
-  alias Nappy.Admin.Seo
+  alias Nappy.Admin.SeoDetail
   alias Nappy.Catalog
   alias Nappy.Catalog.Image
   alias Nappy.Repo
@@ -204,67 +204,67 @@ defmodule Nappy.Admin do
   end
 
   @doc """
-  Returns the list of seo.
+  Returns the list of seo details.
 
   ## Examples
 
-      iex> list_seo()
-      [%Seo{}, ...]
+      iex> list_seo_details()
+      [%SeoDetail{}, ...]
 
   """
-  def list_seo do
-    Repo.all(Seo)
+  def list_seo_details do
+    Repo.all(SeoDetail)
   end
 
   @doc """
-  Gets a single seo.
+  Gets a single seo detail.
 
-  Raises `Ecto.NoResultsError` if the Seo does not exist.
+  Raises `Ecto.NoResultsError` if the SeoDetail does not exist.
 
   ## Examples
 
-      iex> get_seo!(123)
-      %Seo{}
+      iex> get_seo_detail!(123)
+      %SeoDetail{}
 
-      iex> get_seo!(456)
+      iex> get_seo_detail!(456)
       ** (Ecto.NoResultsError)
 
   """
-  def get_seo!(id), do: Repo.get!(Seo, id)
+  def get_seo_detail!(id), do: Repo.get!(SeoDetail, id)
 
   @doc """
-  Creates a seo.
+  Creates a seo detail.
 
   ## Examples
 
-      iex> create_seo(%{field: value})
-      {:ok, %Seo{}}
+      iex> create_seo_detail(%{field: value})
+      {:ok, %SeoDetail{}}
 
-      iex> create_seo(%{field: bad_value})
+      iex> create_seo_detail(%{field: bad_value})
       {:error, %Ecto.Changeset{}}
 
   """
-  def create_seo(attrs \\ %{}) do
-    %Seo{}
-    |> Seo.changeset(attrs)
+  def create_seo_detail(attrs \\ %{}) do
+    %SeoDetail{}
+    |> SeoDetail.changeset(attrs)
     |> Repo.insert()
   end
 
   @doc """
-  Updates a seo.
+  Updates a seo detail.
 
   ## Examples
 
-      iex> update_seo(seo, %{field: new_value})
-      {:ok, %Seo{}}
+      iex> update_seo_detail(seo, %{field: new_value})
+      {:ok, %SeoDetail{}}
 
-      iex> update_seo(seo, %{field: bad_value})
+      iex> update_seo_detail(seo, %{field: bad_value})
       {:error, %Ecto.Changeset{}}
 
   """
-  def update_seo(%Seo{} = seo, attrs) do
+  def update_seo_detail(%SeoDetail{} = seo, attrs) do
     seo
-    |> Seo.changeset(attrs)
+    |> SeoDetail.changeset(attrs)
     |> Repo.update()
   end
 
@@ -273,14 +273,14 @@ defmodule Nappy.Admin do
 
   ## Examples
 
-      iex> delete_seo(seo)
-      {:ok, %Seo{}}
+      iex> delete_seo_detail(seo)
+      {:ok, %SeoDetail{}}
 
-      iex> delete_seo(seo)
+      iex> delete_seo_detail(seo)
       {:error, %Ecto.Changeset{}}
 
   """
-  def delete_seo(%Seo{} = seo) do
+  def delete_seo_detail(%SeoDetail{} = seo) do
     Repo.delete(seo)
   end
 
@@ -290,11 +290,18 @@ defmodule Nappy.Admin do
   ## Examples
 
       iex> change_seo(seo)
-      %Ecto.Changeset{data: %Seo{}}
+      %Ecto.Changeset{data: %SeoDetail{}}
 
   """
-  def change_seo(%Seo{} = seo, attrs \\ %{}) do
-    Seo.changeset(seo, attrs)
+  def change_seo(%SeoDetail{} = seo, attrs \\ %{}) do
+    SeoDetail.changeset(seo, attrs)
+  end
+
+  @spec get_seo_by_type(String.t()) :: struct()
+  def get_seo_by_type(type) do
+    SeoDetail
+    |> where(type: ^type)
+    |> Repo.one()
   end
 
   def generate_tags_and_description(%Image{} = image) do

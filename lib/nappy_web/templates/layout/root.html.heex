@@ -4,11 +4,8 @@
     <meta charset="utf-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="robots" content="NOINDEX, NOFOLLOW" />
     <%= csrf_meta_tag() %>
-    <.live_title suffix={Nappy.default_title_suffix()}>
-      <%= assigns[:page_title] || Nappy.app_name() %>
-    </.live_title>
+    <SEO.juice conn={@conn} config={NappyWeb.SEO.config()} page_title={assigns[:page_title]} />
     <link
       phx-track-static
       rel="stylesheet"

@@ -28,14 +28,14 @@ defmodule NappyWeb.SeoControllerTest do
   describe "index" do
     test "lists all seo", %{conn: conn} do
       conn = get(conn, Routes.seo_path(conn, :index))
-      assert html_response(conn, 200) =~ "Listing Seo"
+      assert html_response(conn, 200) =~ "Listing SeoDetail"
     end
   end
 
   describe "new seo" do
     test "renders form", %{conn: conn} do
       conn = get(conn, Routes.seo_path(conn, :new))
-      assert html_response(conn, 200) =~ "New Seo"
+      assert html_response(conn, 200) =~ "New SeoDetail"
     end
   end
 
@@ -47,26 +47,26 @@ defmodule NappyWeb.SeoControllerTest do
       assert redirected_to(conn) == Routes.seo_path(conn, :show, id)
 
       conn = get(conn, Routes.seo_path(conn, :show, id))
-      assert html_response(conn, 200) =~ "Show Seo"
+      assert html_response(conn, 200) =~ "Show SeoDetail"
     end
 
     test "renders errors when data is invalid", %{conn: conn} do
       conn = post(conn, Routes.seo_path(conn, :create), seo: @invalid_attrs)
-      assert html_response(conn, 200) =~ "New Seo"
+      assert html_response(conn, 200) =~ "New SeoDetail"
     end
   end
 
   describe "edit seo" do
-    setup [:create_seo]
+    setup [:create_seo_detail]
 
     test "renders form for editing chosen seo", %{conn: conn, seo: seo} do
       conn = get(conn, Routes.seo_path(conn, :edit, seo))
-      assert html_response(conn, 200) =~ "Edit Seo"
+      assert html_response(conn, 200) =~ "Edit SeoDetail"
     end
   end
 
   describe "update seo" do
-    setup [:create_seo]
+    setup [:create_seo_detail]
 
     test "redirects when data is valid", %{conn: conn, seo: seo} do
       conn = put(conn, Routes.seo_path(conn, :update, seo), seo: @update_attrs)
@@ -78,12 +78,12 @@ defmodule NappyWeb.SeoControllerTest do
 
     test "renders errors when data is invalid", %{conn: conn, seo: seo} do
       conn = put(conn, Routes.seo_path(conn, :update, seo), seo: @invalid_attrs)
-      assert html_response(conn, 200) =~ "Edit Seo"
+      assert html_response(conn, 200) =~ "Edit SeoDetail"
     end
   end
 
   describe "delete seo" do
-    setup [:create_seo]
+    setup [:create_seo_detail]
 
     test "deletes chosen seo", %{conn: conn, seo: seo} do
       conn = delete(conn, Routes.seo_path(conn, :delete, seo))
@@ -95,7 +95,7 @@ defmodule NappyWeb.SeoControllerTest do
     end
   end
 
-  defp create_seo(_) do
+  defp create_seo_detail(_) do
     seo = seo_fixture()
     %{seo: seo}
   end
