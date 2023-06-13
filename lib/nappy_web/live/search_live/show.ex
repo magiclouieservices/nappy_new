@@ -12,15 +12,27 @@ defmodule NappyWeb.SearchLive.Show do
   @moduledoc false
 
   @impl true
+  def mount(_params, _session, socket) do
+    {:ok, socket, temporary_assigns: [{SEO.key(), nil}]}
+  end
+
+  @impl true
   def handle_params(%{"query" => query}, uri, socket) do
     sponsored_images = SponsoredImages.get_images("search-#{query}", query)
+    page_title = "#{query} Photos"
+
+    seo = %{
+      title: page_title,
+      description: page_title,
+      url: Routes.search_show_url(socket, :show, query)
+    }
 
     socket =
       socket
       |> assign(query: query)
       |> assign(sponsored_images: sponsored_images)
-      |> assign(page_title: "#{query} Photos")
       |> prepare_assigns(uri)
+      |> SEO.assign(seo)
       |> fetch()
 
     {:noreply, socket}

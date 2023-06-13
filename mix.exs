@@ -71,7 +71,8 @@ defmodule Nappy.MixProject do
       {:oban, "~> 2.13"},
       {:ex_azure_vision, "~> 0.1.2"},
       {:nanoid, "~> 2.0.5"},
-      {:carbonite, "~> 0.9.0"}
+      {:carbonite, "~> 0.9.0"},
+      {:phoenix_seo, "~> 0.1.8"}
     ]
   end
 

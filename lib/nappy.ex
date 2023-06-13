@@ -23,6 +23,10 @@ defmodule Nappy do
   def sendy_members_list, do: Application.get_env(:nappy, :runtime)[:sendy_members_list]
   def sendy_webform_list, do: Application.get_env(:nappy, :runtime)[:sendy_webform_list]
 
+  def twitter_handle, do: Application.get_env(:nappy, :runtime)[:twitter_handle]
+  def twitter_site_id, do: Application.get_env(:nappy, :runtime)[:twitter_site_id]
+  def facebook_app_id, do: Application.get_env(:nappy, :runtime)[:facebook_app_id]
+
   def sendy_photographers_list,
     do: Application.get_env(:nappy, :runtime)[:sendy_photographers_list]
 

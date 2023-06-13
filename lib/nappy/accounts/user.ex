@@ -197,3 +197,71 @@ defmodule Nappy.Accounts.User do
     end
   end
 end
+
+defimpl SEO.OpenGraph.Build, for: Nappy.Accounts.User do
+  alias Nappy.Accounts
+  alias NappyWeb.Router.Helpers, as: Routes
+
+  def build(user, conn) do
+    SEO.OpenGraph.build(
+      detail: SEO.OpenGraph.Profile.build(username: user.username),
+      image: image(user, conn),
+      title: "#{user.username}'s Profile",
+      description: user.social_media.bio || "#{user.username}'s Profile"
+    )
+  end
+
+  defp image(user, _conn) do
+    SEO.OpenGraph.Image.build(
+      alt: "#{user.username}'s Profile",
+      height: Accounts.default_avatar_height(),
+      width: Accounts.default_avatar_width(),
+      type: Path.extname(user.avatar_link),
+      url: Accounts.avatar_url(user.avatar_link)
+    )
+  end
+end
+
+defimpl SEO.Site.Build, for: Nappy.Accounts.User do
+  alias NappyWeb.Router.Helpers, as: Routes
+
+  def build(user, conn) do
+    SEO.Site.build(
+      url: Routes.user_profile_show_url(conn, :show, user.username),
+      title: "#{user.username}'s Profile",
+      description: user.social_media.bio || "#{user.username}'s Profile"
+    )
+  end
+end
+
+defimpl SEO.Twitter.Build, for: Nappy.Accounts.User do
+  def build(user, _conn) do
+    SEO.Twitter.build(
+      description: user.social_media.bio || "#{user.username}'s Profile",
+      title: "#{user.username}'s Profile"
+    )
+  end
+end
+
+defimpl SEO.Unfurl.Build, for: Nappy.Accounts.User do
+  alias NappyWeb.Router.Helpers, as: Routes
+
+  def build(user, conn) do
+    SEO.Unfurl.build(
+      label1: "username",
+      data1: user.username,
+      label2: "#{user.username}'s Profile",
+      data2: Routes.user_profile_show_url(conn, :show, user.username)
+    )
+  end
+end
+
+defimpl SEO.Breadcrumb.Build, for: Nappy.Accounts.User do
+  alias NappyWeb.Router.Helpers, as: Routes
+
+  def build(user, conn) do
+    SEO.Breadcrumb.List.build([
+      %{name: "Profile details", item: Routes.user_profile_show_path(conn, :show, user.username)}
+    ])
+  end
+end

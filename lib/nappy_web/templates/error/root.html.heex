@@ -5,9 +5,9 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <%= csrf_meta_tag() %>
-    <.live_title suffix={Nappy.default_title_suffix()}>
-      <%= assigns[:page_title] || Nappy.app_name() %>
-    </.live_title>
+    <%= if NappyWeb.Endpoint.url() != "https://dev.nappy.co" do %>
+      <SEO.juice conn={@conn} config={NappyWeb.SEO.config()} page_title={assigns[:page_title]} />
+    <% end %>
     <link
       phx-track-static
       rel="stylesheet"

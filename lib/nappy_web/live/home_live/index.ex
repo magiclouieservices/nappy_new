@@ -9,6 +9,11 @@ defmodule NappyWeb.HomeLive.Index do
   @moduledoc false
 
   @impl true
+  def mount(_params, _session, socket) do
+    {:ok, socket, temporary_assigns: [{SEO.key(), nil}]}
+  end
+
+  @impl true
   def handle_params(%{"filter" => filter}, uri, socket)
       when filter in ["popular", "all"] do
     page_title = ~s(#{String.capitalize(filter)} Photos)
@@ -99,12 +104,28 @@ defmodule NappyWeb.HomeLive.Index do
   end
 
   defp prepare_assigns(socket, uri, page_title \\ "Nappy", filter \\ [filter: :featured]) do
+    [filter: seo_filter] = filter
+
+    description =
+      case seo_filter do
+        :all -> "All photos that are verified by Nappy team and uploaded by users."
+        :featured -> "Featured photos are handpicked and curated by Nappy team."
+        :popular -> "These are the most viewed picks of Black and Brown People."
+      end
+
+    seo = %{
+      title: page_title,
+      description: description,
+      url: Routes.home_index_url(socket, :index, filter: seo_filter)
+    }
+
     socket
     |> assign(page: 1)
     |> assign(page_size: 12)
     |> assign(current_url: uri)
     |> assign(page_title: page_title)
     |> assign(filter)
+    |> SEO.assign(seo)
     |> fetch()
   end
 

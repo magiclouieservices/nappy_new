@@ -55,6 +55,9 @@ defmodule Nappy.Accounts do
     Repo.one(query)
   end
 
+  def default_avatar_width, do: 1260
+  def default_avatar_height, do: 750
+
   def avatar_url(avatar_link, query \\ nil) do
     if avatar_link do
       host = Nappy.image_src_host()
@@ -65,8 +68,8 @@ defmodule Nappy.Accounts do
           %{
             auto: "compress",
             cs: "tinysrgb",
-            w: 1260,
-            h: 750
+            w: default_avatar_width(),
+            h: default_avatar_height()
           }
           |> URI.encode_query()
         else

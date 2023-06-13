@@ -7,11 +7,18 @@ defmodule NappyWeb.PopularSearchesLive.Show do
 
   def mount(_params, _session, socket) do
     images = Catalog.get_popular_searches()
+    page_title = "Popular searches on Nappy"
+
+    seo = %{
+      title: page_title,
+      description: "The most popular search terms on Nappy",
+      url: Routes.popular_searches_show_url(socket, :show)
+    }
 
     socket =
       socket
       |> assign(images: images)
-      |> assign(page_title: "Popular Searches")
+      |> SEO.assign(seo)
 
     {:ok, socket}
   end

@@ -6,6 +6,7 @@ defmodule Nappy.GlobalSetup do
   alias Nappy.Accounts.AccountRole
   alias Nappy.Accounts.AccountStatus
   alias Nappy.Admin
+  alias Nappy.Admin.SeoDetail
   alias Nappy.Builder.Page
   alias Nappy.Catalog.Category
   alias Nappy.Metrics.ImageStatus
@@ -62,6 +63,51 @@ defmodule Nappy.GlobalSetup do
         inserted_at =
           NaiveDateTime.utc_now()
           |> NaiveDateTime.truncate(:second)
+
+        Repo.insert_all(SeoDetail, [
+          [
+            title: "All photos",
+            description: "All photos that are verified by Nappy team and uploaded by users.",
+            type: "all",
+            inserted_at: inserted_at,
+            updated_at: inserted_at
+          ],
+          [
+            title: "Featured photos",
+            description: "Featured photos are handpicked and curated by Nappy team.",
+            type: "featured",
+            inserted_at: inserted_at,
+            updated_at: inserted_at
+          ],
+          [
+            title: "Popular photos",
+            description: "These are the most viewed picks of Black and Brown People.",
+            type: "popular",
+            inserted_at: inserted_at,
+            updated_at: inserted_at
+          ],
+          [
+            title: "Collections",
+            description: "Handpicked and curated photos grouped as collectons.",
+            type: "collections",
+            inserted_at: inserted_at,
+            updated_at: inserted_at
+          ],
+          [
+            title: "Categories",
+            description: "Photos tagged according to their categories.",
+            type: "categories",
+            inserted_at: inserted_at,
+            updated_at: inserted_at
+          ],
+          [
+            title: "Search",
+            description: "Search for photos",
+            type: "search",
+            inserted_at: inserted_at,
+            updated_at: inserted_at
+          ]
+        ])
 
         Repo.insert_all(
           Page,

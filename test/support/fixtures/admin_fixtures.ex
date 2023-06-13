@@ -59,7 +59,7 @@ defmodule Nappy.AdminFixtures do
         default_keywords: "some default_keywords",
         global_banner_text: "some global_banner_text"
       })
-      |> Nappy.Admin.create_seo()
+      |> Nappy.Admin.create_seo_detail()
 
     seo
   end

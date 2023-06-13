@@ -39,7 +39,10 @@ config :nappy, :runtime,
   sendy_api_key: System.get_env("SENDY_API_KEY"),
   sendy_members_list: System.get_env("SENDY_MEMBERS_LIST"),
   sendy_photographers_list: System.get_env("SENDY_PHOTOGRAPHERS_LIST"),
-  sendy_webform_list: System.get_env("SENDY_WEBFORM_LIST")
+  sendy_webform_list: System.get_env("SENDY_WEBFORM_LIST"),
+  twitter_handle: System.get_env("TWITTER_HANDLE"),
+  twitter_site_id: System.get_env("TWITTER_SITE_ID"),
+  facebook_app_id: System.get_env("FACEBOOK_APP_ID")
 
 config :ex_aws, :s3,
   access_key_id: System.get_env("WASABI_ACCESS_KEY_ID", "minio-root-user"),
