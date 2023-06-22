@@ -72,7 +72,8 @@ defmodule Nappy.MixProject do
       {:ex_azure_vision, "~> 0.1.2"},
       {:nanoid, "~> 2.0.5"},
       {:carbonite, "~> 0.9.0"},
-      {:phoenix_seo, "~> 0.1.8"}
+      {:phoenix_seo, "~> 0.1.8"},
+      {:ex_typesense, path: "/Users/jaeyson/Documents/Github/ex_typesense"}
     ]
   end
 
