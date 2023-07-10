@@ -20,6 +20,7 @@ defmodule Nappy.Catalog do
   alias Nappy.Metrics.ImageAnalytics
   alias Nappy.Metrics.ImageMetadata
   alias Nappy.Metrics.ImageStatus
+  alias Nappy.Metrics.Notifications
   alias Nappy.Repo
   alias Nappy.SponsoredImages
 
@@ -80,11 +81,7 @@ defmodule Nappy.Catalog do
     |> limit(^max_num_of_keywords)
     |> select([i, _], i.tags)
     |> Repo.all()
-    |> Enum.reduce([], fn tag, acc ->
-      tag
-      |> String.split(",", trim: true)
-      |> Kernel.++(acc)
-    end)
+    |> List.flatten()
     |> Enum.uniq()
     |> Enum.take_random(max_num_of_keywords)
   end
@@ -312,7 +309,7 @@ defmodule Nappy.Catalog do
         apply(mod, func_name, args)
       end
 
-    sponsored_search_terms = get_popular_keywords(4) |> Enum.join(",")
+    sponsored_search_terms = get_popular_keywords(4)
     sponsored = SponsoredImages.get_images("image_adverts_#{page}", sponsored_search_terms, 4)
 
     if Enum.empty?(sponsored) do
@@ -476,10 +473,7 @@ defmodule Nappy.Catalog do
     active = Metrics.get_image_status_id(:active)
     featured = Metrics.get_image_status_id(:featured)
 
-    tag =
-      image.tags
-      |> String.split(",", trim: true)
-      |> Enum.take_random(1)
+    tag = Enum.take_random(image.tags, 1)
 
     related_images =
       Nappy.Catalog.Image
@@ -710,6 +704,7 @@ defmodule Nappy.Catalog do
     }
 
     Multi.new()
+    |> Carbonite.Multi.insert_transaction(%{meta: %{type: "image_updated"}})
     |> Multi.update(
       :image_analytics,
       ImageAnalytics.changeset(image_analytics, image_analytics_attrs)
@@ -748,13 +743,21 @@ defmodule Nappy.Catalog do
   """
   def delete_image(%Nappy.Catalog.Image{} = image, bucket_name \\ Nappy.bucket_name()) do
     Repo.transaction(fn ->
+      {:ok, _} = Carbonite.insert_transaction(Repo, %{meta: %{type: "image_deleted"}})
+
       ext = Metrics.get_image_extension(image.id)
-      filename = "photos/#{image.slug}.#{ext}"
+      filename = "#{image.slug}.#{ext}"
+      path = Path.join(["photos", filename])
+
+      Notifications
+      |> where(additional_foreign_key: ^image.id)
+      |> Repo.one()
+      |> Repo.delete!()
 
       Repo.delete!(image)
 
       bucket_name
-      |> S3.delete_object(filename)
+      |> S3.delete_object(path)
       |> ExAws.request!()
     end)
   end
@@ -773,6 +776,7 @@ defmodule Nappy.Catalog do
       end)
 
     Multi.new()
+    |> Carbonite.Multi.insert_transaction(%{meta: %{type: "image_deleted"}})
     |> Multi.delete_all(:remove_images, images)
     |> Multi.run(:delete_s3_objects, fn _repo, _changes ->
       bucket_name
@@ -796,16 +800,7 @@ defmodule Nappy.Catalog do
   end
 
   def image_tags_as_list(tags, generated_tags) do
-    tags = String.split(tags, ",", trim: true)
-
-    generated_tags =
-      if is_nil(generated_tags) do
-        []
-      else
-        String.split(generated_tags, ",", trim: true)
-      end
-
-    List.flatten(tags, generated_tags)
+    List.flatten(tags, generated_tags || [])
     |> Enum.uniq()
   end
 
@@ -1149,9 +1144,10 @@ defmodule Nappy.Catalog do
   defp randomize_and_flatten(query, limit, count, split_method) do
     query
     |> order_by(fragment("RANDOM()"))
+    |> select([i], i.tags)
     |> limit(^limit)
     |> Repo.all()
-    |> Enum.reduce([], &split_method.(&1, &2))
+    # |> Enum.reduce([], &split_method.(&1, &2))
     |> List.flatten()
     |> Enum.uniq()
     |> Enum.take_random(count)

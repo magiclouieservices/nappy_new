@@ -8,37 +8,42 @@ defmodule Nappy.Catalog.Image do
   alias Nappy.Metrics.ImageAnalytics
   alias Nappy.Metrics.ImageMetadata
   alias Nappy.Metrics.ImageStatus
+  @behaviour ExTypesense
 
   @moduledoc false
 
-  @encoded_fields [
-    :title,
-    :slug,
-    :tags,
-    :description,
-    :generated_description,
-    :generated_tags
-  ]
+  defimpl Jason.Encoder, for: __MODULE__ do
+    def encode(value, opts) do
+      value
+      |> Map.take([
+        :image_id,
+        :title,
+        :slug,
+        :tags,
+        :description,
+        :generated_description,
+        :generated_tags
+      ])
+      |> Enum.map(fn {key, val} ->
+        # if is_nil(val), do: {key, ""}, else: {key, val}
+        if key === :image_id do
+          {key, Map.get(value, :id)}
+        else
+          {key, val}
+        end
+      end)
+      |> Enum.into(%{})
+      |> Jason.Encode.map(opts)
+    end
+  end
 
-  # defimpl Jason.Encoder, for: __MODULE__ do
-  #   def encode(value, opts) do
-  #     value
-  #     |> Map.take(@encoded_fields)
-  #     |> Enum.map(fn {key, val} ->
-  #       if is_nil(val), do: {key, ""}, else: {key, val}
-  #     end)
-  #     |> Enum.into(%{})
-  #     |> Jason.Encode.map(opts)
-  #   end
-  # end
-
-  @derive {Jason.Encoder, only: @encoded_fields}
   schema "images" do
     field :description, :string
     field :generated_description, :string
-    field :generated_tags, :string
+    field :generated_tags, Nappy.CustomEctoTypes.Tags
     field :slug, :string
-    field :tags, :string
+    field :tags, Nappy.CustomEctoTypes.Tags
+    field :image_id, :integer, virtual: true
     field :title, :string
 
     many_to_many :collections,
@@ -81,6 +86,24 @@ defmodule Nappy.Catalog.Image do
     |> foreign_key_constraint(:category_id)
     |> foreign_key_constraint(:image_status_id)
     |> unique_constraint(:slug)
+  end
+
+  @doc """
+  This is for setting Typesense collection fields type.
+  """
+  def get_field_types do
+    %{
+      default_sorting_field: "image_id",
+      fields: [
+        %{name: "image_id", type: "int32"},
+        %{name: "title", type: "string"},
+        %{name: "slug", type: "string"},
+        %{name: "tags", type: "string[]"},
+        %{name: "description", type: "string", optional: true},
+        %{name: "generated_description", type: "string", optional: true},
+        %{name: "generated_tags", type: "string[]", optional: true}
+      ]
+    }
   end
 end
 

@@ -65,7 +65,7 @@ defmodule NappyWeb.SearchLive.MobileNavbarSearch do
             <ul class="my-2 flex flex-wrap gap-2">
               <a
                 :for={image <- get_trends()}
-                href={Routes.search_show_path(@socket, :show, get_tag_name(image.tags))}
+                href={Routes.search_show_path(@socket, :show, hd(image.tags))}
                 class="hover:bg-gray-50"
               >
                 <li class="flex gap-2 items-center border rounded py-1 px-2 text-sm">
@@ -73,7 +73,7 @@ defmodule NappyWeb.SearchLive.MobileNavbarSearch do
                     class="object-cover w-8 h-8 rounded-full"
                     src={Catalog.imgix_url(image, "photo")}
                   />
-                  <%= get_tag_name(image.tags) %>
+                  <%= hd(image.tags) %>
                 </li>
               </a>
             </ul>
@@ -85,10 +85,6 @@ defmodule NappyWeb.SearchLive.MobileNavbarSearch do
       </.form>
     </div>
     """
-  end
-
-  def get_tag_name(tags) do
-    String.split(tags, ",") |> hd()
   end
 
   def get_trends do

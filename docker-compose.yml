@@ -1,17 +1,13 @@
-version: "3.8"
-
 services:
   postgres:
-    image: postgres:14-alpine
+    image: arm64v8/postgres:14-alpine
     container_name: postgres
     cpu_count: 1
     cpus: 0.5
-    cpu_percent: 30
-    mem_limit: 500m
     ports:
       - "5432:5432"
     env_file:
-      - nappy_dev.env
+      - ./nappy_dev.env
     volumes:
       - ./priv/repo/nappy_dev.sql:/docker-entrypoint-initdb.d/nappy_dev.sql
 
@@ -22,14 +18,12 @@ services:
   #     dockerfile: Dockerfile
   #   cpu_count: 1
   #   cpus: 0.5
-  #   cpu_percent: 30
-  #   mem_limit: 500m
   #   stdin_open: true
   #   tty: true
   #   ports:
   #     - "4000:4000"
   #   env_file:
-  #     - nappy_dev.env
+  #     - ./nappy_dev.env
   #   volumes:
   #     - ./_build/prod/rel/nappy/:/app
 
@@ -38,42 +32,47 @@ services:
     container_name: minio
     cpu_count: 1
     cpus: 0.5
-    cpu_percent: 30
-    mem_limit: 500m
     ports:
-      - '9000:9000'
-      - '9001:9001'
+      - "9000:9000"
+      - "9001:9001"
     env_file:
-      - nappy_dev.env
+      - ./nappy_dev.env
     volumes:
       - minio_data:/data
 
-  # typesense:
-  #   image: typesense/typesense:0.23.1
-  #   entrypoint: sh -c "/opt/typesense-server --data-dir /data --api-key=xyz"
+  typesense:
+    image: typesense/typesense:0.24.1-arm64
+    container_name: typesense
+    entrypoint: sh -c "/opt/typesense-server --data-dir /data --api-key=xyz"
+    cpu_count: 1
+    cpus: 0.5
+    ports:
+      - "8108:8108"
+    volumes:
+      - typesense:/data
+
+  # This is used when deploying to
+  # a vps with caddy as web server
+  # web:
+  #   build: .
+  #     context: .
+  #     dockerfile: Dockerfile
+  #   env_file: "nappy.env"
+  #   tty: true
   #   ports:
-  #     - "8108:8108"
-  #   volumes:
-  #     - typesense:/data
+  #     - "4000:4000"
+  #   restart: "always"
+  # migration:
+  #   build: .
+  #   env_file:
+  #     - ./nappy.env
+  #   depends_on:
+  #     - web
+  #   command: bin/migrate
+  #   restart: "no"
 
 volumes:
   minio_data:
     driver: local
   typesense:
     driver: local
-
-  # This is used when deploying to
-  # a vps with caddy as web server
-  # web:
-  #   build: .
-  #   env_file: "nappy.env"
-  #   ports:
-  #     - "4000:4000"
-  #   restart: "always"
-  # migration:
-  #   build: .
-  #   env_file: "nappy.env"
-  #   depends_on:
-  #     - web
-  #   command: bin/migrate
-  #   restart: "no"

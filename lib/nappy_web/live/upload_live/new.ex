@@ -24,7 +24,7 @@ defmodule NappyWeb.UploadLive.New do
      socket
      |> assign(tags: [])
      |> assign(uploaded_files: [])
-     |> allow_upload(:images, accept: ~w(.png .jpeg .jpg), max_entries: 1)}
+     |> allow_upload(:images, accept: ~w(.jpeg .jpg), max_entries: 1)}
   end
 
   @impl true
@@ -75,7 +75,6 @@ defmodule NappyWeb.UploadLive.New do
     tag =
       tag
       |> String.replace(~r/[^a-zA-Z0-9\s]/, "")
-      |> String.replace(~r/\W+/, "")
       |> String.split()
       |> Enum.join(" ")
 

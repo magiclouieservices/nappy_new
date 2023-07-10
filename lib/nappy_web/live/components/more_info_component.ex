@@ -61,7 +61,7 @@ defmodule NappyWeb.Components.MoreInfoComponent do
         x-on:click.outside="close($refs.button)"
         x-bind:id="$id('dropdown-button')"
         style="display: none;"
-        class="absolute z-10 xs:w-72 sm:w-[420px] right-0 mt-2 py-2 px-4 bg-black text-white rounded"
+        class="absolute z-10 xs:w-72 sm:w-[420px] right-0 mt-8 py-2 px-4 bg-black text-white rounded"
       >
         <p class="my-2">Title: <%= @image.title %></p>
         <p class="mt-2">Tags:</p>

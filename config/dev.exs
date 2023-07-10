@@ -13,6 +13,12 @@ config :nappy, Nappy.Repo,
 
 config :ex_aws, :s3, port: 9000
 
+config :ex_typesense,
+  api_key: "xyz",
+  host: "localhost",
+  port: 8108,
+  scheme: "http"
+
 # For development, we disable any cache and enable
 # debugging and code reloading.
 #

@@ -20,15 +20,6 @@ if System.get_env("PHX_SERVER") do
   config :nappy, NappyWeb.Endpoint, server: true
 end
 
-config :ex_typesense,
-  api_key: "xyz",
-  # "111222333aaabbbcc-9.x9.typesense.net"
-  host: "localhost",
-  # 443
-  port: 8108,
-  # "https"
-  scheme: "http"
-
 config :ex_azure_vision,
   header_name: System.get_env("AZURE_OCP_APIM_HEADER_NAME"),
   subscription_key: System.get_env("AZURE_OCP_APIM_SUBSCRIPTION_KEY"),
@@ -62,6 +53,12 @@ config :ex_aws, :s3,
   host: System.get_env("WASABI_HOST", "localhost")
 
 if config_env() == :prod do
+  config :ex_typesense,
+    api_key: System.get_env("TYPESENSE_API_KEY"),
+    host: System.get_env("TYPESENSE_HOST"),
+    port: 443,
+    scheme: "https"
+
   config :honeybadger,
     exclude_envs: [:test],
     environment_name: :prod,

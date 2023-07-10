@@ -26,7 +26,7 @@ defmodule NappyWeb.AdminLive.BulkUpload do
      socket
      |> assign(:tags, [])
      |> assign(:uploaded_files, [])
-     |> allow_upload(:images, accept: ~w(.png .jpeg .jpg), max_entries: 12, chunk_size: 64_000)}
+     |> allow_upload(:images, accept: ~w(.jpeg .jpg), max_entries: 12, chunk_size: 64_000)}
   end
 
   @impl true
@@ -60,7 +60,6 @@ defmodule NappyWeb.AdminLive.BulkUpload do
     tag =
       tag
       |> String.replace(~r/[^a-zA-Z0-9\s]/, "")
-      |> String.replace(~r/\W+/, "")
       |> String.split()
       |> Enum.join(" ")
 

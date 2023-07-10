@@ -20,7 +20,10 @@ defmodule NappyWeb.Components.TrendingKeywordsComponent do
     ~H"""
     <div class="flex gap-2 md:text-lg xs:gap-1 xs:text-base">
       Trending:
-      <ul :for={keyword <- keywords(3)} class="text-slate-300 flex gap-2 justify-center items-center">
+      <ul
+        :for={keyword <- Catalog.get_popular_keywords(3)}
+        class="text-slate-300 flex gap-2 justify-center items-center"
+      >
         <li>
           <a
             class="hover:underline hover:text-slate-100"
@@ -36,9 +39,5 @@ defmodule NappyWeb.Components.TrendingKeywordsComponent do
       </a>
     </div>
     """
-  end
-
-  defp keywords(num) do
-    Catalog.get_popular_keywords(num)
   end
 end

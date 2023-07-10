@@ -470,7 +470,7 @@
                               <input
                                 id={"input-tags-#{image.slug}"}
                                 name="input-tags"
-                                value={image.tags}
+                                value={Enum.join(image.tags, ",")}
                                 class="mt-1 appearance-none block w-full border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-gray-500 focus:border-gray-500 sm:text-sm"
                               />
                             </div>
@@ -481,7 +481,7 @@
                               <label class="text-left">Auto generated Tags</label>
                               <div class="flex flex-wrap gap-1">
                                 <span
-                                  :for={gen_tag <- String.split(image.generated_tags, ",")}
+                                  :for={gen_tag <- image.generated_tags}
                                   class="border rounded p-0.5"
                                 >
                                   <%= gen_tag %>

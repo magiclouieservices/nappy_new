@@ -15,6 +15,7 @@ defmodule NappyWeb.Components.GalleryComponent do
 
   @impl true
   def handle_event("show_images", %{"title" => title, "slug" => slug, "tags" => tags}, socket) do
+    tags = String.split(tags, ",", trim: true)
     sponsored_images = SponsoredImages.get_images(slug, tags)
     related_images = related_images(slug)
 
@@ -106,7 +107,7 @@ defmodule NappyWeb.Components.GalleryComponent do
                 <a
                   phx-click="show_images"
                   phx-value-slug={image.slug}
-                  phx-value-tags={image.tags}
+                  phx-value-tags={Enum.join(image.tags, ",")}
                   phx-value-title={image.title}
                   phx-target={@myself}
                   x-on:click.prevent
