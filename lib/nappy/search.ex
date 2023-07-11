@@ -13,6 +13,7 @@ defmodule Nappy.Search do
   # @full_list_status_names [:all, :popular | @image_status_names]
   @types %{search_phrase: :string}
   @query_by "title,tags,generated_tags"
+  @default_page_size 12
 
   def changeset(search_phrase) do
     attrs = %{search_phrase: search_phrase}
@@ -30,7 +31,13 @@ defmodule Nappy.Search do
   def paginate_search(search_string, params) do
     active = Metrics.get_image_status_id(:active)
     featured = Metrics.get_image_status_id(:featured)
-    search_params = %{q: search_string, query_by: @query_by}
+
+    search_params = %{
+      q: search_string,
+      query_by: @query_by,
+      page: params[:page],
+      per_page: params[:page_size]
+    }
 
     Image
     |> ExTypesense.search(search_params)

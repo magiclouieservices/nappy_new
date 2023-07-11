@@ -38,6 +38,9 @@ nappy-*.tar
 npm-debug.log
 /assets/node_modules/
 
+# Elixir LSP-server
+.elixir_ls
+
 .DS_Store
 
 slug_paths.txt

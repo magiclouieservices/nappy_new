@@ -7,7 +7,6 @@ defmodule Nappy.Metrics do
   alias Ecto.Multi
   alias Nappy.Accounts.UserNotifier
   alias Nappy.Admin
-  alias Nappy.Catalog.Image
   alias Nappy.Metrics.ImageAnalytics
   alias Nappy.Metrics.ImageMetadata
   alias Nappy.Metrics.ImageStatus
