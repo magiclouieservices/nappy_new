@@ -51,21 +51,30 @@ defmodule Nappy.Search do
     sort_order = if params[:sort_order] === :asc, do: :desc, else: :asc
     order_by = {sort_order, :title}
     image_status = params[:image_status]
+    query_by = @query_by <> ",username"
 
-    case image_status do
-      :all ->
-        params = %{q: search_string, query_by: @query_by}
-        ExTypesense.search(Image, params)
+    search_params = %{
+      q: search_string,
+      query_by: query_by,
+      page: params[:page],
+      per_page: @default_page_size
+    }
 
-      _ ->
-        params = %{q: "", query_by: @query_by}
+    query = ExTypesense.search(Image, search_params)
 
-        Image
-        |> ExTypesense.search(params)
-        |> where(image_status_id: ^Metrics.get_image_status_id(image_status))
-    end
-    |> preload([:user, :image_metadata, :image_analytics])
+    query =
+      case image_status do
+        :all ->
+          query
+
+        _ ->
+          query
+          |> where(image_status_id: ^Metrics.get_image_status_id(image_status))
+      end
+
+    query
     |> order_by(^order_by)
+    |> preload([:user, :image_metadata, :image_analytics])
     |> Repo.paginate(params)
   end
 end

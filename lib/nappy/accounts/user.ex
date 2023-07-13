@@ -212,11 +212,13 @@ defimpl SEO.OpenGraph.Build, for: Nappy.Accounts.User do
   end
 
   defp image(user, _conn) do
+    ext = if user.avatar_link, do: Path.extname(user.avatar_link), else: ".jpeg"
+
     SEO.OpenGraph.Image.build(
       alt: "#{user.username}'s Profile",
       height: Accounts.default_avatar_height(),
       width: Accounts.default_avatar_width(),
-      type: Path.extname(user.avatar_link),
+      type: ext,
       url: Accounts.avatar_url(user.avatar_link)
     )
   end

@@ -16,7 +16,9 @@ defmodule Nappy.Catalog.Image do
     def encode(value, opts) do
       value
       |> Map.take([
+        :id,
         :image_id,
+        :username,
         :title,
         :slug,
         :tags,
@@ -26,10 +28,10 @@ defmodule Nappy.Catalog.Image do
       ])
       |> Enum.map(fn {key, val} ->
         # if is_nil(val), do: {key, ""}, else: {key, val}
-        if key === :image_id do
-          {key, Map.get(value, :id)}
-        else
-          {key, val}
+        cond do
+          key === :id -> {key, to_string(Map.get(value, :id))}
+          key === :image_id -> {key, Map.get(value, :id)}
+          true -> {key, val}
         end
       end)
       |> Enum.into(%{})
@@ -44,6 +46,7 @@ defmodule Nappy.Catalog.Image do
     field :slug, :string
     field :tags, Nappy.CustomEctoTypes.Tags
     field :image_id, :integer, virtual: true
+    field :username, :string, virtual: true
     field :title, :string
 
     many_to_many :collections,
@@ -99,6 +102,7 @@ defmodule Nappy.Catalog.Image do
         %{name: "title", type: "string"},
         %{name: "slug", type: "string"},
         %{name: "tags", type: "string[]"},
+        %{name: "username", type: "string"},
         %{name: "description", type: "string", optional: true},
         %{name: "generated_description", type: "string", optional: true},
         %{name: "generated_tags", type: "string[]", optional: true}

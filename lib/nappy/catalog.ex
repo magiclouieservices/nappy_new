@@ -667,6 +667,7 @@ defmodule Nappy.Catalog do
 
     category = get_category_by_name(category)
     featured = Metrics.get_image_status_id(:featured)
+    denied = Metrics.get_image_status_id(:denied)
 
     image_status_id =
       if is_featured === "yes" && image.image_status_id !== featured do
@@ -703,30 +704,36 @@ defmodule Nappy.Catalog do
       featured_date: featured_date
     }
 
-    Multi.new()
-    |> Carbonite.Multi.insert_transaction(%{meta: %{type: "image_updated"}})
-    |> Multi.update(
-      :image_analytics,
-      ImageAnalytics.changeset(image_analytics, image_analytics_attrs)
-    )
-    |> Multi.update(:image, Catalog.Image.changeset(image, image_attrs))
-    |> Multi.run(:notify_user, fn repo, %{image: image} ->
-      image =
-        image
-        |> repo.preload(:user)
+    if image.image_status_id === denied do
+      {:error, "status is denied"}
+    else
+      Multi.new()
+      |> Carbonite.Multi.insert_transaction(%{meta: %{type: "image_updated"}})
+      |> Multi.update(
+        :image_analytics,
+        ImageAnalytics.changeset(image_analytics, image_analytics_attrs)
+      )
+      |> Multi.update(:image, Catalog.Image.changeset(image, image_attrs))
+      |> Multi.run(:notify_user, fn repo, %{image: image} ->
+        image =
+          image
+          |> repo.preload(:user)
 
-      if image.image_status_id === featured do
-        %{image.user.username => [image]}
-        |> UserNotifier.notify_uploaded_images_to_users("featured")
-      end
+        if image.image_status_id === featured do
+          %{image.user.username => [image]}
+          |> UserNotifier.notify_uploaded_images_to_users("featured")
+        end
 
-      unless image.generated_tags do
-        {:ok, _} = Admin.generate_tags_and_description(image)
-      end
+        if is_nil(image.generated_tags) or Enum.empty?(image.generated_tags) do
+          {:ok, _} = Admin.generate_tags_and_description(image)
+        end
 
-      {:ok, image}
-    end)
-    |> Repo.transaction()
+        {:ok, _} = ExTypesense.update_document(image)
+
+        {:ok, image}
+      end)
+      |> Repo.transaction()
+    end
   end
 
   @doc """
@@ -775,15 +782,22 @@ defmodule Nappy.Catalog do
         "photos/#{image.slug}.#{ext}"
       end)
 
-    Multi.new()
-    |> Carbonite.Multi.insert_transaction(%{meta: %{type: "image_deleted"}})
-    |> Multi.delete_all(:remove_images, images)
-    |> Multi.run(:delete_s3_objects, fn _repo, _changes ->
-      bucket_name
-      |> S3.delete_multiple_objects(objects)
-      |> ExAws.request()
-    end)
-    |> Repo.transaction()
+    transaction =
+      Multi.new()
+      |> Carbonite.Multi.insert_transaction(%{meta: %{type: "image_deleted"}})
+      |> Multi.delete_all(:remove_images, images)
+      |> Multi.run(:delete_s3_objects, fn _repo, _changes ->
+        bucket_name
+        |> S3.delete_multiple_objects(objects)
+        |> ExAws.request()
+      end)
+      |> Repo.transaction()
+
+    with {:ok, _} <- transaction do
+      images
+      |> Repo.all()
+      |> Enum.each(&ExTypesense.delete_document/1)
+    end
   end
 
   @doc """
