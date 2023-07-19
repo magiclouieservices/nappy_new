@@ -61,11 +61,16 @@ defmodule NappyWeb.AdminLive.Images do
 
   @impl true
   def handle_event("update_photo", params, socket) do
-    Catalog.admin_update_image(params)
+    {status, message} =
+      case Catalog.admin_update_image(params) do
+        {:ok, _} ->
+          {:info, "updated an image"}
 
-    socket =
-      socket
-      |> put_flash(:info, "updated an image")
+        {:error, reason} ->
+          {:error, reason}
+      end
+
+    socket = put_flash(socket, status, message)
 
     Process.send_after(self(), :clear_info, 5_000)
 

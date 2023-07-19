@@ -53,6 +53,12 @@ config :ex_aws, :s3,
   host: System.get_env("WASABI_HOST", "localhost")
 
 if config_env() == :prod do
+  config :ex_typesense,
+    api_key: System.get_env("TYPESENSE_API_KEY"),
+    host: System.get_env("TYPESENSE_HOST"),
+    port: 443,
+    scheme: "https"
+
   config :honeybadger,
     exclude_envs: [:test],
     environment_name: :prod,

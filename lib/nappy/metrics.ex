@@ -7,7 +7,6 @@ defmodule Nappy.Metrics do
   alias Ecto.Multi
   alias Nappy.Accounts.UserNotifier
   alias Nappy.Admin
-  alias Nappy.Catalog.Image
   alias Nappy.Metrics.ImageAnalytics
   alias Nappy.Metrics.ImageMetadata
   alias Nappy.Metrics.ImageStatus
@@ -153,6 +152,7 @@ defmodule Nappy.Metrics do
       |> where([i], i.image_id in ^images_id)
 
     Multi.new()
+    |> Carbonite.Multi.insert_transaction(%{meta: %{type: "image_denied"}})
     |> Multi.update_all(:approve_image, images, set: [image_status_id: denied])
     |> Multi.update_all(:set_nil_dates, image_analytics,
       set: [approved_date: nil, featured_date: nil]
@@ -175,12 +175,12 @@ defmodule Nappy.Metrics do
           [] ->
             {:error, :not_found}
 
-          value ->
-            value =
-              value
+          values ->
+            values =
+              values
               |> Enum.group_by(fn image -> image.user.username end)
 
-            {:ok, value}
+            {:ok, values}
         end
       end)
       |> Multi.run(:notify_users, fn _repo, %{images: images} ->
@@ -204,6 +204,11 @@ defmodule Nappy.Metrics do
           timeout: 100_000
         )
         |> Stream.run()
+
+        ExTypesense.index_multiple_documents(images)
+
+      [{:ok, _}, "denied"] ->
+        Enum.each(images, &ExTypesense.delete_document/1)
 
       [{:error, reason}, _] ->
         reason

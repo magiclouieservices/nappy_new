@@ -8,24 +8,31 @@ defmodule Nappy.Catalog.Image do
   alias Nappy.Metrics.ImageAnalytics
   alias Nappy.Metrics.ImageMetadata
   alias Nappy.Metrics.ImageStatus
+  @behaviour ExTypesense
 
   @moduledoc false
 
   defimpl Jason.Encoder, for: __MODULE__ do
     def encode(value, opts) do
-      encoded_fields = [
+      value
+      |> Map.take([
+        :id,
+        :image_id,
+        :username,
         :title,
         :slug,
         :tags,
         :description,
         :generated_description,
         :generated_tags
-      ]
-
-      value
-      |> Map.take(encoded_fields)
+      ])
       |> Enum.map(fn {key, val} ->
-        if is_nil(val), do: {key, ""}, else: {key, val}
+        # if is_nil(val), do: {key, ""}, else: {key, val}
+        cond do
+          key === :id -> {key, to_string(Map.get(value, :id))}
+          key === :image_id -> {key, Map.get(value, :id)}
+          true -> {key, val}
+        end
       end)
       |> Enum.into(%{})
       |> Jason.Encode.map(opts)
@@ -35,9 +42,11 @@ defmodule Nappy.Catalog.Image do
   schema "images" do
     field :description, :string
     field :generated_description, :string
-    field :generated_tags, :string
+    field :generated_tags, Nappy.CustomEctoTypes.Tags
     field :slug, :string
-    field :tags, :string
+    field :tags, Nappy.CustomEctoTypes.Tags
+    field :image_id, :integer, virtual: true
+    field :username, :string, virtual: true
     field :title, :string
 
     many_to_many :collections,
@@ -80,6 +89,25 @@ defmodule Nappy.Catalog.Image do
     |> foreign_key_constraint(:category_id)
     |> foreign_key_constraint(:image_status_id)
     |> unique_constraint(:slug)
+  end
+
+  @doc """
+  This is for setting Typesense collection fields type.
+  """
+  def get_field_types do
+    %{
+      default_sorting_field: "image_id",
+      fields: [
+        %{name: "image_id", type: "int32"},
+        %{name: "title", type: "string"},
+        %{name: "slug", type: "string"},
+        %{name: "tags", type: "string[]"},
+        %{name: "username", type: "string"},
+        %{name: "description", type: "string", optional: true},
+        %{name: "generated_description", type: "string", optional: true},
+        %{name: "generated_tags", type: "string[]", optional: true}
+      ]
+    }
   end
 end
 

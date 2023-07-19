@@ -18,7 +18,7 @@ defmodule NappyWeb.SearchLive.Show do
 
   @impl true
   def handle_params(%{"query" => query}, uri, socket) do
-    sponsored_images = SponsoredImages.get_images("search-#{query}", query)
+    sponsored_images = SponsoredImages.get_images("search-#{query}", [query])
     page_title = "#{query} Photos"
 
     seo = %{

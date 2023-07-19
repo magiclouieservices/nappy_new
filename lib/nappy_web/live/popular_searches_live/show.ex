@@ -22,10 +22,4 @@ defmodule NappyWeb.PopularSearchesLive.Show do
 
     {:ok, socket}
   end
-
-  def get_first_tag(tags) do
-    tags
-    |> String.split(",")
-    |> hd()
-  end
 end

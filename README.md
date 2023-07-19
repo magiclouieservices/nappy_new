@@ -219,6 +219,31 @@ brew install gitleaks
 gitleaks detect
 ```
 
+## Typesense specifics
+
+### Index an image
+
+```elixir
+image =
+  Nappy.Catalog.Image
+  |> preload(:user)
+  |> Repo.get!(1)
+
+image
+|> Map.put(:username, image.user.username)
+|> ExTypesense.index_document()
+```
+
+### Index all images
+
+```elixir
+Nappy.Catalog.Image
+|> preload(:user)
+|> Repo.all()
+|> Enum.map(&Map.put(&1, :username, &1.user.username))
+|> ExTypesense.index_multiple_documents()
+```
+
 ## Fly.io specifics
 
 ```bash

@@ -8,12 +8,9 @@ defmodule Nappy.SponsoredImages do
   alias Nappy.SponsoredImagesBehaviour
 
   @impl SponsoredImagesBehaviour
-  @spec get_images(String.t(), String.t()) :: [map()]
+  @spec get_images(String.t(), list(String.t()), integer()) :: [map()]
   def get_images(key_name, tags, page_size \\ 5) do
-    tag =
-      tags
-      |> String.split(",", trim: true)
-      |> Enum.random()
+    tag = Enum.random(tags)
 
     cache_name = "#{key_name}-#{tag}"
     cache = Nappy.cache_name() |> Cachex.get(cache_name)

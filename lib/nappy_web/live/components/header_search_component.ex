@@ -92,7 +92,7 @@ defmodule NappyWeb.Components.HeaderSearchComponent do
     Catalog.get_trend_search_bar()
     |> Enum.reduce([[], []], fn image, acc ->
       [images, already_picked] = acc
-      tags = image.tags |> String.split(",", trim: true)
+      tags = List.flatten(image.tags, image.generated_tags) |> Enum.uniq()
 
       if Enum.random(tags) in already_picked do
         tag = Enum.random(tags -- already_picked)

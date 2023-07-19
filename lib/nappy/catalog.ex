@@ -20,6 +20,7 @@ defmodule Nappy.Catalog do
   alias Nappy.Metrics.ImageAnalytics
   alias Nappy.Metrics.ImageMetadata
   alias Nappy.Metrics.ImageStatus
+  alias Nappy.Metrics.Notifications
   alias Nappy.Repo
   alias Nappy.SponsoredImages
 
@@ -80,11 +81,7 @@ defmodule Nappy.Catalog do
     |> limit(^max_num_of_keywords)
     |> select([i, _], i.tags)
     |> Repo.all()
-    |> Enum.reduce([], fn tag, acc ->
-      tag
-      |> String.split(",", trim: true)
-      |> Kernel.++(acc)
-    end)
+    |> List.flatten()
     |> Enum.uniq()
     |> Enum.take_random(max_num_of_keywords)
   end
@@ -312,7 +309,7 @@ defmodule Nappy.Catalog do
         apply(mod, func_name, args)
       end
 
-    sponsored_search_terms = get_popular_keywords(4) |> Enum.join(",")
+    sponsored_search_terms = get_popular_keywords(4)
     sponsored = SponsoredImages.get_images("image_adverts_#{page}", sponsored_search_terms, 4)
 
     if Enum.empty?(sponsored) do
@@ -476,10 +473,7 @@ defmodule Nappy.Catalog do
     active = Metrics.get_image_status_id(:active)
     featured = Metrics.get_image_status_id(:featured)
 
-    tag =
-      image.tags
-      |> String.split(",", trim: true)
-      |> Enum.take_random(1)
+    tag = Enum.take_random(image.tags, 1)
 
     related_images =
       Nappy.Catalog.Image
@@ -673,6 +667,7 @@ defmodule Nappy.Catalog do
 
     category = get_category_by_name(category)
     featured = Metrics.get_image_status_id(:featured)
+    denied = Metrics.get_image_status_id(:denied)
 
     image_status_id =
       if is_featured === "yes" && image.image_status_id !== featured do
@@ -709,29 +704,36 @@ defmodule Nappy.Catalog do
       featured_date: featured_date
     }
 
-    Multi.new()
-    |> Multi.update(
-      :image_analytics,
-      ImageAnalytics.changeset(image_analytics, image_analytics_attrs)
-    )
-    |> Multi.update(:image, Catalog.Image.changeset(image, image_attrs))
-    |> Multi.run(:notify_user, fn repo, %{image: image} ->
-      image =
-        image
-        |> repo.preload(:user)
+    if image.image_status_id === denied do
+      {:error, "status is denied"}
+    else
+      Multi.new()
+      |> Carbonite.Multi.insert_transaction(%{meta: %{type: "image_updated"}})
+      |> Multi.update(
+        :image_analytics,
+        ImageAnalytics.changeset(image_analytics, image_analytics_attrs)
+      )
+      |> Multi.update(:image, Catalog.Image.changeset(image, image_attrs))
+      |> Multi.run(:notify_user, fn repo, %{image: image} ->
+        image =
+          image
+          |> repo.preload(:user)
 
-      if image.image_status_id === featured do
-        %{image.user.username => [image]}
-        |> UserNotifier.notify_uploaded_images_to_users("featured")
-      end
+        if image.image_status_id === featured do
+          %{image.user.username => [image]}
+          |> UserNotifier.notify_uploaded_images_to_users("featured")
+        end
 
-      unless image.generated_tags do
-        {:ok, _} = Admin.generate_tags_and_description(image)
-      end
+        if is_nil(image.generated_tags) or Enum.empty?(image.generated_tags) do
+          {:ok, _} = Admin.generate_tags_and_description(image)
+        end
 
-      {:ok, image}
-    end)
-    |> Repo.transaction()
+        {:ok, _} = ExTypesense.update_document(image)
+
+        {:ok, image}
+      end)
+      |> Repo.transaction()
+    end
   end
 
   @doc """
@@ -748,13 +750,21 @@ defmodule Nappy.Catalog do
   """
   def delete_image(%Nappy.Catalog.Image{} = image, bucket_name \\ Nappy.bucket_name()) do
     Repo.transaction(fn ->
+      {:ok, _} = Carbonite.insert_transaction(Repo, %{meta: %{type: "image_deleted"}})
+
       ext = Metrics.get_image_extension(image.id)
-      filename = "photos/#{image.slug}.#{ext}"
+      filename = "#{image.slug}.#{ext}"
+      path = Path.join(["photos", filename])
+
+      Notifications
+      |> where(additional_foreign_key: ^image.id)
+      |> Repo.one()
+      |> Repo.delete!()
 
       Repo.delete!(image)
 
       bucket_name
-      |> S3.delete_object(filename)
+      |> S3.delete_object(path)
       |> ExAws.request!()
     end)
   end
@@ -772,14 +782,22 @@ defmodule Nappy.Catalog do
         "photos/#{image.slug}.#{ext}"
       end)
 
-    Multi.new()
-    |> Multi.delete_all(:remove_images, images)
-    |> Multi.run(:delete_s3_objects, fn _repo, _changes ->
-      bucket_name
-      |> S3.delete_multiple_objects(objects)
-      |> ExAws.request()
-    end)
-    |> Repo.transaction()
+    transaction =
+      Multi.new()
+      |> Carbonite.Multi.insert_transaction(%{meta: %{type: "image_deleted"}})
+      |> Multi.delete_all(:remove_images, images)
+      |> Multi.run(:delete_s3_objects, fn _repo, _changes ->
+        bucket_name
+        |> S3.delete_multiple_objects(objects)
+        |> ExAws.request()
+      end)
+      |> Repo.transaction()
+
+    with {:ok, _} <- transaction do
+      images
+      |> Repo.all()
+      |> Enum.each(&ExTypesense.delete_document/1)
+    end
   end
 
   @doc """
@@ -796,16 +814,7 @@ defmodule Nappy.Catalog do
   end
 
   def image_tags_as_list(tags, generated_tags) do
-    tags = String.split(tags, ",", trim: true)
-
-    generated_tags =
-      if is_nil(generated_tags) do
-        []
-      else
-        String.split(generated_tags, ",", trim: true)
-      end
-
-    List.flatten(tags, generated_tags)
+    List.flatten(tags, generated_tags || [])
     |> Enum.uniq()
   end
 
@@ -1121,7 +1130,7 @@ defmodule Nappy.Catalog do
     Nappy.Catalog.Image
     |> where([i], i.image_status_id in ^[active, featured])
     |> where(category_id: ^category_id)
-    |> randomize_and_flatten(3, count, &[String.split(&1.tags, ",") | &2])
+    |> randomize_and_flatten(3, count)
   end
 
   @doc """
@@ -1134,7 +1143,7 @@ defmodule Nappy.Catalog do
     Collection
     |> where(slug: ^slug)
     |> preload(images: ^images)
-    |> randomize_and_flatten(3, count, &[String.split(&1.image.tags, ",") | &2])
+    |> randomize_and_flatten(3, count)
   end
 
   def random_tags(count \\ 24) do
@@ -1143,15 +1152,15 @@ defmodule Nappy.Catalog do
 
     Nappy.Catalog.Image
     |> where([i], i.image_status_id in ^[active, featured])
-    |> randomize_and_flatten(3, count, &[String.split(&1.tags, ",") | &2])
+    |> randomize_and_flatten(3, count)
   end
 
-  defp randomize_and_flatten(query, limit, count, split_method) do
+  defp randomize_and_flatten(query, limit, count) do
     query
     |> order_by(fragment("RANDOM()"))
+    |> select([i], i.tags)
     |> limit(^limit)
     |> Repo.all()
-    |> Enum.reduce([], &split_method.(&1, &2))
     |> List.flatten()
     |> Enum.uniq()
     |> Enum.take_random(count)
