@@ -8,7 +8,7 @@
 
   <ul class="pt-8 grid grid-cols-4 auto-rows-[18rem] gap-4">
     <li :for={image <- @images} class="relative rounded-lg bg-slate-300">
-      <a href={Routes.search_show_path(@socket, :show, get_first_tag(image.tags))}>
+      <a href={Routes.search_show_path(@socket, :show, hd(image.tags))}>
         <img
           loading="lazy"
           class="object-cover rounded-lg w-full h-full"
@@ -16,7 +16,7 @@
           alt={image.title}
         />
         <span class="absolute rounded-lg inset-0 flex text-center gap-2 items-center justify-center bg-[rgba(0,0,0,.5)] text-white text-3xl font-tiempos-bold">
-          <%= get_first_tag(image.tags) %>
+          <%= hd(image.tags) %>
         </span>
       </a>
     </li>

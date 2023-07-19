@@ -4,7 +4,8 @@ defmodule Nappy.Search do
   """
 
   import Ecto.Query, warn: false
-  import Ecto.Changeset
+  alias Ecto.Changeset
+  alias Nappy.Accounts.User
   alias Nappy.Catalog.Image
   alias Nappy.Metrics
   alias Nappy.Repo
@@ -19,13 +20,13 @@ defmodule Nappy.Search do
     attrs = %{search_phrase: search_phrase}
 
     {%{}, @types}
-    |> cast(attrs, [
+    |> Changeset.cast(attrs, [
       :search_phrase
     ])
-    |> validate_required([:search_phrase])
-    |> update_change(:search_phrase, &String.trim/1)
-    |> validate_length(:search_phrase, min: 2)
-    |> validate_format(:search_phrase, ~r/[A-Za-z0-9\ ]/)
+    |> Changeset.validate_required([:search_phrase])
+    |> Changeset.update_change(:search_phrase, &String.trim/1)
+    |> Changeset.validate_length(:search_phrase, min: 2)
+    |> Changeset.validate_format(:search_phrase, ~r/[A-Za-z0-9\ ]/)
   end
 
   def paginate_search(search_string, params) do
@@ -51,30 +52,44 @@ defmodule Nappy.Search do
     sort_order = if params[:sort_order] === :asc, do: :desc, else: :asc
     order_by = {sort_order, :title}
     image_status = params[:image_status]
-    query_by = @query_by <> ",username"
-
-    search_params = %{
-      q: search_string,
-      query_by: query_by,
-      page: params[:page],
-      per_page: @default_page_size
-    }
-
-    query = ExTypesense.search(Image, search_params)
 
     query =
       case image_status do
         :all ->
-          query
+          Image
 
         _ ->
-          query
+          Image
           |> where(image_status_id: ^Metrics.get_image_status_id(image_status))
       end
 
     query
+    |> join(:inner, [i], u in assoc(i, :user))
+    |> join(:inner, [i, _u], im in assoc(i, :image_metadata))
+    |> join(:inner, [i, _u, _im], ia in assoc(i, :image_analytics))
+    |> where([_i, u, _im, _ia], ilike(u.username, ^"%#{search_string}%"))
+    |> or_where([i, _u, _im, _ia], ilike(i.title, ^"%#{search_string}%"))
+    |> or_where([i, _u, _im, _ia], ilike(i.tags, ^"%#{search_string}%"))
+    |> or_where([i, _u, _im, _ia], ilike(i.generated_tags, ^"%#{search_string}%"))
+    |> or_where([i, _u, _im, _ia], ilike(i.slug, ^"%#{search_string}%"))
     |> order_by(^order_by)
-    |> preload([:user, :image_metadata, :image_analytics])
+    |> select([i, u, im, ia], %Image{
+      id: i.id,
+      description: i.description,
+      generated_description: i.generated_description,
+      generated_tags: i.generated_tags,
+      slug: i.slug,
+      tags: i.tags,
+      title: i.title,
+      category_id: i.category_id,
+      image_analytics: ia,
+      image_metadata: im,
+      image_status_id: i.image_status_id,
+      user_id: u.id,
+      user: u,
+      inserted_at: i.inserted_at,
+      updated_at: i.updated_at
+    })
     |> Repo.paginate(params)
   end
 end

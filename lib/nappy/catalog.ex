@@ -1130,7 +1130,7 @@ defmodule Nappy.Catalog do
     Nappy.Catalog.Image
     |> where([i], i.image_status_id in ^[active, featured])
     |> where(category_id: ^category_id)
-    |> randomize_and_flatten(3, count, &[String.split(&1.tags, ",") | &2])
+    |> randomize_and_flatten(3, count)
   end
 
   @doc """
@@ -1143,7 +1143,7 @@ defmodule Nappy.Catalog do
     Collection
     |> where(slug: ^slug)
     |> preload(images: ^images)
-    |> randomize_and_flatten(3, count, &[String.split(&1.image.tags, ",") | &2])
+    |> randomize_and_flatten(3, count)
   end
 
   def random_tags(count \\ 24) do
@@ -1152,16 +1152,15 @@ defmodule Nappy.Catalog do
 
     Nappy.Catalog.Image
     |> where([i], i.image_status_id in ^[active, featured])
-    |> randomize_and_flatten(3, count, &[String.split(&1.tags, ",") | &2])
+    |> randomize_and_flatten(3, count)
   end
 
-  defp randomize_and_flatten(query, limit, count, split_method) do
+  defp randomize_and_flatten(query, limit, count) do
     query
     |> order_by(fragment("RANDOM()"))
     |> select([i], i.tags)
     |> limit(^limit)
     |> Repo.all()
-    # |> Enum.reduce([], &split_method.(&1, &2))
     |> List.flatten()
     |> Enum.uniq()
     |> Enum.take_random(count)
